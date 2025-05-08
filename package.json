@@ -1,0 +1,42 @@
+{
+  "name": "infra-devtools",
+  "version": "1.0.0",
+  "description": "Infraestrutura padrão para desenvolvimento com Docker, Prometheus, Grafana e outras ferramentas essenciais.",
+  "keywords": [
+    "docker",
+    "infraestrutura",
+    "prometheus",
+    "grafana",
+    "monitoramento",
+    "desenvolvimento"
+  ],
+  "homepage": "https://github.com/KleilsonSantos/infra-devtools#readme",
+  "bugs": {
+    "url": "https://github.com/KleilsonSantos/infra-devtools/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KleilsonSantos/infra-devtools.git"
+  },
+  "license": "MIT",
+  "author": "Kleilson Santos",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "make up",
+    "stop": "make down",
+    "logs": "make logs",
+    "build": "make build",
+    "rebuild": "make rebuild", 
+    "check-deps": "make check-deps", 
+    "check-deps-path": "make check-deps-path path=.", 
+    "lint": "eslint .", 
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "eslint": "^8.50.0",    "prettier": "^3.0.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.0" 
+  }
+}
