@@ -105,49 +105,47 @@ Este projeto utiliza um arquivo `.env` para armazenar variáveis de ambiente. Ce
 
 ## 🚀 Comandos Principais
 
-O `Makefile` deste projeto oferece comandos práticos para gerenciar os containers e monitoramento da stack. Abaixo estão os comandos disponíveis:
+Este projeto oferece comandos práticos para gerenciar a infraestrutura e os serviços. Você pode executá-los utilizando o `Makefile` ou os scripts definidos no `package.json` com `npm run`. Escolha a abordagem que preferir.
 
 ### 🔹 Inicializar e Gerenciar Containers
-| Comando                     | Descrição                                                                 |
-|-----------------------------|---------------------------------------------------------------------------|
-| `make up`                   | Inicia todos os containers definidos na variável `SERVICES`.             |
-| `make down`                 | Para todos os containers, mantendo os volumes.                           |
-| `make force-recreate`       | Para e recria todos os containers a partir do zero.                      |
+| Comando                     | Descrição                                                                 | Comando Alternativo (npm)         |
+|-----------------------------|---------------------------------------------------------------------------|-----------------------------------|
+| `make up`                   | Inicia todos os containers definidos na variável `SERVICES`.             | `npm run start`                   |
+| `make down`                 | Para todos os containers, mantendo os volumes.                           | `npm run stop`                    |
+| `make rebuild`              | Para, faz build e reinicia todos os containers definidos.                | `npm run rebuild`                 |
 
 ### 🔹 Logs e Status
-| Comando                     | Descrição                                                                 |
-|-----------------------------|---------------------------------------------------------------------------|
-| `make logs c=<serviço>`     | Exibe os logs em tempo real do serviço especificado.                     |
-| `make ps`                   | Lista os containers ativos.                                              |
-| `make ps-all`               | Lista todos os containers, incluindo os inativos.                        |
-| `make ps-filter c=<filtro>` | Lista containers filtrando pelo nome ou termo especificado.              |
+| Comando                     | Descrição                                                                 | Comando Alternativo (npm)         |
+|-----------------------------|---------------------------------------------------------------------------|-----------------------------------|
+| `make logs`                 | Exibe os logs em tempo real de todos os serviços.                        | `npm run logs`                    |
+| `make ps`                   | Lista os containers ativos.                                              | Não disponível via npm            |
 
 ### 🔹 Build e Rebuild
-| Comando                     | Descrição                                                                 |
-|-----------------------------|---------------------------------------------------------------------------|
-| `make rebuild`              | Para, faz build e reinicia todos os containers definidos.                |
-
-### 🔹 Execução e Debug
-| Comando                              | Descrição                                                                 |
-|--------------------------------------|---------------------------------------------------------------------------|
-| `DOCKER_COMPOSE_EXEC`                | Executa um comando dentro de um container em execução.                   |
-| `DOCKER_COMPOSE_RUN`                 | Executa um comando e remove o container após a execução.                 |
-
-### 🔹 Imagens
-| Comando                     | Descrição                                                                 |
-|-----------------------------|---------------------------------------------------------------------------|
-| `DOCKER_COMPOSE_PULL`       | Atualiza as imagens de todos os serviços.                                |
-| `DOCKER_COMPOSE_BUILD`      | Faz o build das imagens locais dos containers.                           |
+| Comando                     | Descrição                                                                 | Comando Alternativo (npm)         |
+|-----------------------------|---------------------------------------------------------------------------|-----------------------------------|
+| `make build`                | Faz o build dos containers.                                              | `npm run build`                   |
+| `make rebuild`              | Reconstrói os containers forçando a recriação.                           | `npm run rebuild`                 |
 
 ### 🔹 Verificação de Dependências
-| Comando                               | Descrição                                                                 |
-|---------------------------------------|---------------------------------------------------------------------------|
-| `make check-deps`                     | Executa o OWASP Dependency-Check com configurações padrão.               |
-| `make check-deps-path path=<caminho>` | Executa o Dependency-Check em um caminho específico.                     |
+| Comando                               | Descrição                                                                 | Comando Alternativo (npm)         |
+|---------------------------------------|---------------------------------------------------------------------------|-----------------------------------|
+| `make check-deps`                     | Executa o OWASP Dependency-Check com configurações padrão.               | `npm run check-deps`              |
+| `make check-deps-path path=<caminho>` | Executa o Dependency-Check em um caminho específico.                     | `npm run check-deps-path`         |
 
----
+### 🔹 Lint e Formatação (npm apenas)
+| Comando                     | Descrição                                                                 |
+|-----------------------------|---------------------------------------------------------------------------|
+| `npm run lint`              | Executa o ESLint para verificar problemas no código.                     |
+| `npm run format`            | Executa o Prettier para formatar o código automaticamente.               |
 
-> 💡 **Nota:** Certifique-se de configurar corretamente o arquivo `.env` antes de executar os comandos.
+
+> 💡 **Nota:** Certifique-se de configurar corretamente o arquivo `.env` antes de executar os comandos acima.
+
+### Como escolher entre `make` e `npm run`?
+- Use `make` se você já está familiarizado com o Makefile e prefere gerenciar os serviços diretamente.
+- Use `npm run` se você prefere centralizar os comandos no `package.json` e utilizar o mesmo fluxo de trabalho para desenvolvimento e automação.
+
+Ambas as abordagens são equivalentes e oferecem flexibilidade para atender às suas preferências.
 
 ## 🌐 Prometheus Configuration
 
