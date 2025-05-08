@@ -1,0 +1,298 @@
+services:
+  portainer:
+    image: portainer/portainer-ce # 📦 Portainer image
+    container_name: infra-default-portainer # 🏷️ Container name
+    restart: always # 🔁 Automatically restarts if it stops
+    ports:
+      - "9001:9000" # 🌐 Port mapping
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # 💾 Volume for Docker socket
+      - infra-default-portainer_data:/data # 💾 Volume for Portainer data
+    networks:
+      - infra-default-shared-net # 🌐 Network name
+  sonarqube:
+    image: sonarqube:latest # 📦 SonarQube image
+    container_name: infra-default-sonarqube # 🏷️ Container name
+    restart: always # 🔁 Automatically restarts if it stops
+    ports:
+      - "9000:9000" # 🌐 Port mapping
+    environment:
+      SONAR_JDBC_URL: ${SONAR_JDBC_URL} # 🐘 PostgreSQL connection URL
+      SONAR_JDBC_USERNAME: ${SONAR_JDBC_USERNAME} # 👤 Database username
+      SONAR_JDBC_PASSWORD: ${SONAR_JDBC_PASSWORD} # 🔑 Database password
+      SONARQUBE_JVM_OPTIONS: ${SONARQUBE_JVM_OPTIONS} # 📊 JVM memory configuration
+      SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: ${SONAR_ES_BOOTSTRAP_CHECKS_DISABLE} # 🔑 Disable ES bootstrap checks
+    volumes:
+      - infra-default-sonarqube_data:/opt/sonarqube/data # 💾 Volume for SonarQube data
+      - infra-default-sonarqube_extensions:/opt/sonarqube/extensions # 💾 Volume for SonarQube extensions
+      - infra-default-sonarqube_logs:/opt/sonarqube/logs # 💾 Volume for SonarQube logs
+      - infra-default-sonarqube_temp:/opt/sonarqube/temp # 💾 Volume for SonarQube data
+    networks:
+      - infra-default-shared-net # 🌐 Network name
+
+  mongo:
+    image: mongo:latest # 📦 MongoDB image
+    container_name: infra-default-mongo # 🏷️ Container name
+    restart: always # 🔁 Automatically restarts if it stops
+    ports:
+      - "27017:27017" # 🌐 Port mapping
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME} # 🔑 MongoDB root username
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD} # 🔑 MongoDB root password
+    volumes:
+      - infra-default-mongo_data:/data/db # 💾 Volume for MongoDB data
+    networks:
+      - infra-default-shared-net # 🌐 Network name
+
+  mongo-express:
+    image: mongo-express:1.0.0-alpha.4 # 📦 Mongo Express image
+    container_name: infra-default-mongo-express # 🏷️ Container name
+    restart: always # 🔁 Automatically restarts if it stops
+    ports:
+      - "8081:8081" # 🌐 Port mapping
+    environment:
+      ME_CONFIG_MONGODB_SERVER: ${ME_CONFIG_MONGODB_SERVER} # 🔑 MongoDB server
+      ME_CONFIG_MONGODB_PORT: ${ME_CONFIG_MONGODB_PORT} # 🔑 MongoDB port
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_INITDB_ROOT_USERNAME} # 🔑 MongoDB admin username
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_INITDB_ROOT_PASSWORD} # 🔑 MongoDB admin password
+      ME_CONFIG_MONGODB_AUTH_DATABASE: ${ME_CONFIG_MONGODB_AUTH_DATABASE} # 🔑 MongoDB auth database
+      ME_CONFIG_BASICAUTH_USERNAME: ${ME_CONFIG_BASICAUTH_USERNAME} # 🔑 Basic auth username
+      ME_CONFIG_BASICAUTH_PASSWORD: ${ME_CONFIG_BASICAUTH_PASSWORD} # 🔑 Basic auth password
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: ${ME_CONFIG_MONGODB_ENABLE_ADMIN} # 🔑 Enable admin access
+      ME_CONFIG_MONGODB_USE_UNIFIED_TOPOLOGY: ${ME_CONFIG_MONGODB_USE_UNIFIED_TOPOLOGY} # 🔑 Use unified topology
+    depends_on:
+      - mongo # 🔄 Depends on MongoDB service
+    networks:
+      - infra-default-shared-net # 🌐 Network name
+  postgres:
+    image: postgres:15 # 📦 PostgreSQL image
+    container_name: infra-default-postgres # 🏷️ Container name
+    restart: always # 🔁 Automatically restarts if it stops
+    ports:
+      - "5432:5432" # 🌐 Port mapping
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB} # 🔑 PostgreSQL credentials
+      POSTGRES_USER: ${POSTGRES_USER} # 🔑 PostgreSQL credentials
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} # 🔑 PostgreSQL credentials
+    volumes:
+      - infra-default-postgres_data:/var/lib/postgresql/data # 💾 Volume for PostgreSQL data
+    networks:
+      - infra-default-shared-net # 🌐 Network name
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: infra-default-pgadmin # 🏷️ Container name
+    restart: always # 🔁 Automatically restarts if it stops
+    ports:
+      - "8088:80" # 🌐 Port mapping
+    depends_on:
+      - postgres # 🔄 Depends on PostgreSQL service
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL} # 🔑 pgAdmin default email
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD} # 🔑 pgAdmin default email and password
+    volumes:
+      - infra-default-pgadmin-data:/pgadmin4/servers.json # 💾 Volume for data persistence
+    networks:
+      - infra-default-shared-net # 🌐 Network name
+
+  mysql:
+    image: mysql:5.7 # 📦 MySQL image
+    container_name: infra-default-mysql # 🏷️ Container name
+    restart: always # 🔁 Automatically restarts if it stops
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} # 🔑 Root password
+      MYSQL_DATABASE: ${MYSQL_DATABASE} # 📂 Default DB
+      MYSQL_USER: ${MYSQL_USER} # 👤 App user
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD} # 🔐 App password
+    ports:
+      - "3306:3306" # 🌐 Port mapping
+    volumes:
+      - infra-default-mysql_data:/var/lib/mysql # 💾 Volume for MySQL data
+    networks:
+      - infra-default-shared-net # 🌐 Network name
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest # 📦 phpMyAdmin image
+    container_name: infra-default-phpmyadmin # 🏷️ Container name
+    restart: always # 🔁 Automatically restarts if it stops
+    environment:
+      PMA_HOST: mysql # 📦 phpMyAdmin image
+      PMA_PORT: 3306 # 📦 phpMyAdmin image
+      PMA_USER: ${MYSQL_USER} # 📦 phpMyAdmin image
+      PMA_PASSWORD: ${MYSQL_PASSWORD} # 📦 phpMyAdmin image
+    ports:
+      - "8082:80" # 🌐 Port mapping
+    depends_on:
+      - mysql # 🔄 Depends on MySQL service
+    networks:
+      - infra-default-shared-net # 🌐 Network name
+  
+  # 🐳 Container for Redis
+  redis:
+    image: redis:7.2 # 📦 Redis image
+    container_name: infra-default-redis # 🏷️ Container name
+    restart: always # 🔁 Automatically restarts if it stops
+    ports:
+      - "6379:6379" # 🌐 Port mapping
+    volumes:
+      - infra-default-redis_data:/data # 💾 Volume for Redis data
+    networks:
+      - infra-default-shared-net # 🌐 Network name
+
+  redisinsight:
+    image: redis/redisinsight:latest # 📦 Redis Insight image
+    container_name: infra-default-redisinsight # 🏷️ Container name
+    restart: always # 🔁 Automatically restarts if it stops
+    ports:
+      - "8083:5540" # 🌐 Port mapping
+    depends_on:
+      - redis # 🔄 Depends on Redis service
+    networks:
+      - infra-default-shared-net # 🌐 Network name
+
+  # 🐳 Monitoring and Logging
+  prometheus:
+    image: prom/prometheus # 📦 Prometheus image
+    container_name: infra-default-prometheus # 🏷️ Container name
+    restart: always # 🔁 Automatically restarts if it stops
+    environment:
+      - TZ=America/Lisbon # 🌍 Timezone
+      - PROMETHEUS_CONFIG=./prometheus.yml # 🔑 Prometheus configuration file
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml # 💾 Volume for configuration
+    ports:
+      - "9090:9090" # 🌐 Port mapping
+    networks:
+      - infra-default-shared-net # 🌐 Network name
+
+  grafana:
+    image: grafana/grafana # 📦 Grafana image
+    container_name: infra-default-grafana # 🏷️ Container name
+    restart: always # 🔁 Automatically restarts if it stops
+    ports:
+      - "3001:3000" # 🌐 Port mapping
+    volumes:
+      - infra-default-grafana-storage:/var/lib/grafana # 💾 Volume for data persistence
+    extra_hosts:
+      - '172.17.0.1:host-gateway' # 🌐 Extra hosts
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GF_SECURITY_ADMIN_USER} # 🔑 Grafana admin user
+      GF_AUTH_ANONYMOUS_ENABLED: ${GF_AUTH_ANONYMOUS_ENABLED} # 🔑 Enable anonymous access
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD} # 🔑 Grafana admin password
+      GF_AUTH_DISABLE_LOGIN_FORM: ${GF_AUTH_DISABLE_LOGIN_FORM} # 🔑 Disable login form
+    networks:
+      - infra-default-shared-net # 🌐 Network name
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest # 📦 cadvisor image
+    container_name: infra-default-cadvisor # 🏷️ Container name
+    restart: always # 🔁 Automatically restarts if it stops
+    ports:
+      - "8080:8080" # 🌐 Port mapping
+    volumes:
+      - /:/rootfs:ro # 💾 Volume for root filesystem
+      - /var/run:/var/run:ro # 💾 Volume for run directory
+      - /sys:/sys:ro # 💾 Volume for sys directory
+      - /var/lib/docker/:/var/lib/docker:ro # 💾 Volume for Docker directory
+    networks:
+      - infra-default-shared-net # 🌐 Network name
+
+  node-exporter:
+    image: prom/node-exporter:latest # 📦 Node Exporter image
+    container_name: infra-default-node-exporter # 🏷️ Container name
+    restart: always # 🔁 Automatically restarts if it stop
+    ports:
+      - "9100:9100" # 🌐 Port mapping
+    networks:
+      - infra-default-shared-net # 🌐 Network name
+  
+  # 🔍 Exporter para PostgreSQL
+  postgres-exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter # 📦 PostgreSQL Exporter image
+    container_name: infra-default-postgres-exporter # 🏷️ Container name
+    restart: always # 🔁 Automatically restarts if it stops
+    environment:
+      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable" # 🔑 PostgreSQL credentials
+    ports:
+      - "9187:9187" # 🌐 Port mapping
+    networks:
+      - infra-default-shared-net # 🌐 Network name
+    depends_on:
+      - postgres # 🔄 Depends on PostgreSQL service
+
+  # 🛢️ Exporter para MySQL
+  mysql-exporter:
+    image: prom/mysqld-exporter:latest # 📦 MySQL Exporter image
+    container_name: infra-default-mysql-exporter # 🏷️ Container name
+    restart: always # 🔁 Automatically restarts if it stops
+    environment:
+      DATA_SOURCE_NAME: ${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(infra-defualt-mysql:3306)/" # 🔑 MySQL credentials
+    ports:
+      - "9104:9104" # 🌐 Port mapping
+    networks:
+      - infra-default-shared-net # 🌐 Network name 
+    depends_on:
+      - mysql # 🔄 Depends on MySQL service
+    command:
+     - --mysqld.username=${MYSQL_USER}:$${MYSQL_PASSWORD} # 🔑 MySQL credentials
+     - --mysqld.address=mysql:3306 # 🌐 Port mapping
+
+  # 🗄️ Exporter para MongoDB
+  mongodb-exporter:
+    image: bitnami/mongodb-exporter:latest # 📦 MongoDB Exporter image
+    container_name: infra-default-mongodb-exporter # 🏷️ Container name
+    restart: always # 🔁 Automatically restarts if it stops
+    environment:
+      MONGODB_URI: "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017" # 🔑 MongoDB credentials
+    ports:
+      - "9216:9216" # 🌐 Port mapping
+    networks:
+      - infra-default-shared-net # 🌐 Network name
+    depends_on:
+      - mongo # 🔄 Depends on MongoDB service
+
+  # 🚀 Exporter para Redis
+  redis-exporter:
+    image: oliver006/redis_exporter:latest # 📦 Redis Exporter image
+    container_name: infra-default-redis-exporter # 🏷️ Container name
+    restart: always # 🔁 Automatically restarts if it stops
+    environment:
+      REDIS_ADDR: ${REDIS_ADDR} # 🔑 Redis credentials
+    ports:
+      - "9121:9121" # 🌐 Port mapping
+    networks:
+      - infra-default-shared-net # 🌐 Network name
+    depends_on:
+      - redis # 🔄 Depends on Redis service
+
+
+networks:
+  infra-default-shared-net:
+    name: infra-default-shared-net # 🌐 Network name
+    driver: bridge # 🌐 Network driver
+
+volumes:
+  infra-default-sonarqube_data:
+    name: infra-default-sonarqube_data
+  infra-default-sonarqube_extensions:
+    name: infra-default-sonarqube_extensions
+  infra-default-sonarqube_logs:
+    name: infra-default-sonarqube_logs
+  infra-default-sonarqube_temp:
+    name: infra-default-sonarqube_temp
+  infra-default-mongo_data:
+    name: infra-default-mongo_data
+  infra-default-postgres_data:
+    name: infra-default-postgres_data
+  infra-default-portainer_data:
+    name: infra-default-portainer_data
+  infra-default-pgadmin-data:
+    name: infra-default-pgadmin-data
+  infra-default-grafana-storage:
+    name: infra-default-grafana-storage
+  infra-default-mysql_data:
+    name: infra-default-mysql_data
+  infra-default-phpmyadmin_data:
+    name: infra-default-phpmyadmin_data
+  infra-default-redis_data:
+    name: infra-default-redis_data
