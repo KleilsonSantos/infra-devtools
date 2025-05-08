@@ -1,0 +1,27 @@
+# 🌐 Prometheus Configuration  
+# 🛠️ Configuração global do Prometheus  
+
+global:  
+  scrape_interval: 15s  # ⏱️ Define a frequência de coleta de métricas (a cada 15s)  
+  evaluation_interval: 15s  # 🔎 Intervalo para avaliação de regras (também a cada 15s)  
+
+scrape_configs:  
+  - job_name: 'prometheus'  # 📊 Monitoramento do próprio Prometheus  
+    static_configs:  
+      - targets: ['localhost:9090']  # 🏠 Servidor local onde o Prometheus está rodando  
+
+  - job_name: 'node-exporter'  # 🖥️ Coleta métricas do sistema operacional  
+    static_configs:  
+      - targets: ['node-exporter:9100']  # 🔌 Porta padrão do Node Exporter  
+
+  - job_name: 'cadvisor'  # 🐳 Monitoramento de containers Docker  
+    static_configs:  
+      - targets: ['cadvisor:8080']  # 📡 Porta onde o cAdvisor expõe métricas  
+
+  - job_name: 'mongodb-exporter'  # 🗄️ Exportador de métricas do MongoDB  
+    static_configs:  
+      - targets: ['mongo:9216']  # 🔄 Coleta métricas do banco de dados MongoDB  
+
+  - job_name: 'postgres-exporter'  # 🗄️ Exportador de métricas do PostgreSQL  
+    static_configs:  
+      - targets: ['postgres:9187']  # 📊 Monitoramento do banco de dados PostgreSQL  
