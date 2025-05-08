@@ -1,6 +1,6 @@
 {
   "name": "infra-devtools",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Infraestrutura padrão para desenvolvimento com Docker, Prometheus, Grafana e outras ferramentas essenciais.",
   "keywords": [
     "docker",
@@ -34,7 +34,8 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
-    "eslint": "^8.50.0",    "prettier": "^3.0.0"
+    "eslint": "^8.50.0",    
+    "prettier": "^3.0.0"
   },
   "dependencies": {
     "dotenv": "^16.0.0" 
