@@ -1,6 +1,6 @@
 {
   "name": "infra-devtools",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Infraestrutura padrão para desenvolvimento com Docker, Prometheus, Grafana e outras ferramentas essenciais.",
   "keywords": [
     "docker",
