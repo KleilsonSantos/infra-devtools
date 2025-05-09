@@ -76,13 +76,14 @@ Esta seção destaca os passos que já foram implementados e estão funcionando 
 ## 📂 **Estrutura do Projeto**
 
 ```plaintext
-.env                 # Variáveis de ambiente para os serviços
-docker-compose.yml   # Configuração do Docker Compose
-Makefile             # Comandos úteis para automação
-prometheus.yml       # Configuração do Prometheus
-scripts/             # Scripts auxiliares
-  └── run-dependency-check.sh
-reports/             # Relatórios gerados pelo OWASP Dependency Check
+├── reports/ 📄 Relatórios gerados pelo OWASP Dependency-Check
+├── infra-devtools/ 🛠️ Diretório do projeto (caso usado como submódulo)
+│ ├── .env.development 📋 Exemplo de variáveis de ambiente
+│ ├── .env 🔐 Arquivo real com configurações (⚠️ não versionar)
+│ ├── Makefile ⚙️ Comandos automatizados (make up, make down, etc)
+│ ├── docker-compose.yml 🐳 Configuração principal dos containers
+│ ├── prometheus.yml 📊 Configuração do Prometheus (monitoramento)
+│ └── scripts/ 📂 Scripts auxiliares
 ```
 
 ## 🛠️ Instalação e Uso do Infra DevTools para Desenvolvedores 👨‍💻
