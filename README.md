@@ -79,7 +79,6 @@ Esta seção destaca os passos que já foram implementados e estão funcionando 
 ├── reports/ 📄 Relatórios gerados pelo OWASP Dependency-Check
 ├── infra-devtools/ 🛠️ Diretório do projeto (caso usado como submódulo)
 │ ├── .env.development 📋 Exemplo de variáveis de ambiente
-│ ├── .env 🔐 Arquivo real com configurações (⚠️ não versionar)
 │ ├── Makefile ⚙️ Comandos automatizados (make up, make down, etc)
 │ ├── docker-compose.yml 🐳 Configuração principal dos containers
 │ ├── prometheus.yml 📊 Configuração do Prometheus (monitoramento)
