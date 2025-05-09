@@ -84,6 +84,7 @@ Esta seção destaca os passos que já foram implementados e estão funcionando 
 │ ├── docker-compose.yml 🐳 Configuração principal dos containers
 │ ├── prometheus.yml 📊 Configuração do Prometheus (monitoramento)
 │ └── scripts/ 📂 Scripts auxiliares
+    └── run-dependency-check.sh  # Script para executar o OWASP Dependency-Check
 ```
 
 ## 🛠️ Instalação e Uso do Infra DevTools para Desenvolvedores 👨‍💻
