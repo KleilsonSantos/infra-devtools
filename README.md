@@ -73,6 +73,83 @@ Esta seção destaca os passos que já foram implementados e estão funcionando 
 - ✅ **Verificação de Segurança de Dependências:** Implementação de um script utilizando OWASP Dependency-Check para identificar possíveis vulnerabilidades nas dependências dos projetos.
 - ✅ **Documentação Detalhada:** Elaboração de um `README.md` abrangente, explicando a finalidade, os serviços incluídos e como utilizar a infraestrutura.
 
+## 📂 **Estrutura do Projeto**
+
+```plaintext
+.env                 # Variáveis de ambiente para os serviços
+docker-compose.yml   # Configuração do Docker Compose
+Makefile             # Comandos úteis para automação
+prometheus.yml       # Configuração do Prometheus
+scripts/             # Scripts auxiliares
+  └── run-dependency-check.sh
+reports/             # Relatórios gerados pelo OWASP Dependency Check
+```
+
+## 🛠️ Instalação e Uso do Infra DevTools para Desenvolvedores 👨‍💻
+
+Este projeto facilita a configuração de um ambiente de desenvolvimento robusto com ferramentas essenciais como SonarQube, MongoDB, PostgreSQL, Prometheus, Grafana, Portainer e muito mais! 🚀
+
+> ⚠️ **Atenção: Segurança em Primeiro Lugar!**
+>
+> O arquivo .env **NÃO** deve ser versionado ou incluído no repositório, por boas práticas de segurança.
+>
+> Este arquivo geralmente contém informações sensíveis, como:
+> - 🔐 Credenciais de banco de dados
+> - 🔑 Chaves de API
+> - 🕵️‍♂️ Segredos da aplicação
+>
+> ✅ Em vez disso:
+> - Adicione .env ao .gitignore
+> - Crie um arquivo .env.example com as variáveis necessárias (sem dados sensíveis)
+> - Documente no README.md como configurar o .env localmente
+>
+> 🔒 Isso protege seu projeto contra vazamentos acidentais de informações críticas.
+
+**Você tem duas formas principais de integrar o Infra DevTools ao seu fluxo de trabalho:**
+
+## 📦 1. Utilização Direta no Seu Ambiente Local:
+### ⬇️ Clone o repositório
+```bash
+git clone https://github.com/KleilsonSantos/infra-devtools.git
+```
+### 📂 Acesse a pasta
+```bash
+cd infra-devtools
+```
+### ⚙️ Configure seu ambiente (.env)
+```bash
+cp .env.development .env
+nano .env
+```
+### 🚀 Suba a infraestrutura completa
+```bash
+make up
+```
+## 🔗 2. Integração como Submódulo Git no Seu Projeto:
+**📦 git submodule add [https://github.com/KleilsonSantos/infra-devtools.git](https://github.com/KleilsonSantos/infra-devtools.git) infra-devtools**
+### ➕ Adicione como submódulo
+```bash
+git submodule add https://github.com/KleilsonSantos/infra-devtools.git
+```
+### ⚙️ Inicialize e atualize
+```bash
+git submodule update --init --recursive
+```
+### 📂 Acesse a pasta do submódulo
+```bash
+cd infra-devtools
+```
+### ⚙️ Configure seu ambiente (.env)
+```bash
+cp .env.development .env
+nano .env
+```
+
+### 🚀 Suba a stack
+```bash
+make up
+```
+
 ## ✅ **Serviços incluídos**
 
 | Serviço                | Porta       | Acesso                                         |
@@ -95,13 +172,6 @@ Esta seção destaca os passos que já foram implementados e estão funcionando 
 | 🐘 **Postgres Exporter**| `9187`      | *Acesso interno (para métricas do PostgreSQL)*|
 | 🐬 **MySQL Exporter**   | `9104`      | *Acesso interno (para métricas do MySQL)*     |
 | 📦 **Redis Exporter**   | `9121`      | *Acesso interno (para métricas do Redis)*     |
-## 🌍 Environment Configuration
-
-Este projeto utiliza um arquivo `.env` para armazenar variáveis de ambiente. Certifique-se de definir corretamente os valores no seu ambiente local antes de executar os comandos abaixo.
-
-## 📦 Arquivos Importantes
-- **ENV_FILE**: `.env`
-- **Docker Compose** utiliza este arquivo para configurar os serviços automaticamente.
 
 ## 🚀 Comandos Principais
 
@@ -258,18 +328,6 @@ make check-deps-path path=/seu/caminho
 ```
 Os relatórios serão gerados na pasta `reports/`:
 - 📁 **Relatório HTML:** `reports/index.html`
-
-## 📂 **Estrutura do Projeto**
-
-```plaintext
-.env                 # Variáveis de ambiente para os serviços
-docker-compose.yml   # Configuração do Docker Compose
-Makefile             # Comandos úteis para automação
-prometheus.yml       # Configuração do Prometheus
-scripts/             # Scripts auxiliares
-  └── run-dependency-check.sh
-reports/             # Relatórios gerados pelo OWASP Dependency Check
-```
 
 ## 🔮 **Passos futuros**
 
