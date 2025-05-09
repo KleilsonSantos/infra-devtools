@@ -372,4 +372,4 @@ Agradecemos por utilizar este projeto! Caso tenha sugestões, melhorias ou encon
 Desenvolvido com ❤️ por **Kleilson Santos**.
 
 - 🌐 [GitHub](https://github.com/KleilsonSantos) - KleilsonSantos
-- 💼 [LinkedIn](https://www.linkedin.com/in/KleilsonSantos) - KleilsonSantos
+- 💼 [LinkedIn](https://www.linkedin.com/in/kleilson-dev-full-stack) - KleilsonSantos
