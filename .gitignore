@@ -1,3 +1,4 @@
 reports
 .env
 .my.cnf
+node_modules
