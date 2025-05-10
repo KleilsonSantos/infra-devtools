@@ -31,7 +31,7 @@
     "build": "make build",
     "rebuild": "make rebuild",
     "check-deps": "make check-deps",
-    "check-deps-path": "make check-deps-path path=.",
+    "check-deps-path": "make check-deps-path path=."
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
