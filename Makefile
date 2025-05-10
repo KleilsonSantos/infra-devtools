@@ -1,7 +1,7 @@
 # 🌍 Environment Configuration
 ENV_FILE=.env
 
-DOCKER_COMPOSE=docker-compose --env-file $(ENV_FILE)
+DOCKER_COMPOSE=docker compose --env-file $(ENV_FILE)
 DOCKER_COMPOSE_PS=$(DOCKER_COMPOSE) ps
 
 DOCKER_COMPOSE_UP=$(DOCKER_COMPOSE) up -d
@@ -12,6 +12,8 @@ DOCKER_COMPOSE_BUILD=$(DOCKER_COMPOSE) build
 DOCKER_COMPOSE_RUN=$(DOCKER_COMPOSE) run --rm
 DOCKER_COMPOSE_EXEC=$(DOCKER_COMPOSE) exec
 DOCKER_COMPOSE_PULL=$(DOCKER_COMPOSE) pull
+
+CHECK-DEPS=scripts/run-dependency-check.sh
 
 # 📦 List of available services
 SERVICES=portainer sonarqube mongo mongo-express postgres pgadmin mysql phpmyadmin prometheus grafana cadvisor node-exporter redis redisinsight mysql-exporter postgres-exporter mongodb-exporter redis-exporter

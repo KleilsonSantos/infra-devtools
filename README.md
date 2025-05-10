@@ -337,13 +337,13 @@ Os relatórios serão gerados na pasta `reports/`:
 - [ ] 🔒 Implementar autenticação para os serviços expostos.
 - [ ] 🧪 Criar testes automatizados para validar a infraestrutura.
 - [ ] **🛠️ Refatorar build scripts para utilizar `npm`:**
-    - [ ] ⚙️ Analisar os comandos atuais do `Makefile` e identificar os equivalentes em scripts `npm`.
-    - [ ] 📝 Criar scripts no `package.json` (por exemplo, `build`, `start`, `test`, `lint`).
-    - [ ] 🔄 Substituir as chamadas ao `make` por comandos `npm run <script>`.
-    - [ ] 📄 Documentar a nova estrutura de build com `npm`.
+    - [x] ⚙️ Analisar os comandos atuais do `Makefile` e identificar os equivalentes em scripts `npm`.
+    - [x] 📝 Criar scripts no `package.json` (por exemplo, `build`, `start`, `test`, `lint`).
+    - [x] 🔄 Substituir as chamadas ao `make` por comandos `npm run <script>`.
+    - [x] 📄 Documentar a nova estrutura de build com `npm`.
 - [ ] **✨ Otimizar o fluxo de desenvolvimento com `npm`:**
     - [ ] ➕ Adicionar ferramentas de desenvolvimento como linters (`eslint`, `prettier`) e formatadores como dependências de desenvolvimento (`devDependencies`).
-    - [ ] ⚙️ Configurar scripts `npm` para executar essas ferramentas (por exemplo, `lint`, `format`).
+    - [x] ⚙️ Configurar scripts `npm` para executar essas ferramentas (por exemplo, `lint`, `format`).
     - [ ] 🎣 Integrar essas verificações no ciclo de desenvolvimento (por exemplo, através de hooks de commit com `husky`).
 - [ ] **🚢 Considerar o uso de ferramentas de build mais avançadas baseadas em Node.js:**
     - [ ] 🧐 Avaliar ferramentas como `webpack` ou `parcel` para o empacotamento de assets (se aplicável ao projeto).
