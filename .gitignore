@@ -1,4 +1,63 @@
-reports
+# 🔧 Dependências
+node_modules/
+.pnpm/
+.cache/
+*.tgz
+
+# 📦 Builds e Compilações
+dist/
+build/
+out/
+coverage/
+tsbuildinfo
+
+# 🧪 Testes e Caches
+test-results/
+.nyc_output/
+jest-cache/
+jest-test-results.json
+src/tests/__pycache__/
+
+# 📝 Logs e Relatórios
+logs/
+reports/
+*.log
+*.pid
+*.seed
+*.tmp
+*.temp
+.coverage
+htmlcov/
+coverage.xml
+.scannerwork
+
+# 🐳 Docker e Ambientes
+docker-compose.override.yml
 .env
+.env.local
+.env.*.local
 .my.cnf
-node_modules
+myenv/
+
+# 🔒 Segurança e Arquivos Sensíveis
+*.pem
+*.key
+*.crt
+
+# ⚙️ Configurações de IDE e Editores
+.vscode/
+.idea/
+*.sw?
+*.bak
+*.old
+
+# 🧹 Linters e Formatadores
+.prettierignore
+eslintcache
+
+# 💻 Sistema
+.DS_Store
+Thumbs.db
+
+# 📦 NPM
+package-lock.json

@@ -1,76 +1,155 @@
-# 🌍 Environment Configuration
+# -------------------------------------------
+# 🐳 Infraestrutura Base - Makefile
+# 🧑‍💻 Autor: Kleilson Santos
+# 📅 Última atualização: 2025-05-11
+#
+# 📦 Serviços Integrados:
+#   🔍 Monitoramento:	   Prometheus, Node Exporter, cAdvisor
+#   📊 Bancos de Dados:	 MongoDB, PostgreSQL, Redis, MySQL
+#   🛠️ DevTools:			Portainer, RedisInsight, phpMyAdmin, pgAdmin
+#   🧹 Qualidade de Código: SonarQube, ESLint, Prettier, OWASP Dependency-Check
+#
+# 🎯 Comandos Disponíveis (targets):
+#   🔼 up				   → Inicia todos os containers listados
+#   🔽 down				 → Para os containers sem remover volumes
+#   ♻️ force-recreate	   → Força recriação dos containers
+#   📋 logs				 → Mostra os logs do serviço especificado
+#   📜 ps / ps-format	   → Lista os containers em diferentes formatos
+#   📊 coverage			 → Executa testes com cobertura
+#   ✨ lint / format		→ Executa ESLint e Prettier para lint e formatação
+#   🔍 check-deps		   → Executa o Dependency Check
+#   🧹 clean				→ Limpa a pasta de relatórios
+#   🔍 sonar-scanner		→ Executa análise com SonarQube
+# -------------------------------------------
+
+
+# 🌍 Configurações de Ambiente
+MODULE=src
 ENV_FILE=.env
+include $(ENV_FILE)
 
+# 🏷️ Nomes dos Serviços
+REPORTS_DIR=reports
+SERVICES=portainer sonarqube mongo mongo-express postgres pgadmin mysql phpmyadmin prometheus grafana rabbitmq cadvisor node-exporter redis redisinsight mysql-exporter postgres-exporter mongodb-exporter redis-exporter
+
+# 🏷️ Sonar Configuration
+SONAR_SCANNER=npx sonar-scanner
+SONAR_PROJECT_KEY=infra-devtools
+#SONAR_HOST_URL=${SONAR_HOST_URL}
+#SONAR_TOKEN=${SONAR_TOKEN_INFRA_DEVTOOLS}
+
+# 🐳 Configuração do Docker Compose
 DOCKER_COMPOSE=docker compose --env-file $(ENV_FILE)
-DOCKER_COMPOSE_PS=$(DOCKER_COMPOSE) ps
-
 DOCKER_COMPOSE_UP=$(DOCKER_COMPOSE) up -d
-DOCKER_COMPOSE_UP_FORCE_RECREATE=$(DOCKER_COMPOSE) up -d --force-recreate
 DOCKER_COMPOSE_DOWN=$(DOCKER_COMPOSE) down --volumes=false --remove-orphans
-DOCKER_COMPOSE_LOGS=$(DOCKER_COMPOSE) logs -f
 DOCKER_COMPOSE_BUILD=$(DOCKER_COMPOSE) build
-DOCKER_COMPOSE_RUN=$(DOCKER_COMPOSE) run --rm
 DOCKER_COMPOSE_EXEC=$(DOCKER_COMPOSE) exec
 DOCKER_COMPOSE_PULL=$(DOCKER_COMPOSE) pull
+DOCKER_COMPOSE_RUN=$(DOCKER_COMPOSE) run --rm
 
-CHECK-DEPS=scripts/run-dependency-check.sh
+# 🔍 Status & Logs
+DOCKER_COMPOSE_PS=$(DOCKER_COMPOSE) ps
+DOCKER_COMPOSE_LOGS=$(DOCKER_COMPOSE) logs -f
+DOCKER_COMPOSE_FORMAT=$(DOCKER_COMPOSE) ps --format 'table {{.Names}}'
+DOCKER_COMPOSE_FORMAT_DETAILED=$(DOCKER_COMPOSE) ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
 
-# 📦 List of available services
-SERVICES=portainer sonarqube mongo mongo-express postgres pgadmin mysql phpmyadmin prometheus grafana cadvisor node-exporter redis redisinsight mysql-exporter postgres-exporter mongodb-exporter redis-exporter
+# 🧪 Testes e Cobertura
+CONVERTER_SCRIPT=src/utils/convert_junit_to_sonar.py
+JUNIT_XML=reports/coverage/test-results.xml
+SONAR_XML=reports/coverage/test-executions.xml
+PYTEST_COVERAGE_ALL=pytest --cov=$(MODULE) --cov-report xml:$(REPORTS_DIR)/coverage/coverage.xml --cov-report html:$(REPORTS_DIR)/coverage
+PYTEST_COVERAGE_JUNIT=pytest --junitxml=reports/coverage/test-results.xml
 
-# 🚀 Start containers (all or selected via SERVICES variable)
+# 🎨 Linting e Formatação
+LINT=npx eslint --ext .ts,.js --fix
+FORMAT=npx prettier --write "**/*.{ts,js,json,md,py}"
+
+
+# 🚀 Comandos para Containers
+.PHONY: up down force-recreate logs ps ps-format ps-format-detailed ps-filter rebuild clean check-deps coverage sonar-scanner lint format convert-tests
+
 up:
-	@echo "🔼 Starting **all** containers"
+	@echo "🔼 Iniciando containers..."
 	$(DOCKER_COMPOSE_UP) $(SERVICES)
 
-# 🛑 Stop containers without removing volumes
 down:
-	@echo "🔽 Stopping all containers"
+	@echo "🔽 Parando todos os containers..."
 	$(DOCKER_COMPOSE_DOWN)
 
-# 🛑 Stop containers and remove volumes
 force-recreate:
-	@echo "🔽 Stopping all containers"
-	@echo "🔄 Recreating containers"
+	@echo "🔄 Recriando containers..."
 	$(DOCKER_COMPOSE_DOWN) && \
-	$(DOCKER_COMPOSE_UP_FORCE_RECREATE) $(SERVICES)
+	$(DOCKER_COMPOSE_UP) $(SERVICES)
 
-# 📜 Show logs for a specific service
 logs:
-	@echo "📋 Showing logs for service $(c)"
-	$(DOCKER_COMPOSE_LOGS) $(c)
+	@echo "📋 Mostrando logs do serviço $(service)..."
+	$(DOCKER_COMPOSE_LOGS) $(service)
 
-# 📜 Show logs for all services
 ps:
-	@echo "📜 Listing all containers"
+	@echo "📜 Listando todos os containers..."
 	$(DOCKER_COMPOSE_PS)
 
-# 📜 Show logs for all services
-ps-all:
-	@echo "📜 Listing all containers with details"
-	$(DOCKER_COMPOSE_PS) -a
+ps-format:
+	@echo "📜 Listando containers em formato compacto..."
+	$(DOCKER_COMPOSE_FORMAT)
 
-# 📜 Show logs for a specific service
+ps-format-detailed:
+	@echo "📜 Listando containers com detalhes..."
+	$(DOCKER_COMPOSE_FORMAT_DETAILED)
+
 ps-filter:
-	@echo "📜 Listing all containers with details and filter $(c)"
-	$(DOCKER_COMPOSE_PS) -a | grep $(c)
+	@echo "📜 Filtrando containers por: $(filter)"
+	$(DOCKER_COMPOSE_PS) -a | grep $(filter)
 
-# 🔄 Rebuild containers
 rebuild:
-	@echo "♻️ Rebuilding containers: $(SERVICES)"
-	@echo "🔽 Stopping all containers: $(SERVICES)"
-	@echo "🔄 Rebuilding containers: $(SERVICES)"
-	@echo "🔼 Starting containers: $(SERVICES)"
+	@echo "♻️ Reconstruindo containers..."
 	$(DOCKER_COMPOSE_DOWN) && \
 	$(DOCKER_COMPOSE_BUILD) && \
 	$(DOCKER_COMPOSE_UP)
 
-# 🧪 Check dependencies
+
+# 🧪 Testes e Cobertura
+coverage:
+	@echo "📊 Executando cobertura de testes..."
+	$(PYTEST_COVERAGE_ALL)
+	$(PYTEST_COVERAGE_JUNIT)
+	python3 $(CONVERTER_SCRIPT) $(JUNIT_XML) $(SONAR_XML)
+
+
+# 🎨 Linting e Formatação
+lint:
+	@echo "✨ Executando ESLint..."
+	$(LINT)
+
+format:
+	@echo "🖌️ Formatando código com Prettier..."
+	$(FORMAT)
+
+
+# 🔍 Verificação de Dependências
+CHECK-DEPS=scripts/run-dependency-check.sh
+
 check-deps:
-	@echo "🔍 Running dependency check: Running..."
+	@echo "🔎 Executando Dependency Check..."
 	$(CHECK-DEPS)
 
-# 🧪 Check dependencies with specific path
 check-deps-path:
-	@echo "🔍 Running dependency check for path: $(path)"
+	@echo "🔎 Executando Dependency Check para o caminho: $(path)..."
 	$(CHECK-DEPS) $(path)
+
+
+# 🧹 Limpeza de Relatórios
+clean:
+	@echo "🧹 Limpando relatórios..."
+	rm -rf $(REPORTS_DIR)/*
+
+
+# 🔍 Executar SonarQube Scanner
+sonar-scanner:
+	@echo "🔍 Executando SonarQube Scanner..."
+	$(SONAR_SCANNER) -Dsonar.projectKey=$(SONAR_PROJECT_KEY) \
+	-Dsonar.sources=. \
+	-Dsonar.host.url=${SONAR_HOST_URL} \
+	-Dsonar.token=${SONAR_TOKEN_INFRA_DEVTOOLS} \
+	-Dsonar.sourceEncoding=UTF-8
+
