@@ -1,3 +1,10 @@
+# -------------------------------------------
+# 📡 Configuração do Prometheus - prometheus.yml
+# 🧑‍💻 Autor: Kleilson Santos
+# 📅 Atualizado em: 2025-05-11
+# 🔧 Serviços Monitorados: Prometheus 📊, Node Exporter 🖥️, cAdvisor 🐳, MongoDB Exporter 🗄️, PostgreSQL Exporter 🗄️
+# -------------------------------------------
+
 # 🌐 Prometheus Configuration  
 # 🛠️ Configuração global do Prometheus  
 
@@ -20,8 +27,16 @@ scrape_configs:
 
   - job_name: 'mongodb-exporter'  # 🗄️ Exportador de métricas do MongoDB  
     static_configs:  
-      - targets: ['mongo:9216']  # 🔄 Coleta métricas do banco de dados MongoDB  
+      - targets: ['mongodb-exporter:9216']  # 🔄 Coleta métricas do banco de dados MongoDB  
 
   - job_name: 'postgres-exporter'  # 🗄️ Exportador de métricas do PostgreSQL  
     static_configs:  
-      - targets: ['postgres:9187']  # 📊 Monitoramento do banco de dados PostgreSQL  
+      - targets: ['postgres-exporter:9187']  # 📊 Monitoramento do banco de dados PostgreSQL
+  
+  - job_name: 'mysql-exporter'  # 🗄️ Exportador de métricas do MySQL  
+    static_configs:  
+      - targets: ['mysql-exporter:9104']  # 📊 Monitoramento do banco de dados MySQL
+
+  - job_name: 'redis-exporter'  # 🗄️ Exportador de métricas do Redis  
+    static_configs:  
+      - targets: ['redis-exporter:9121']  # 📊 Monitoramento do banco de dados Redis
