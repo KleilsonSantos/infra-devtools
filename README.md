@@ -18,7 +18,7 @@
 ![Redis Exporter](https://img.shields.io/badge/Redis%20Exporter-%23DC382D.svg?style=for-the-badge&logo=redis&logoColor=white)
 
 > ⚠️ **Este projeto está 🚀 _(Em Desenvolvimento 🚧)_**
->  
+>
 > Algumas funcionalidades podem estar incompletas ou sujeitas a alterações. Contribuições são bem-vindas! 🛠️
 
 ## 🌟 **Por que este projeto é importante?**
@@ -95,11 +95,13 @@ Este projeto facilita a configuração de um ambiente de desenvolvimento robusto
 > O arquivo .env **NÃO** deve ser versionado ou incluído no repositório, por boas práticas de segurança.
 >
 > Este arquivo geralmente contém informações sensíveis, como:
+>
 > - 🔐 Credenciais de banco de dados
 > - 🔑 Chaves de API
 > - 🕵️‍♂️ Segredos da aplicação
 >
 > ✅ Em vez disso:
+>
 > - Adicione .env ao .gitignore
 > - Crie um arquivo .env.example com as variáveis necessárias (sem dados sensíveis)
 > - Documente no README.md como configurar o .env localmente
@@ -109,110 +111,135 @@ Este projeto facilita a configuração de um ambiente de desenvolvimento robusto
 **Você tem duas formas principais de integrar o Infra DevTools ao seu fluxo de trabalho:**
 
 ## 📦 1. Utilização Direta no Seu Ambiente Local:
+
 ### ⬇️ Clone o repositório
+
 ```bash
 git clone https://github.com/KleilsonSantos/infra-devtools.git
 ```
+
 ### 📂 Acesse a pasta
+
 ```bash
 cd infra-devtools
 ```
+
 ### ⚙️ Configure seu ambiente (.env)
+
 ```bash
 cp .env.development .env
 nano .env
 ```
+
 ### 🚀 Suba a infraestrutura completa
+
 ```bash
 make up
 ```
+
 ## 🔗 2. Integração como Submódulo Git no Seu Projeto:
+
 **📦 git submodule add [https://github.com/KleilsonSantos/infra-devtools.git](https://github.com/KleilsonSantos/infra-devtools.git) infra-devtools**
+
 ### ➕ Adicione como submódulo
+
 ```bash
 git submodule add https://github.com/KleilsonSantos/infra-devtools.git
 ```
+
 ### ⚙️ Inicialize e atualize
+
 ```bash
 git submodule update --init --recursive
 ```
+
 ### 📂 Acesse a pasta do submódulo
+
 ```bash
 cd infra-devtools
 ```
+
 ### ⚙️ Configure seu ambiente (.env)
+
 ```bash
 cp .env.development .env
 nano .env
 ```
 
 ### 🚀 Suba a stack
+
 ```bash
 make up
 ```
 
 ## ✅ **Serviços incluídos**
 
-| Serviço                | Porta       | Acesso                                         |
-|------------------------|-------------|------------------------------------------------|
-| 🛠 **SonarQube**        | `9000`      | [http://localhost:9000](http://localhost:9000) |
-| 🐳 **Portainer**        | `9001`      | [http://localhost:9001](http://localhost:9001) |
-| 🌐 **Mongo Express**    | `8081`      | [http://localhost:8081](http://localhost:8081) |
-| 🖥️ **pgAdmin**          | `8088`      | [http://localhost:8088](http://localhost:8088) |
-| 🧰 **phpMyAdmin**       | `8082`      | [http://localhost:8082](http://localhost:8082) |
-| 🧠 **RedisInsight**     | `8083`      | [http://localhost:8083](http://localhost:8083) |
-| 📈 **Prometheus**       | `9090`      | [http://localhost:9090](http://localhost:9090) |
-| 📊 **Grafana**          | `3001`      | [http://localhost:3001](http://localhost:3001) |
-| 🐾 **cAdvisor**         | `8080`      | [http://localhost:8080](http://localhost:8080) |
-| 🐘 **PostgreSQL**       | `5432`      | *Acesso interno (via pgAdmin ou app)*         |
-| 🍃 **MongoDB**          | `27017`     | *Acesso interno (via Mongo Express ou app)*   |
-| 🐬 **MySQL**            | `3306`      | *Acesso interno (via phpMyAdmin ou app)*      |
-| 📦 **Redis**            | `6379`      | *Acesso interno (via RedisInsight ou app)*    |
-| 🖥️ **Node Exporter**    | `9100`      | *Acesso interno (para métricas do sistema)*   |
-| 📦 **MongoDB Exporter** | `9216`      | *Acesso interno (para métricas do MongoDB)*   |
-| 🐘 **Postgres Exporter**| `9187`      | *Acesso interno (para métricas do PostgreSQL)*|
-| 🐬 **MySQL Exporter**   | `9104`      | *Acesso interno (para métricas do MySQL)*     |
-| 📦 **Redis Exporter**   | `9121`      | *Acesso interno (para métricas do Redis)*     |
+| Serviço                  | Porta   | Acesso                                           |
+| ------------------------ | ------- | ----------------------------------------------   |
+| 🛠 **SonarQube**         | `9000`  | [http://localhost:9000](http://localhost:9000)   |
+| 🐳 **Portainer**         | `9001`  | [http://localhost:9001](http://localhost:9001)   |
+| 🌐 **Mongo Express**     | `8081`  | [http://localhost:8081](http://localhost:8081)   |
+| 🖥️ **pgAdmin**           | `8088`  | [http://localhost:8088](http://localhost:8088)   |
+| 🧰 **phpMyAdmin**        | `8082`  | [http://localhost:8082](http://localhost:8082)   |
+| 🧠 **RedisInsight**      | `8083`  | [http://localhost:8083](http://localhost:8083)   |
+| 📈 **Prometheus**        | `9090`  | [http://localhost:9090](http://localhost:9090)   |
+| 📊 **Grafana**           | `3001`  | [http://localhost:3001](http://localhost:3001)   |
+| 🐾 **cAdvisor**          | `8080`  | [http://localhost:8080](http://localhost:8080)   |
+| 🐰 **RabbitMQ**          | `15672` | [http://localhost:15672](http://localhost:15672) |
+| 🐘 **PostgreSQL**        | `5432`  | _Acesso interno (via pgAdmin ou app)_            |
+| 🍃 **MongoDB**           | `27017` | _Acesso interno (via Mongo Express ou app)_      |
+| 🐬 **MySQL**             | `3306`  | _Acesso interno (via phpMyAdmin ou app)_         |
+| 📦 **Redis**             | `6379`  | _Acesso interno (via RedisInsight ou app)_       |
+| 🖥️ **Node Exporter**     | `9100`  | _Acesso interno (para métricas do sistema)_      |
+| 📦 **MongoDB Exporter**  | `9216`  | _Acesso interno (para métricas do MongoDB)_      |
+| 🐘 **Postgres Exporter** | `9187`  | _Acesso interno (para métricas do PostgreSQL)_   |
+| 🐬 **MySQL Exporter**    | `9104`  | _Acesso interno (para métricas do MySQL)_        |
+| 📦 **Redis Exporter**    | `9121`  | _Acesso interno (para métricas do Redis)_        |
 
 ## 🚀 Comandos Principais
 
 Este projeto oferece comandos práticos para gerenciar a infraestrutura e os serviços. Você pode executá-los utilizando o `Makefile` ou os scripts definidos no `package.json` com `npm run`. Escolha a abordagem que preferir.
 
 ### 🔹 Inicializar e Gerenciar Containers
-| Comando                     | Descrição                                                                 | Comando Alternativo (npm)         |
-|-----------------------------|---------------------------------------------------------------------------|-----------------------------------|
-| `make up`                   | Inicia todos os containers definidos na variável `SERVICES`.             | `npm run start`                   |
-| `make down`                 | Para todos os containers, mantendo os volumes.                           | `npm run stop`                    |
-| `make rebuild`              | Para, faz build e reinicia todos os containers definidos.                | `npm run rebuild`                 |
+
+| Comando        | Descrição                                                    | Comando Alternativo (npm) |
+| -------------- | ------------------------------------------------------------ | ------------------------- |
+| `make up`      | Inicia todos os containers definidos na variável `SERVICES`. | `npm run start`           |
+| `make down`    | Para todos os containers, mantendo os volumes.               | `npm run stop`            |
+| `make rebuild` | Para, faz build e reinicia todos os containers definidos.    | `npm run rebuild`         |
 
 ### 🔹 Logs e Status
-| Comando                     | Descrição                                                                 | Comando Alternativo (npm)         |
-|-----------------------------|---------------------------------------------------------------------------|-----------------------------------|
-| `make logs`                 | Exibe os logs em tempo real de todos os serviços.                        | `npm run logs`                    |
-| `make ps`                   | Lista os containers ativos.                                              | Não disponível via npm            |
+
+| Comando     | Descrição                                         | Comando Alternativo (npm) |
+| ----------- | ------------------------------------------------- | ------------------------- |
+| `make logs` | Exibe os logs em tempo real de todos os serviços. | `npm run logs`            |
+| `make ps`   | Lista os containers ativos.                       | Não disponível via npm    |
 
 ### 🔹 Build e Rebuild
-| Comando                     | Descrição                                                                 | Comando Alternativo (npm)         |
-|-----------------------------|---------------------------------------------------------------------------|-----------------------------------|
-| `make build`                | Faz o build dos containers.                                              | `npm run build`                   |
-| `make rebuild`              | Reconstrói os containers forçando a recriação.                           | `npm run rebuild`                 |
+
+| Comando        | Descrição                                      | Comando Alternativo (npm) |
+| -------------- | ---------------------------------------------- | ------------------------- |
+| `make build`   | Faz o build dos containers.                    | `npm run build`           |
+| `make rebuild` | Reconstrói os containers forçando a recriação. | `npm run rebuild`         |
 
 ### 🔹 Verificação de Dependências
-| Comando                               | Descrição                                                                 | Comando Alternativo (npm)         |
-|---------------------------------------|---------------------------------------------------------------------------|-----------------------------------|
-| `make check-deps`                     | Executa o OWASP Dependency-Check com configurações padrão.               | `npm run check-deps`              |
-| `make check-deps-path path=<caminho>` | Executa o Dependency-Check em um caminho específico.                     | `npm run check-deps-path`         |
+
+| Comando                               | Descrição                                                  | Comando Alternativo (npm) |
+| ------------------------------------- | ---------------------------------------------------------- | ------------------------- |
+| `make check-deps`                     | Executa o OWASP Dependency-Check com configurações padrão. | `npm run check-deps`      |
+| `make check-deps-path path=<caminho>` | Executa o Dependency-Check em um caminho específico.       | `npm run check-deps-path` |
 
 ### 🔹 Lint e Formatação (npm apenas)
-| Comando                     | Descrição                                                                 |
-|-----------------------------|---------------------------------------------------------------------------|
-| `npm run lint`              | Executa o ESLint para verificar problemas no código.                     |
-| `npm run format`            | Executa o Prettier para formatar o código automaticamente.               |
 
+| Comando          | Descrição                                                  |
+| ---------------- | ---------------------------------------------------------- |
+| `npm run lint`   | Executa o ESLint para verificar problemas no código.       |
+| `npm run format` | Executa o Prettier para formatar o código automaticamente. |
 
 > 💡 **Nota:** Certifique-se de configurar corretamente o arquivo `.env` antes de executar os comandos acima.
 
 ### Como escolher entre `make` e `npm run`?
+
 - Use `make` se você já está familiarizado com o Makefile e prefere gerenciar os serviços diretamente.
 - Use `npm run` se você prefere centralizar os comandos no `package.json` e utilizar o mesmo fluxo de trabalho para desenvolvimento e automação.
 
@@ -224,26 +251,29 @@ Este projeto utiliza **Prometheus** para monitoramento e coleta de métricas. A 
 
 ### 🔄 Configuração Global
 
-| Configuração | Descrição |
-|-------------|-----------|
-| `scrape_interval: 15s` | Intervalo de coleta de métricas (a cada 15 segundos) |
-| `evaluation_interval: 15s` | Intervalo para avaliação de regras |
+| Configuração               | Descrição                                            |
+| -------------------------- | ---------------------------------------------------- |
+| `scrape_interval: 15s`     | Intervalo de coleta de métricas (a cada 15 segundos) |
+| `evaluation_interval: 15s` | Intervalo para avaliação de regras                   |
 
 ## 📊 Alvos de Monitoramento
+
 Os seguintes serviços estão configurados para serem **scrapeados** pelo Prometheus:
 
 ### 🔹 Serviços Configurados
-| Job Name | Porta | Descrição |
-|----------|-------|-----------|
-| `prometheus` | `9090` | Monitoramento do próprio Prometheus |
-| `node-exporter`      | `9100` | Exportador de métricas do sistema operacional |
-| `cadvisor`           | `8080` | Monitoramento de containers Docker            |
-| `mongodb-exporter`   | `9216` | Exportador de métricas do MongoDB             |
-| `postgres-exporter`  | `9187` | Exportador de métricas do PostgreSQL          |
-| `mysql-exporter`     | `9104` | Exportador de métricas do MySQL               |
-| `redis-exporter`     | `9121` | Exportador de métricas do Redis               |
+
+| Job Name            | Porta  | Descrição                                     |
+| ------------------- | ------ | --------------------------------------------- |
+| `prometheus`        | `9090` | Monitoramento do próprio Prometheus           |
+| `node-exporter`     | `9100` | Exportador de métricas do sistema operacional |
+| `cadvisor`          | `8080` | Monitoramento de containers Docker            |
+| `mongodb-exporter`  | `9216` | Exportador de métricas do MongoDB             |
+| `postgres-exporter` | `9187` | Exportador de métricas do PostgreSQL          |
+| `mysql-exporter`    | `9104` | Exportador de métricas do MySQL               |
+| `redis-exporter`    | `9121` | Exportador de métricas do Redis               |
 
 ## ⚙️ Exemplo de Configuração
+
 Aqui está um exemplo do trecho YAML utilizado para definir os alvos de monitoramento:
 
 ```yaml
@@ -259,7 +289,7 @@ scrape_configs:
   - job_name: 'cadvisor'
     static_configs:
       - targets: ['cadvisor:8080']
-  
+
   - job_name: 'mongodb-exporter'
     static_configs:
       - targets: ['mongo:9216']
@@ -276,6 +306,7 @@ scrape_configs:
     static_configs:
       - targets: ['redis-exporter:9121']
 ```
+
 > 💡 **Nota:** Certifique-se de que os serviços listados estão rodando corretamente e acessíveis pelas portas configuradas para uma coleta eficiente de métricas.
 
 ## 🧱 **Como subir a infraestrutura**
@@ -307,6 +338,7 @@ Este projeto inclui um **script de verificação de dependências** utilizando [
 O script analisa o diretório do projeto e gera relatórios detalhados sobre possíveis vulnerabilidades.
 
 ### 📂 Estrutura de Diretórios
+
 - **PROJECT_PATH**: Caminho do projeto analisado (padrão: diretório atual).
 - **REPORT_PATH**: Caminho onde os relatórios de análise serão armazenados.
 
@@ -327,27 +359,31 @@ Para verificar um caminho específico:
 ```bash
 make check-deps-path path=/seu/caminho
 ```
+
 Os relatórios serão gerados na pasta `reports/`:
+
 - 📁 **Relatório HTML:** `reports/index.html`
 
 ## 🔮 **Passos futuros**
 
 - [ ] 📦 Adicionar suporte ao Redis e RabbitMQ.
-- [ ] 📊 Configurar dashboards personalizados no Grafana.
 - [ ] 🔒 Implementar autenticação para os serviços expostos.
-- [ ] 🧪 Criar testes automatizados para validar a infraestrutura.
-- [ ] **🛠️ Refatorar build scripts para utilizar `npm`:**
-    - [x] ⚙️ Analisar os comandos atuais do `Makefile` e identificar os equivalentes em scripts `npm`.
-    - [x] 📝 Criar scripts no `package.json` (por exemplo, `build`, `start`, `test`, `lint`).
-    - [x] 🔄 Substituir as chamadas ao `make` por comandos `npm run <script>`.
-    - [x] 📄 Documentar a nova estrutura de build com `npm`.
+- [x] 🧪 Criar testes automatizados para validar a infraestrutura.
+- [x] **🛠️ Refatorar build scripts para utilizar `npm`:**
+  - [x] ⚙️ Analisar os comandos atuais do `Makefile` e identificar os equivalentes em scripts `npm`.
+  - [x] 📝 Criar scripts no `package.json` (por exemplo, `build`, `start`, `test`, `lint`).
+  - [x] 🔄 Substituir as chamadas ao `make` por comandos `npm run <script>`.
+  - [x] 📄 Documentar a nova estrutura de build com `npm`.
 - [ ] **✨ Otimizar o fluxo de desenvolvimento com `npm`:**
-    - [ ] ➕ Adicionar ferramentas de desenvolvimento como linters (`eslint`, `prettier`) e formatadores como dependências de desenvolvimento (`devDependencies`).
-    - [x] ⚙️ Configurar scripts `npm` para executar essas ferramentas (por exemplo, `lint`, `format`).
-    - [ ] 🎣 Integrar essas verificações no ciclo de desenvolvimento (por exemplo, através de hooks de commit com `husky`).
-- [ ] **🚢 Considerar o uso de ferramentas de build mais avançadas baseadas em Node.js:**
-    - [ ] 🧐 Avaliar ferramentas como `webpack` ou `parcel` para o empacotamento de assets (se aplicável ao projeto).
-    - [ ] 🧩 Investigar o uso de task runners como `gulp` ou `grunt` (se o projeto se beneficiar de fluxos de trabalho mais complexos).
+  - [x] ➕ Adicionar ferramentas de desenvolvimento como linters (`eslint`, `prettier`) e formatadores como dependências de desenvolvimento (`devDependencies`).
+  - [x] ⚙️ Configurar scripts `npm` para executar essas ferramentas (por exemplo, `lint`, `format`).
+  - [ ] 🎣 Integrar essas verificações no ciclo de desenvolvimento (por exemplo, através de hooks de commit com `husky`).
+- [ ] **⚙️ Considerar ferramentas de automação de tarefas para DevInfra (Makefile, Task, Shell Scripts)**
+  - [x] 🧩 Automatizar tarefas comuns com `Makefile` e scripts shell
+  - [ ] 🔐 Integrar hardening de containers com `Docker Bench` ou `Dockle`
+  - [ ] 🧪 Adicionar testes automatizados dos serviços usando `bats` ou `Testcontainers`
+  - [ ] 🧱 Modularizar serviços com uso de redes nomeadas e volumes persistentes
+  - [ ] 📊 Configurar dashboards personalizados de monitoramento visual com Grafana e alertas no Prometheus
 
 > 💡 **Nota:** Este projeto está em constante desenvolvimento. Algumas funcionalidades podem estar incompletas ou sujeitas a alterações. Contribuições são sempre bem-vindas! 🛠️
 
