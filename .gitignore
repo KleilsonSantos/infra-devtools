@@ -37,7 +37,6 @@ docker-compose.override.yml
 .env.local
 .env.*.local
 .my.cnf
-<<<<<<< Updated upstream
 myenv/
 
 # 🔒 Segurança e Arquivos Sensíveis
@@ -60,12 +59,7 @@ eslintcache
 .DS_Store
 Thumbs.db
 
-# 📦 NPM
+# 📦 NPM e Outros Arquivos de Configuração
 package-lock.json
-=======
-node_modules
 .scannerwork
-myenv
-.vscode
 .coverage
->>>>>>> Stashed changes

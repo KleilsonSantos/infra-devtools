@@ -1,18 +1,30 @@
+# -------------------------------------------
+# 🐳 Infraestrutura Base - Docker Compose
+# 🧑‍💻 Autor: Kleilson Santos
+# 📅 Atualizado em: 2025-05-11
+# 🔧 Serviços:
+#    - 📈 Monitoramento: Prometheus, Node Exporter, cAdvisor, MongoDB Exporter, PostgreSQL Exporter
+#    - 🧹 Qualidade de Código: SonarQube, ESLint, Prettier, Dependency Check
+#    - 🐳 Containers: MongoDB, PostgreSQL, Redis, Portainer
+# -------------------------------------------
+
+
 services:
   portainer:
     image: portainer/portainer-ce # 📦 Portainer image
     container_name: infra-default-portainer # 🏷️ Container name
+    env_file: .env # 📦 Environment file
     restart: always # 🔁 Automatically restarts if it stops
     ports:
       - "9001:9000" # 🌐 Port mapping
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock # 💾 Volume for Docker socket
-      - infra-default-portainer_data:/data # 💾 Volume for Portainer data
     networks:
       - infra-default-shared-net # 🌐 Network name
   sonarqube:
     image: sonarqube:latest # 📦 SonarQube image
     container_name: infra-default-sonarqube # 🏷️ Container name
+    env_file: .env # 📦 Environment file
     restart: always # 🔁 Automatically restarts if it stops
     ports:
       - "9000:9000" # 🌐 Port mapping
@@ -26,13 +38,13 @@ services:
       - infra-default-sonarqube_data:/opt/sonarqube/data # 💾 Volume for SonarQube data
       - infra-default-sonarqube_extensions:/opt/sonarqube/extensions # 💾 Volume for SonarQube extensions
       - infra-default-sonarqube_logs:/opt/sonarqube/logs # 💾 Volume for SonarQube logs
-      - infra-default-sonarqube_temp:/opt/sonarqube/temp # 💾 Volume for SonarQube data
     networks:
       - infra-default-shared-net # 🌐 Network name
 
   mongo:
     image: mongo:latest # 📦 MongoDB image
     container_name: infra-default-mongo # 🏷️ Container name
+    env_file: .env # 📦 Environment file
     restart: always # 🔁 Automatically restarts if it stops
     ports:
       - "27017:27017" # 🌐 Port mapping
@@ -47,6 +59,7 @@ services:
   mongo-express:
     image: mongo-express:1.0.0-alpha.4 # 📦 Mongo Express image
     container_name: infra-default-mongo-express # 🏷️ Container name
+    env_file: .env # 📦 Environment file
     restart: always # 🔁 Automatically restarts if it stops
     ports:
       - "8081:8081" # 🌐 Port mapping
@@ -67,6 +80,7 @@ services:
   postgres:
     image: postgres:15 # 📦 PostgreSQL image
     container_name: infra-default-postgres # 🏷️ Container name
+    env_file: .env # 📦 Environment file
     restart: always # 🔁 Automatically restarts if it stops
     ports:
       - "5432:5432" # 🌐 Port mapping
@@ -82,6 +96,7 @@ services:
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: infra-default-pgadmin # 🏷️ Container name
+    env_file: .env # 📦 Environment file
     restart: always # 🔁 Automatically restarts if it stops
     ports:
       - "8088:80" # 🌐 Port mapping
@@ -91,13 +106,14 @@ services:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL} # 🔑 pgAdmin default email
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD} # 🔑 pgAdmin default email and password
     volumes:
-      - infra-default-pgadmin-data:/pgadmin4/servers.json # 💾 Volume for data persistence
+      - infra-default-pgadmin-data:/var/lib/pgadmin # 💾 Volume for data persistence
     networks:
       - infra-default-shared-net # 🌐 Network name
 
   mysql:
     image: mysql:5.7 # 📦 MySQL image
     container_name: infra-default-mysql # 🏷️ Container name
+    env_file: .env # 📦 Environment file
     restart: always # 🔁 Automatically restarts if it stops
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} # 🔑 Root password
@@ -114,6 +130,7 @@ services:
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest # 📦 phpMyAdmin image
     container_name: infra-default-phpmyadmin # 🏷️ Container name
+    env_file: .env # 📦 Environment file
     restart: always # 🔁 Automatically restarts if it stops
     environment:
       PMA_HOST: mysql # 📦 phpMyAdmin image
@@ -131,6 +148,7 @@ services:
   redis:
     image: redis:7.2 # 📦 Redis image
     container_name: infra-default-redis # 🏷️ Container name
+    env_file: .env # 📦 Environment file
     restart: always # 🔁 Automatically restarts if it stops
     ports:
       - "6379:6379" # 🌐 Port mapping
@@ -142,23 +160,50 @@ services:
   redisinsight:
     image: redis/redisinsight:latest # 📦 Redis Insight image
     container_name: infra-default-redisinsight # 🏷️ Container name
+    #env_file: .env # 📦 Environment file
     restart: always # 🔁 Automatically restarts if it stops
     ports:
       - "8083:5540" # 🌐 Port mapping
+    volumes:
+      - infra-default-redisinsight_data:/usr/src/app/redisinsight/api/dist # 💾 Volume for Redis Insight data
+    user: "1000:1000" # 👤 User
     depends_on:
       - redis # 🔄 Depends on Redis service
     networks:
       - infra-default-shared-net # 🌐 Network name
 
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: infra-default-rabbitmq # 🏷️ Container name for rabbitmq
+    restart: always # 🔁 Automatically restarts if it stops
+    env_file: .env
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    ports:
+      - "5672:5672"  # Porta para comunicação AMQP
+      - "15672:15672"  # Porta para o painel de gerenciamento
+    volumes:
+      - infra-default-rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmqctl status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - infra-default-shared-net
+
   # 🐳 Monitoring and Logging
   prometheus:
     image: prom/prometheus # 📦 Prometheus image
     container_name: infra-default-prometheus # 🏷️ Container name
+    env_file: .env # 📦 Environment file
     restart: always # 🔁 Automatically restarts if it stops
     environment:
       - TZ=America/Lisbon # 🌍 Timezone
       - PROMETHEUS_CONFIG=./prometheus.yml # 🔑 Prometheus configuration file
     volumes:
+      - infra-default-prometheus_data:/etc/prometheus/prometheus.yml # 💾 Volume for Prometheus data
       - ./prometheus.yml:/etc/prometheus/prometheus.yml # 💾 Volume for configuration
     ports:
       - "9090:9090" # 🌐 Port mapping
@@ -168,11 +213,15 @@ services:
   grafana:
     image: grafana/grafana # 📦 Grafana image
     container_name: infra-default-grafana # 🏷️ Container name
+    env_file: .env # 📦 Environment file
     restart: always # 🔁 Automatically restarts if it stops
     ports:
       - "3001:3000" # 🌐 Port mapping
     volumes:
       - infra-default-grafana-storage:/var/lib/grafana # 💾 Volume for data persistence
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+
     extra_hosts:
       - '172.17.0.1:host-gateway' # 🌐 Extra hosts
     environment:
@@ -186,6 +235,7 @@ services:
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest # 📦 cadvisor image
     container_name: infra-default-cadvisor # 🏷️ Container name
+    env_file: .env # 📦 Environment file
     restart: always # 🔁 Automatically restarts if it stops
     ports:
       - "8080:8080" # 🌐 Port mapping
@@ -200,6 +250,7 @@ services:
   node-exporter:
     image: prom/node-exporter:latest # 📦 Node Exporter image
     container_name: infra-default-node-exporter # 🏷️ Container name
+    env_file: .env # 📦 Environment file
     restart: always # 🔁 Automatically restarts if it stop
     ports:
       - "9100:9100" # 🌐 Port mapping
@@ -210,6 +261,7 @@ services:
   postgres-exporter:
     image: quay.io/prometheuscommunity/postgres-exporter # 📦 PostgreSQL Exporter image
     container_name: infra-default-postgres-exporter # 🏷️ Container name
+    env_file: .env # 📦 Environment file
     restart: always # 🔁 Automatically restarts if it stops
     environment:
       DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable" # 🔑 PostgreSQL credentials
@@ -224,9 +276,10 @@ services:
   mysql-exporter:
     image: prom/mysqld-exporter:latest # 📦 MySQL Exporter image
     container_name: infra-default-mysql-exporter # 🏷️ Container name
+    env_file: .env # 📦 Environment file
     restart: always # 🔁 Automatically restarts if it stops
     environment:
-      DATA_SOURCE_NAME: ${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(infra-defualt-mysql:3306)/" # 🔑 MySQL credentials
+      DATA_SOURCE_NAME: ${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(infra-defualt-mysql:3306)/ # 🔑 MySQL credentials
     ports:
       - "9104:9104" # 🌐 Port mapping
     networks:
@@ -241,6 +294,7 @@ services:
   mongodb-exporter:
     image: bitnami/mongodb-exporter:latest # 📦 MongoDB Exporter image
     container_name: infra-default-mongodb-exporter # 🏷️ Container name
+    env_file: .env # 📦 Environment file
     restart: always # 🔁 Automatically restarts if it stops
     environment:
       MONGODB_URI: "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017" # 🔑 MongoDB credentials
@@ -255,6 +309,7 @@ services:
   redis-exporter:
     image: oliver006/redis_exporter:latest # 📦 Redis Exporter image
     container_name: infra-default-redis-exporter # 🏷️ Container name
+    env_file: .env # 📦 Environment file
     restart: always # 🔁 Automatically restarts if it stops
     environment:
       REDIS_ADDR: ${REDIS_ADDR} # 🔑 Redis credentials
@@ -264,7 +319,6 @@ services:
       - infra-default-shared-net # 🌐 Network name
     depends_on:
       - redis # 🔄 Depends on Redis service
-
 
 networks:
   infra-default-shared-net:
@@ -278,8 +332,6 @@ volumes:
     name: infra-default-sonarqube_extensions
   infra-default-sonarqube_logs:
     name: infra-default-sonarqube_logs
-  infra-default-sonarqube_temp:
-    name: infra-default-sonarqube_temp
   infra-default-mongo_data:
     name: infra-default-mongo_data
   infra-default-postgres_data:
@@ -296,3 +348,7 @@ volumes:
     name: infra-default-phpmyadmin_data
   infra-default-redis_data:
     name: infra-default-redis_data
+  infra-default-rabbitmq_data:
+    name: infra-default-rabbitmq_data
+  infra-default-redisinsight_data:
+    name: infra-default-redisinsight_data
