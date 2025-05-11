@@ -60,6 +60,5 @@ eslintcache
 Thumbs.db
 
 # 📦 NPM e Outros Arquivos de Configuração
-package-lock.json
 .scannerwork
 .coverage
