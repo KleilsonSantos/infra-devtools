@@ -19,6 +19,7 @@ services:
       - "9001:9000" # 🌐 Port mapping
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock # 💾 Volume for Docker socket
+      - infra-default-portainer_data:/data # 💾 Volume for Portainer data
     networks:
       - infra-default-shared-net # 🌐 Network name
   sonarqube:
@@ -190,6 +191,22 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    networks:
+      - infra-default-shared-net
+
+  rabbitmq-exporter:
+    image: kbudde/rabbitmq-exporter
+    container_name: infra-default-rabbitmq-exporter
+    restart: always
+    env_file: .env
+    environment:
+      RABBITMQ_URL: "http://rabbitmq:15672"
+      RABBITMQ_USER: "guest"
+      RABBITMQ_PASSWORD: "guest"
+    ports:
+      - "9419:9419"  # Porta para métricas Prometheus
+    depends_on:
+      - rabbitmq
     networks:
       - infra-default-shared-net
 

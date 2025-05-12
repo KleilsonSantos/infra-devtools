@@ -8,6 +8,7 @@
 ![pgAdmin](https://img.shields.io/badge/pgAdmin-%23336791.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 ![phpMyAdmin](https://img.shields.io/badge/phpMyAdmin-%2347A248.svg?style=for-the-badge&logo=mysql&logoColor=white)
 ![RedisInsight](https://img.shields.io/badge/RedisInsight-%23DC382D.svg?style=for-the-badge&logo=redis&logoColor=white)
+![RabbitMQ](https://img.shields.io/badge/RabbitMQ-%23FF6600.svg?style=for-the-badge&logo=rabbitmq&logoColor=white)
 ![Prometheus](https://img.shields.io/badge/Prometheus-%23E6522C.svg?style=for-the-badge&logo=prometheus&logoColor=white)
 ![Grafana](https://img.shields.io/badge/Grafana-%23F46800.svg?style=for-the-badge&logo=grafana&logoColor=white)
 ![cAdvisor](https://img.shields.io/badge/cAdvisor-%234285F4.svg?style=for-the-badge&logo=google-cloud&logoColor=white)
@@ -16,6 +17,7 @@
 ![Postgres Exporter](https://img.shields.io/badge/Postgres%20Exporter-%23336791.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 ![MySQL Exporter](https://img.shields.io/badge/MySQL%20Exporter-%2347A248.svg?style=for-the-badge&logo=mysql&logoColor=white)
 ![Redis Exporter](https://img.shields.io/badge/Redis%20Exporter-%23DC382D.svg?style=for-the-badge&logo=redis&logoColor=white)
+![RabbitMQ Exporter](https://img.shields.io/badge/RabbitMQ%20Exporter-%23FF6600.svg?style=for-the-badge&logo=rabbitmq&logoColor=white)
 
 > ⚠️ **Este projeto está 🚀 _(Em Desenvolvimento 🚧)_**
 >
@@ -72,18 +74,30 @@ Esta seção destaca os passos que já foram implementados e estão funcionando 
 - ✅ **Automação de Tarefas Comuns:** Criação de um `Makefile` com comandos simplificados para executar tarefas como iniciar, parar e visualizar logs dos serviços.
 - ✅ **Verificação de Segurança de Dependências:** Implementação de um script utilizando OWASP Dependency-Check para identificar possíveis vulnerabilidades nas dependências dos projetos.
 - ✅ **Documentação Detalhada:** Elaboração de um `README.md` abrangente, explicando a finalidade, os serviços incluídos e como utilizar a infraestrutura.
+- ✅ **Testes Automatizados:** Implementação de testes automatizados para validar a infraestrutura utilizando `pytest`, `testinfra` e `Testcontainers`.
+- ✅ **Scripts `npm` Alternativos:** Adição de scripts no `package.json` para substituir comandos do `Makefile`, garantindo maior compatibilidade multiplataforma.
+- ✅ **Compatibilidade Multiplataforma:** Inclusão de instruções e alternativas para usuários de Windows, como o uso de `Taskfile` e `npm scripts`.
+- ✅ **Configuração do SonarQube Scanner:** Adição de suporte ao SonarQube Scanner para análise de qualidade de código diretamente no pipeline.
 
 ## 📂 **Estrutura do Projeto**
 
 ```plaintext
-├── reports/ 📄 Relatórios gerados pelo OWASP Dependency-Check
+├── reports/ 📄 Relatórios gerados pelo OWASP Dependency-Check e testes automatizados
 ├── infra-devtools/ 🛠️ Diretório do projeto (caso usado como submódulo)
-│ ├── .env.development 📋 Exemplo de variáveis de ambiente
-│ ├── Makefile ⚙️ Comandos automatizados (make up, make down, etc)
-│ ├── docker-compose.yml 🐳 Configuração principal dos containers
-│ ├── prometheus.yml 📊 Configuração do Prometheus (monitoramento)
-│ └── scripts/ 📂 Scripts auxiliares
-    └── run-dependency-check.sh  # Script para executar o OWASP Dependency-Check
+│   ├── .env.example 📋 Exemplo de variáveis de ambiente
+│   ├── Makefile ⚙️ Comandos automatizados (make up, make down, etc.)
+│   ├── docker-compose.yml 🐳 Configuração principal dos containers
+│   ├── prometheus.yml 📊 Configuração do Prometheus (monitoramento)
+│   ├── scripts/ 📂 Scripts auxiliares
+│   │   └── run-dependency-check.sh  # Script para executar o OWASP Dependency-Check
+│   ├── src/ 📂 Código-fonte e testes
+│   │   ├── tests/ 📂 Testes automatizados
+│   │   │   ├── test_services.py  # Testes para verificar serviços
+│   │   │   ├── test_volumes.py  # Testes para verificar volumes
+│   │   │   ├── test_networks.py  # Testes para verificar conectividade de redes
+│   │   │   └── test_integration.py  # Testes de integração com Testcontainers
+│   │   └── utils/ 📂 Utilitários
+│   │       └── convert_junit_to_sonar.py  # Script para converter relatórios de testes para o formato do SonarQube
 ```
 
 ## 🛠️ Instalação e Uso do Infra DevTools para Desenvolvedores 👨‍💻
@@ -191,10 +205,11 @@ make up
 | 🐬 **MySQL**             | `3306`  | _Acesso interno (via phpMyAdmin ou app)_         |
 | 📦 **Redis**             | `6379`  | _Acesso interno (via RedisInsight ou app)_       |
 | 🖥️ **Node Exporter**     | `9100`  | _Acesso interno (para métricas do sistema)_      |
-| 📦 **MongoDB Exporter**  | `9216`  | _Acesso interno (para métricas do MongoDB)_      |
-| 🐘 **Postgres Exporter** | `9187`  | _Acesso interno (para métricas do PostgreSQL)_   |
 | 🐬 **MySQL Exporter**    | `9104`  | _Acesso interno (para métricas do MySQL)_        |
+| 📦 **MongoDB Exporter**  | `9216`  | _Acesso interno (para métricas do MongoDB)_      |
 | 📦 **Redis Exporter**    | `9121`  | _Acesso interno (para métricas do Redis)_        |
+| 🐘 **Postgres Exporter** | `9187`  | _Acesso interno (para métricas do PostgreSQL)_   |
+| 🐰 **RabbitMQ Exporter** | `9419`  | _Acesso interno (para métricas do RabbitMQ)_     |
 
 ## 🚀 Comandos Principais
 
@@ -277,34 +292,38 @@ Os seguintes serviços estão configurados para serem **scrapeados** pelo Promet
 Aqui está um exemplo do trecho YAML utilizado para definir os alvos de monitoramento:
 
 ```yaml
-scrape_configs:
-  - job_name: 'prometheus'
-    static_configs:
-      - targets: ['localhost:9090']
+scrape_configs:  
+  - job_name: 'prometheus'  # 📊 Monitoramento do próprio Prometheus  
+    static_configs:  
+      - targets: ['localhost:9090']  # 🏠 Servidor local onde o Prometheus está rodando  
 
-  - job_name: 'node-exporter'
-    static_configs:
-      - targets: ['node-exporter:9100']
+  - job_name: 'node-exporter'  # 🖥️ Coleta métricas do sistema operacional  
+    static_configs:  
+      - targets: ['node-exporter:9100']  # 🔌 Porta padrão do Node Exporter  
 
-  - job_name: 'cadvisor'
-    static_configs:
-      - targets: ['cadvisor:8080']
+  - job_name: 'cadvisor'  # 🐳 Monitoramento de containers Docker  
+    static_configs:  
+      - targets: ['cadvisor:8080']  # 📡 Porta onde o cAdvisor expõe métricas  
 
-  - job_name: 'mongodb-exporter'
-    static_configs:
-      - targets: ['mongo:9216']
+  - job_name: 'mongodb-exporter'  # 🗄️ Exportador de métricas do MongoDB  
+    static_configs:  
+      - targets: ['mongodb-exporter:9216']  # 🔄 Coleta métricas do banco de dados MongoDB  
 
-  - job_name: 'postgres-exporter'
-    static_configs:
-      - targets: ['postgres:9187']
+  - job_name: 'postgres-exporter'  # 🗄️ Exportador de métricas do PostgreSQL  
+    static_configs:  
+      - targets: ['postgres-exporter:9187']  # 📊 Monitoramento do banco de dados PostgreSQL
+  
+  - job_name: 'mysql-exporter'  # 🗄️ Exportador de métricas do MySQL  
+    static_configs:  
+      - targets: ['mysql-exporter:9104']  # 📊 Monitoramento do banco de dados MySQL
 
-  - job_name: 'mysql-exporter'
-    static_configs:
-      - targets: ['mysql-exporter:9104']
+  - job_name: 'redis-exporter'  # 🗄️ Exportador de métricas do Redis  
+    static_configs:  
+      - targets: ['redis-exporter:9121']  # 📊 Monitoramento do banco de dados Redis
 
-  - job_name: 'redis-exporter'
-    static_configs:
-      - targets: ['redis-exporter:9121']
+  - job_name: 'rabbitmq-exporter'  # 🗄️ Exportador de métricas do RabbitMQ  
+    static_configs:  
+      - targets: ['rabbitmq-exporter:9419']  # 📊 Monitoramento do banco de dados RabbitMQ
 ```
 
 > 💡 **Nota:** Certifique-se de que os serviços listados estão rodando corretamente e acessíveis pelas portas configuradas para uma coleta eficiente de métricas.

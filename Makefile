@@ -30,7 +30,7 @@ include $(ENV_FILE)
 
 # 🏷️ Nomes dos Serviços
 REPORTS_DIR=reports
-SERVICES=portainer sonarqube mongo mongo-express postgres pgadmin mysql phpmyadmin prometheus grafana rabbitmq cadvisor node-exporter redis redisinsight mysql-exporter postgres-exporter mongodb-exporter redis-exporter
+SERVICES=portainer sonarqube mongo mongo-express postgres pgadmin mysql phpmyadmin prometheus grafana rabbitmq rabbitmq-exporter cadvisor node-exporter redis redisinsight mysql-exporter postgres-exporter mongodb-exporter redis-exporter
 
 # 🏷️ Sonar Configuration
 SONAR_SCANNER=npx sonar-scanner
