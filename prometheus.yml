@@ -40,3 +40,7 @@ scrape_configs:
   - job_name: 'redis-exporter'  # 🗄️ Exportador de métricas do Redis  
     static_configs:  
       - targets: ['redis-exporter:9121']  # 📊 Monitoramento do banco de dados Redis
+
+  - job_name: 'rabbitmq-exporter'  # 🗄️ Exportador de métricas do RabbitMQ  
+    static_configs:  
+      - targets: ['rabbitmq-exporter:9419']  # 📊 Monitoramento do banco de dados RabbitMQ
