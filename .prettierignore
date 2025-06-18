@@ -1,0 +1,8 @@
+Makefile
+vault
+node_modules
+dist
+coverage
+.vscode
+.idea
+*.log
