@@ -1,4 +1,41 @@
-# 🚀 Infraestrutura Padrão para Desenvolvimento
+ <style>
+  .rocket {
+    display: inline-block;
+    animation: rocket-launch 2s infinite ease-in-out;
+  }
+
+  @keyframes rocket-launch {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-15px);
+    }
+  }
+</style>
+
+<h1 align="center">
+  <span class="rocket">🚀</span> Infraestrutura Padrão para Desenvolvimento
+</h1>
+
+<div align="center">
+
+<p ><h3 align="center">🚀 _(Em Desenvolvimento 🚧)_</h3></p>
+
+<p align="center">
+  <img src="https://akumeninc.com/wp-content/uploads/DevSecOps-Animation.gif" alt="Infra DevTools e DevOps" width="600"/>
+
+<strong>🚀 Infra DevTools e Pipelines CI/CD 🔧</strong><br>
+⚙️ Ferramentas para infraestrutura como código, automação, testes e deploy.  
+✅ Ideal para fluxos modernos com segurança 🔐 e eficiência ⚡.
+
+</p>
+
+</div>
+
+## 🛠️ Tecnologias Utilizadas
+
+<div align="center">
 
 ![Docker](https://img.shields.io/badge/Docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 ![Makefile](https://img.shields.io/badge/Makefile-%23F7DF1E.svg?style=for-the-badge&logo=gnu&logoColor=black)
@@ -18,6 +55,8 @@
 ![MySQL Exporter](https://img.shields.io/badge/MySQL%20Exporter-%2347A248.svg?style=for-the-badge&logo=mysql&logoColor=white)
 ![Redis Exporter](https://img.shields.io/badge/Redis%20Exporter-%23DC382D.svg?style=for-the-badge&logo=redis&logoColor=white)
 ![RabbitMQ Exporter](https://img.shields.io/badge/RabbitMQ%20Exporter-%23FF6600.svg?style=for-the-badge&logo=rabbitmq&logoColor=white)
+
+</div>
 
 > ⚠️ **Este projeto está 🚀 _(Em Desenvolvimento 🚧)_**
 >
@@ -81,15 +120,20 @@ Esta seção destaca os passos que já foram implementados e estão funcionando 
 
 ## 📂 **Estrutura do Projeto**
 
+````plaintext## 📂 **Estrutura do Projeto**
+
 ```plaintext
 ├── reports/ 📄 Relatórios gerados pelo OWASP Dependency-Check e testes automatizados
 ├── infra-devtools/ 🛠️ Diretório do projeto (caso usado como submódulo)
+│   ├── .env 📋 Arquivo de variáveis de ambiente (não versionado)
 │   ├── .env.example 📋 Exemplo de variáveis de ambiente
+│   ├── .env.development 📋 Configuração de variáveis para ambiente de desenvolvimento
 │   ├── Makefile ⚙️ Comandos automatizados (make up, make down, etc.)
 │   ├── docker-compose.yml 🐳 Configuração principal dos containers
 │   ├── prometheus.yml 📊 Configuração do Prometheus (monitoramento)
 │   ├── scripts/ 📂 Scripts auxiliares
-│   │   └── run-dependency-check.sh  # Script para executar o OWASP Dependency-Check
+│   │   ├── run-dependency-check.sh  # Script para executar o OWASP Dependency-Check
+│   │   └── setup.sh  # Script para configuração inicial do ambiente
 │   ├── src/ 📂 Código-fonte e testes
 │   │   ├── tests/ 📂 Testes automatizados
 │   │   │   ├── test_services.py  # Testes para verificar serviços
@@ -98,7 +142,19 @@ Esta seção destaca os passos que já foram implementados e estão funcionando 
 │   │   │   └── test_integration.py  # Testes de integração com Testcontainers
 │   │   └── utils/ 📂 Utilitários
 │   │       └── convert_junit_to_sonar.py  # Script para converter relatórios de testes para o formato do SonarQube
+
 ```
+├── .gitignore 🚫 Arquivos e diretórios ignorados pelo Git
+├── .eslintignore 🚫 Arquivos ignorados pelo ESLint
+├── .prettierignore 🚫 Arquivos ignorados pelo Prettier
+├── .prettierrc 🎨 Configuração do Prettier para formatação de código
+├── eslint.config.ts 🔍 Configuração alternativa do ESLint em TypeScript
+├── jest.config.ts ⚙️ Configuração do Jest para testes automatizados
+├── pytest.ini ⚙️ Configuração do Pytest para testes em Python
+├── sonar-project.properties 🔍 Configuração do SonarQube para análise de código
+├── package.json 📦 Configurações e dependências do projeto Node.js
+├── README.md 📖 Documentação principal do projeto
+````
 
 ## 🛠️ Instalação e Uso do Infra DevTools para Desenvolvedores 👨‍💻
 
@@ -292,38 +348,38 @@ Os seguintes serviços estão configurados para serem **scrapeados** pelo Promet
 Aqui está um exemplo do trecho YAML utilizado para definir os alvos de monitoramento:
 
 ```yaml
-scrape_configs:  
-  - job_name: 'prometheus'  # 📊 Monitoramento do próprio Prometheus  
-    static_configs:  
-      - targets: ['localhost:9090']  # 🏠 Servidor local onde o Prometheus está rodando  
+scrape_configs:
+  - job_name: 'prometheus' # 📊 Monitoramento do próprio Prometheus
+    static_configs:
+      - targets: ['localhost:9090'] # 🏠 Servidor local onde o Prometheus está rodando
 
-  - job_name: 'node-exporter'  # 🖥️ Coleta métricas do sistema operacional  
-    static_configs:  
-      - targets: ['node-exporter:9100']  # 🔌 Porta padrão do Node Exporter  
+  - job_name: 'node-exporter' # 🖥️ Coleta métricas do sistema operacional
+    static_configs:
+      - targets: ['node-exporter:9100'] # 🔌 Porta padrão do Node Exporter
 
-  - job_name: 'cadvisor'  # 🐳 Monitoramento de containers Docker  
-    static_configs:  
-      - targets: ['cadvisor:8080']  # 📡 Porta onde o cAdvisor expõe métricas  
+  - job_name: 'cadvisor' # 🐳 Monitoramento de containers Docker
+    static_configs:
+      - targets: ['cadvisor:8080'] # 📡 Porta onde o cAdvisor expõe métricas
 
-  - job_name: 'mongodb-exporter'  # 🗄️ Exportador de métricas do MongoDB  
-    static_configs:  
-      - targets: ['mongodb-exporter:9216']  # 🔄 Coleta métricas do banco de dados MongoDB  
+  - job_name: 'mongodb-exporter' # 🗄️ Exportador de métricas do MongoDB
+    static_configs:
+      - targets: ['mongodb-exporter:9216'] # 🔄 Coleta métricas do banco de dados MongoDB
 
-  - job_name: 'postgres-exporter'  # 🗄️ Exportador de métricas do PostgreSQL  
-    static_configs:  
-      - targets: ['postgres-exporter:9187']  # 📊 Monitoramento do banco de dados PostgreSQL
-  
-  - job_name: 'mysql-exporter'  # 🗄️ Exportador de métricas do MySQL  
-    static_configs:  
-      - targets: ['mysql-exporter:9104']  # 📊 Monitoramento do banco de dados MySQL
+  - job_name: 'postgres-exporter' # 🗄️ Exportador de métricas do PostgreSQL
+    static_configs:
+      - targets: ['postgres-exporter:9187'] # 📊 Monitoramento do banco de dados PostgreSQL
 
-  - job_name: 'redis-exporter'  # 🗄️ Exportador de métricas do Redis  
-    static_configs:  
-      - targets: ['redis-exporter:9121']  # 📊 Monitoramento do banco de dados Redis
+  - job_name: 'mysql-exporter' # 🗄️ Exportador de métricas do MySQL
+    static_configs:
+      - targets: ['mysql-exporter:9104'] # 📊 Monitoramento do banco de dados MySQL
 
-  - job_name: 'rabbitmq-exporter'  # 🗄️ Exportador de métricas do RabbitMQ  
-    static_configs:  
-      - targets: ['rabbitmq-exporter:9419']  # 📊 Monitoramento do banco de dados RabbitMQ
+  - job_name: 'redis-exporter' # 🗄️ Exportador de métricas do Redis
+    static_configs:
+      - targets: ['redis-exporter:9121'] # 📊 Monitoramento do banco de dados Redis
+
+  - job_name: 'rabbitmq-exporter' # 🗄️ Exportador de métricas do RabbitMQ
+    static_configs:
+      - targets: ['rabbitmq-exporter:9419'] # 📊 Monitoramento do banco de dados RabbitMQ
 ```
 
 > 💡 **Nota:** Certifique-se de que os serviços listados estão rodando corretamente e acessíveis pelas portas configuradas para uma coleta eficiente de métricas.
@@ -406,6 +462,10 @@ Os relatórios serão gerados na pasta `reports/`:
 
 > 💡 **Nota:** Este projeto está em constante desenvolvimento. Algumas funcionalidades podem estar incompletas ou sujeitas a alterações. Contribuições são sempre bem-vindas! 🛠️
 
+## 📜 Licença
+
+Este projeto está licenciado sob a licença [MIT](https://www.google.com/search?q=https://github.com/KleilsonSantos/Mongo-RestFull-API/blob/main/LICENSE).
+
 ## 🌍 **Junte-se a nós**
 
 Se você acredita que este projeto pode ajudar outros desenvolvedores, compartilhe com sua rede! Vamos construir juntos uma infraestrutura de desenvolvimento mais eficiente e acessível para todos. 🚀✨
@@ -418,13 +478,26 @@ Este projeto é **open-source** e está em constante evolução. Sua contribuiç
 - 🛠️ **Contribua com código:** Envie pull requests com novas funcionalidades ou correções.
 - ⭐ **Dê uma estrela no GitHub:** Isso ajuda o projeto a alcançar mais desenvolvedores.
 
+<br>
+
+<p align="center">
+  <img src="https://media.giphy.com/media/26ufnwz3wDUli7GU0/giphy.gif" width="120"/>
+</p>
+
 ## 🙏 **Agradecimentos**
 
 Agradecemos por utilizar este projeto! Caso tenha sugestões, melhorias ou encontre algum problema, sinta-se à vontade para abrir uma issue ou enviar um pull request. Sua contribuição é muito bem-vinda! 💡
 
 ## ✍️ **Autor**
 
-Desenvolvido com ❤️ por **Kleilson Santos**.
+Desenvolvido por **Kleilson Santos**.
 
-- 🌐 [GitHub](https://github.com/KleilsonSantos) - KleilsonSantos
-- 💼 [LinkedIn](https://www.linkedin.com/in/kleilson-dev-full-stack) - KleilsonSantos
+## 📬 Contato
+
+- 📧 Email: kleilson@icloud.com
+- 🔗 LinkedIn: [linkedin.com/in/kleilson-dev-full-stack](https://linkedin.com/in/kleilson-dev-full-stack)
+- 💻 GitHub: [Kleilson Santos](https://github.com/KleilsonSantos)
+
+
+
+<p align="center"><b>⚡ Construa com segurança, teste com propósito, automatize com clareza.<br>by Kleilson Santos 🚀</b></p>

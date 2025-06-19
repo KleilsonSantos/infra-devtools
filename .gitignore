@@ -65,3 +65,6 @@ Thumbs.db
 
 #
 .venv/
+vault/
+node_modules
+src/tests/__pycache__
