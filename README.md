@@ -421,7 +421,7 @@ Os relatórios serão gerados na pasta `reports/`:
 
 ## 🔮 **Passos futuros**
 
-- [ ] 📦 Adicionar suporte ao Redis e RabbitMQ.
+- [X] 📦 Adicionar suporte ao Redis e RabbitMQ.
 - [ ] 🔒 Implementar autenticação para os serviços expostos.
 - [x] 🧪 Criar testes automatizados para validar a infraestrutura.
 - [x] **🛠️ Refatorar build scripts para utilizar `npm`:**
@@ -436,8 +436,8 @@ Os relatórios serão gerados na pasta `reports/`:
 - [ ] **⚙️ Considerar ferramentas de automação de tarefas para DevInfra (Makefile, Task, Shell Scripts)**
   - [x] 🧩 Automatizar tarefas comuns com `Makefile` e scripts shell
   - [ ] 🔐 Integrar hardening de containers com `Docker Bench` ou `Dockle`
-  - [ ] 🧪 Adicionar testes automatizados dos serviços usando `bats` ou `Testcontainers`
-  - [ ] 🧱 Modularizar serviços com uso de redes nomeadas e volumes persistentes
+  - [X] 🧪 Adicionar testes automatizados dos serviços usando `bats` ou `Testcontainers`
+  - [X] 🧱 Modularizar serviços com uso de redes nomeadas e volumes persistentes
   - [ ] 📊 Configurar dashboards personalizados de monitoramento visual com Grafana e alertas no Prometheus
 
 > 💡 **Nota:** Este projeto está em constante desenvolvimento. Algumas funcionalidades podem estar incompletas ou sujeitas a alterações. Contribuições são sempre bem-vindas! 🛠️
