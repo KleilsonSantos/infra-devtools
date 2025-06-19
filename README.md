@@ -1,19 +1,3 @@
- <style>
-  .rocket {
-    display: inline-block;
-    animation: rocket-launch 2s infinite ease-in-out;
-  }
-
-  @keyframes rocket-launch {
-    0%, 100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-15px);
-    }
-  }
-</style>
-
 <h1 align="center">
   <span class="rocket">🚀</span> Infraestrutura Padrão para Desenvolvimento
 </h1>
