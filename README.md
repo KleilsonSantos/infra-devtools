@@ -25,6 +25,11 @@
 >
 > Algumas funcionalidades podem estar incompletas ou sujeitas a alterações. Contribuições são bem-vindas! 🛠️
 
+⚙️ Ferramentas para infraestrutura como código, automação, testes e deploy.  
+✅ Ideal para fluxos modernos com segurança 🔐 e eficiência ⚡.
+
+</p>
+
 </div>
 
 ## 🛠️ Tecnologias Utilizadas
@@ -181,7 +186,6 @@ Esta seção destaca os principais componentes já implementados e funcionando n
 ├── [prometheus.yml](http://_vscodecontentref_/8)           # Configuração do Prometheus
 ├── [README.md](http://_vscodecontentref_/9)                # Documentação principal
 ├── [package.json](http://_vscodecontentref_/10)             # Dependências e scripts npm
->>>>>>> Stashed changes
 ```
 
 ## 🛠️ Instalação e Uso do Infra DevTools para Desenvolvedores 👨‍💻
@@ -642,7 +646,7 @@ Os relatórios serão gerados na pasta `reports/`:
 
 ## 🔮 **Passos futuros**
 
-- [x] 📦 Adicionar suporte ao Redis e RabbitMQ.
+- [X] 📦 Adicionar suporte ao Redis e RabbitMQ.
 - [ ] 🔒 Implementar autenticação para os serviços expostos.
 - [x] 🧪 Criar testes automatizados para validar a infraestrutura.
 - [x] **🛠️ Refatorar build scripts para utilizar `npm`:**
@@ -663,6 +667,10 @@ Os relatórios serão gerados na pasta `reports/`:
 
 > 💡 **Nota:** Este projeto está em constante desenvolvimento. Algumas funcionalidades podem estar incompletas ou sujeitas a alterações. Contribuições são sempre bem-vindas! 🛠️
 
+## 📜 Licença
+
+Este projeto está licenciado sob a licença [MIT](https://www.google.com/search?q=https://github.com/KleilsonSantos/Mongo-RestFull-API/blob/main/LICENSE).
+
 ## 🌍 **Junte-se a nós**
 
 Se você acredita que este projeto pode ajudar outros desenvolvedores, compartilhe com sua rede! Vamos construir juntos uma infraestrutura de desenvolvimento mais eficiente e acessível para todos. 🚀✨
@@ -674,6 +682,12 @@ Este projeto é **open-source** e está em constante evolução. Sua contribuiç
 - 💬 **Sugira melhorias:** Abra uma issue com suas ideias.
 - 🛠️ **Contribua com código:** Envie pull requests com novas funcionalidades ou correções.
 - ⭐ **Dê uma estrela no GitHub:** Isso ajuda o projeto a alcançar mais desenvolvedores.
+
+<br>
+
+<p align="center">
+  <img src="https://media.giphy.com/media/26ufnwz3wDUli7GU0/giphy.gif" width="120"/>
+</p>
 
 ## 🙏 **Agradecimentos**
 
