@@ -318,8 +318,6 @@ make logs
 
 Este projeto oferece comandos práticos para gerenciar a infraestrutura e os serviços. Você pode executá-los utilizando o `Makefile` ou os scripts definidos no `package.json` com `npm run`. Escolha a abordagem que preferir.
 
-### convert_junit_to_sonar.py
-
 ## 🔄 Importância do Script `convert_junit_to_sonar.py`
 
 O script `convert_junit_to_sonar.py` desempenha um papel fundamental na integração entre os testes automatizados do projeto e a análise de qualidade de código realizada pelo SonarQube.
