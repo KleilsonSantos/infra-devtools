@@ -1,0 +1,21 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  #receiver: 'default'
+  receiver: 'email-team'
+
+receivers:
+  - name: 'email-team'
+    email_configs:
+      - to: 'kdsdesign1@gmail.com'
+        from: "$FROM_EMAIL"
+        smarthost: "$SMTP_HOST"
+        auth_username: "$SMTP_USER"
+        auth_password: "$SMTP_PASS"
+        require_tls: $SMTP_TLS
+ 
+  # - name: 'webhook-team'
+  #   webhook_configs:
+  #     - url: 'http://meu-servico-webhook:5001/alert'
+  #       send_resolved: true

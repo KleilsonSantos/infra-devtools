@@ -1,0 +1,200 @@
+groups:
+  - name: test-rules
+    rules:
+      # ============================================
+      # 🧪 TEST ALERT: Always firing (for testing flow)
+      # ============================================
+      - alert: Test_Always_Firing
+        expr: vector(1)
+        for: 10s
+        labels:
+          severity: test
+        annotations:
+          summary: "Test alert that always fires 🚨"
+          description: "This alert is used to test the Prometheus → Alertmanager → Email pipeline."
+
+  - name: infra_alerts
+    rules:
+      # ========================
+      # 🔥 ALERT: High CPU Usage
+      # ========================
+      - alert: HighCPUUsage
+        expr: 1 == bool 1
+        for: 1m
+        labels:
+          severity: warning
+          service: node-exporter
+        annotations:
+          summary: "High CPU usage detected on {{ $labels.instance }}"
+          description: "CPU usage is above 80% for more than 2 minutes on host {{ $labels.instance }}."
+
+      # ============================
+      # 🧠 ALERT: High Memory Usage
+      # ============================
+      - alert: HighMemoryUsage
+        expr: 1 == bool 1
+        for: 1m
+        labels:
+          severity: warning
+          service: node-exporter
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage is above 85% for more than 2 minutes."
+
+      # =============================
+      # 💽 ALERT: Low Disk Space
+      # =============================
+      - alert: LowDiskSpace
+        expr: 1 == bool 1
+        for: 1m
+        labels:
+          severity: critical
+          service: node-exporter
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }}"
+          description: "Less than 10% of free disk space on host {{ $labels.instance }}."
+
+      # =====================================
+      # 🍃 ALERT: MongoDB - Availability
+      # =====================================
+      - alert: MongoDBDown
+        expr: 1 == bool 1
+        for: 1m
+        labels:
+          severity: critical
+          service: mongo
+        annotations:
+          summary: "MongoDB is down on {{ $labels.instance }}"
+          description: "MongoDB Exporter has been unreachable for over 1 minute."
+
+      # ====================================
+      # 🐘 ALERT: PostgreSQL - Availability
+      # ====================================
+      - alert: PostgreSQLDown
+        expr: 1 == bool 1
+        for: 1m
+        labels:
+          severity: critical
+          service: postgres
+        annotations:
+          summary: "PostgreSQL is down on {{ $labels.instance }}"
+          description: "PostgreSQL Exporter has been unreachable for over 1 minute."
+
+      # ====================================
+      # 🐬 ALERT: MySQL - Availability
+      # ====================================
+      - alert: MySQLDown
+        expr: 1 == bool 1
+        for: 1m
+        labels:
+          severity: critical
+          service: mysql
+        annotations:
+          summary: "MySQL is down on {{ $labels.instance }}"
+          description: "MySQL Exporter has been unreachable for over 1 minute."
+
+      # ====================================
+      # 🔑 ALERT: Keycloak - Availability
+      # ====================================
+      - alert: KeycloakDown
+        expr: 1 == bool 1
+        for: 1m
+        labels:
+          severity: critical
+          service: keycloak
+        annotations:
+          summary: "Keycloak is down on {{ $labels.instance }}"
+          description: "Keycloak Exporter has been unreachable for over 1 minute."
+
+      # ====================================
+      # 🔑 ALERT: Redis - Availability
+      # ====================================
+      - alert: RedisDown
+        expr: 1 == bool 1
+        for: 1m
+        labels:
+          severity: critical
+          service: redis
+        annotations:
+          summary: "Redis is down on {{ $labels.instance }}"
+          description: "Redis Exporter has been unreachable for over 1 minute."
+
+      # ====================================
+      # 🔑 ALERT: RabbitMQ - Availability
+      # ====================================
+      - alert: RabbitMQDown
+        expr: 1 == bool 1
+        for: 1m
+        labels:
+          severity: critical
+          service: rabbitmq
+        annotations:
+          summary: "RabbitMQ is down on {{ $labels.instance }}"
+          description: "RabbitMQ Exporter has been unreachable for over 1 minute."
+
+      # ====================================
+      # 🔍 ALERT: Blackbox Exporter - Availability
+      # ====================================
+      - alert: BlackboxDown
+        expr: 1 == bool 1
+        for: 1m
+        labels:
+          severity: critical
+          service: blackbox
+        annotations:
+          summary: "Blackbox Exporter is down on {{ $labels.instance }}"
+          description: "Blackbox Exporter has been unreachable for over 1 minute."
+
+      # ============================================
+      # 📡 ALERT: Blackbox ICMP - Availability
+      # ============================================
+      - alert: BlackboxICMPDown
+        expr: 1 == bool 1
+        for: 1m
+        labels:
+          severity: critical
+          service: blackbox-icmp
+        annotations:
+          summary: "Blackbox ICMP probe is down on {{ $labels.instance }}"
+          description: "Blackbox ICMP Exporter has been unreachable for over 1 minute."
+
+  - name: rabbitmq_alerts
+    rules:
+      # ============================================
+      # 📦 ALERT: RabbitMQ queue size too large
+      # ============================================
+      - alert: RabbitMQQueueTooLarge
+        expr: rabbitmq_queue_messages_ready{queue="alerts.queue"} > 20
+        for: 2m
+        labels:
+          severity: warning
+          service: rabbitmq
+        annotations:
+          summary: "Too many messages in queue: {{ $labels.queue }}"
+          description: "The queue '{{ $labels.queue }}' has more than 20 pending messages for over 2 minutes. This may indicate processing delay."
+
+      # ============================================
+      # 🔴 ALERT: RabbitMQ is down
+      # ============================================
+      - alert: RabbitMQDown
+        expr: rabbitmq_up == 0
+        for: 30s
+        labels:
+          severity: critical
+          service: rabbitmq
+        annotations:
+          summary: "RabbitMQ is down on {{ $labels.instance }}"
+          description: "RabbitMQ service has not responded for more than 30 seconds."
+
+      # ============================================
+      # ⚠️ ALERT: Queue has no active consumers
+      # ============================================
+      - alert: RabbitMQConsumersZero
+        expr: rabbitmq_queue_consumers{queue="alerts.queue"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          service: rabbitmq
+        annotations:
+          summary: "No active consumers on queue {{ $labels.queue }}"
+          description: "The queue '{{ $labels.queue }}' has no active consumers for more than 30 seconds. Messages may be piling up."

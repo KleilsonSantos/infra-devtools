@@ -1,46 +1,99 @@
 # -------------------------------------------
-# 📡 Configuração do Prometheus - prometheus.yml
-# 🧑‍💻 Autor: Kleilson Santos
-# 📅 Atualizado em: 2025-05-11
-# 🔧 Serviços Monitorados: Prometheus 📊, Node Exporter 🖥️, cAdvisor 🐳, MongoDB Exporter 🗄️, PostgreSQL Exporter 🗄️
+# 📡 Prometheus Configuration - prometheus.yml
+# 👨‍💻 Author: Kleilson Santos
+# 📅 Last Updated: 2025-06-19
+# 🔍 Description: Prometheus scraping and alerting setup for infrastructure observability.
+# 🎯 Monitored Services:
+#   - Prometheus, Node Exporter, cAdvisor
+#   - Exporters for MongoDB, PostgreSQL, MySQL, Redis, RabbitMQ
+#   - Blackbox Exporter (HTTP/ICMP)
+#   - API with Spring Boot Actuator
 # -------------------------------------------
 
-# 🌐 Prometheus Configuration  
-# 🛠️ Configuração global do Prometheus  
+# 🌐 Global configuration
+global:
+  scrape_interval: 15s           # ⏱️ Collect metrics every 15 seconds
+  evaluation_interval: 15s       # 🔎 Evaluate alert rules every 15 seconds
 
-global:  
-  scrape_interval: 15s  # ⏱️ Define a frequência de coleta de métricas (a cada 15s)  
-  evaluation_interval: 15s  # 🔎 Intervalo para avaliação de regras (também a cada 15s)  
+# 📜 Alert rule files
+rule_files:
+  - "alerts.yml"
 
-scrape_configs:  
-  - job_name: 'prometheus'  # 📊 Monitoramento do próprio Prometheus  
-    static_configs:  
-      - targets: ['localhost:9090']  # 🏠 Servidor local onde o Prometheus está rodando  
+# 🚨 Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
 
-  - job_name: 'node-exporter'  # 🖥️ Coleta métricas do sistema operacional  
-    static_configs:  
-      - targets: ['node-exporter:9100']  # 🔌 Porta padrão do Node Exporter  
+# 📦 Scraping targets
+scrape_configs:
 
-  - job_name: 'cadvisor'  # 🐳 Monitoramento de containers Docker  
-    static_configs:  
-      - targets: ['cadvisor:8080']  # 📡 Porta onde o cAdvisor expõe métricas  
+  # 📊 Monitor Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['prometheus:9090']  # 🏠 Local Prometheus server
 
-  - job_name: 'mongodb-exporter'  # 🗄️ Exportador de métricas do MongoDB  
-    static_configs:  
-      - targets: ['mongodb-exporter:9216']  # 🔄 Coleta métricas do banco de dados MongoDB  
+  # 🖥️ Monitor host system resources (CPU, RAM, Disk)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']  # 🔌 Default Node Exporter port
 
-  - job_name: 'postgres-exporter'  # 🗄️ Exportador de métricas do PostgreSQL  
-    static_configs:  
-      - targets: ['postgres-exporter:9187']  # 📊 Monitoramento do banco de dados PostgreSQL
-  
-  - job_name: 'mysql-exporter'  # 🗄️ Exportador de métricas do MySQL  
-    static_configs:  
-      - targets: ['mysql-exporter:9104']  # 📊 Monitoramento do banco de dados MySQL
+  # 🐳 Monitor running Docker containers
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']  # 📦 cAdvisor metrics endpoint
 
-  - job_name: 'redis-exporter'  # 🗄️ Exportador de métricas do Redis  
-    static_configs:  
-      - targets: ['redis-exporter:9121']  # 📊 Monitoramento do banco de dados Redis
+  # 🍃 MongoDB exporter
+  - job_name: 'mongodb-exporter'
+    static_configs:
+      - targets: ['mongodb-exporter:9216']  # 📊 MongoDB metrics
 
-  - job_name: 'rabbitmq-exporter'  # 🗄️ Exportador de métricas do RabbitMQ  
-    static_configs:  
-      - targets: ['rabbitmq-exporter:9419']  # 📊 Monitoramento do banco de dados RabbitMQ
+  # 🐘 PostgreSQL exporter
+  - job_name: 'postgres-exporter'
+    static_configs:
+      - targets: ['postgres-exporter:9187']  # 📊 PostgreSQL metrics
+
+  # 🐬 MySQL exporter
+  - job_name: 'mysql-exporter'
+    static_configs:
+      - targets: ['mysql-exporter:9104']  # 📊 MySQL metrics
+
+  # 🧠 Redis exporter
+  - job_name: 'redis-exporter'
+    static_configs:
+      - targets: ['redis-exporter:9121']  # 📊 Redis metrics
+
+  # 🐰 RabbitMQ exporter
+  - job_name: 'rabbitmq-exporter'
+    static_configs:
+      - targets: ['rabbitmq-exporter:9419']  # 📊 RabbitMQ metrics
+
+  # 🌐 Blackbox Exporter (HTTP probe)
+  - job_name: 'blackbox-exporter'
+    static_configs:
+      - targets: ['blackbox-exporter:9115']  # 🛰️ Blackbox exporter metrics endpoint
+
+  # ⚙️ Spring Boot API metrics via Actuator
+  - job_name: 'crud-users-api'
+    metrics_path: /actuator/prometheus
+    params:
+      module: [http_2xx, http_3xx, http_4xx, http_5xx]
+    static_configs:
+      - targets: ['crud-users-api:8089']  # 🧪 Application metrics
+
+  # 🌐 Blackbox Exporter for ICMP Ping
+  - job_name: 'blackbox-exporter-icmp-ping'
+    metrics_path: /probe
+    params:
+      module: [icmp_ping]
+    static_configs:
+      - targets:
+          - 8.8.8.8  # 📡 Google DNS or target IP to monitor
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115

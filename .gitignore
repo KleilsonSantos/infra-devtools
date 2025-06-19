@@ -63,8 +63,7 @@ Thumbs.db
 .scannerwork
 .coverage
 
-#
-.venv/
+# 🔧 Ambiente Virtual Python
+.venv/*
 vault/
 node_modules
-src/tests/__pycache__

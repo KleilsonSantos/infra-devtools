@@ -1,0 +1,20 @@
+global:
+  smtp_smarthost: "$SMTP_HOST"
+  smtp_from: "$FROM_EMAIL"
+  smtp_auth_username: "$SMTP_USER"
+  smtp_auth_password: "$SMTP_PASS"
+  smtp_require_tls: $SMTP_TLS
+
+route:
+  receiver: "email-team"
+
+receivers:
+  - name: "email-team"
+    email_configs:
+      - to: "$TO_EMAIL"
+        send_resolved: true
+        from: "$FROM_EMAIL"
+        smarthost: "$SMTP_HOST"
+        auth_username: "$SMTP_USER"
+        auth_password: "$SMTP_PASS"
+        require_tls: $SMTP_TLS
