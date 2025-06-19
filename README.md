@@ -104,8 +104,6 @@ Esta seção destaca os passos que já foram implementados e estão funcionando 
 
 ## 📂 **Estrutura do Projeto**
 
-````plaintext## 📂 **Estrutura do Projeto**
-
 ```plaintext
 ├── reports/ 📄 Relatórios gerados pelo OWASP Dependency-Check e testes automatizados
 ├── infra-devtools/ 🛠️ Diretório do projeto (caso usado como submódulo)
@@ -126,8 +124,6 @@ Esta seção destaca os passos que já foram implementados e estão funcionando 
 │   │   │   └── test_integration.py  # Testes de integração com Testcontainers
 │   │   └── utils/ 📂 Utilitários
 │   │       └── convert_junit_to_sonar.py  # Script para converter relatórios de testes para o formato do SonarQube
-
-```
 ├── .gitignore 🚫 Arquivos e diretórios ignorados pelo Git
 ├── .eslintignore 🚫 Arquivos ignorados pelo ESLint
 ├── .prettierignore 🚫 Arquivos ignorados pelo Prettier
@@ -138,7 +134,7 @@ Esta seção destaca os passos que já foram implementados e estão funcionando 
 ├── sonar-project.properties 🔍 Configuração do SonarQube para análise de código
 ├── package.json 📦 Configurações e dependências do projeto Node.js
 ├── README.md 📖 Documentação principal do projeto
-````
+```
 
 ## 🛠️ Instalação e Uso do Infra DevTools para Desenvolvedores 👨‍💻
 
