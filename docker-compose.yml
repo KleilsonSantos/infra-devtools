@@ -480,7 +480,7 @@ services:
   # 📊 USERS-API
   # ======================
   users-api:
-    image: santos/users-api:v1.0.0
+    image: kleilsonsantos/users-api:latest
     container_name: infra-default-users-api
     restart: always
     ports:
@@ -508,7 +508,7 @@ services:
   # 📊 WEBHOOK LISTENER
   # ======================
   webhook-listener:
-    image: santos/webhook-alerts-rabbitmq:v1.0.1
+    image: kleilsonsantos/webhook-alerts-rabbitmq:latest
     container_name: infra-default-webhook-listener
     restart: always
     ports:
@@ -545,7 +545,7 @@ services:
       - infra-default-shared-net
 
   eureka-server:
-    image: santos/eureka-server:latest
+    image: kleilsonsantos/eureka-server:latest
     container_name: infra-default-eureka-server
     ports:
       - "8761:8761"
