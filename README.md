@@ -25,9 +25,6 @@
 >
 > Algumas funcionalidades podem estar incompletas ou sujeitas a alterações. Contribuições são bem-vindas! 🛠️
 
-⚙️ Ferramentas para infraestrutura como código, automação, testes e deploy.  
-✅ Ideal para fluxos modernos com segurança 🔐 e eficiência ⚡.
-
 </p>
 
 </div>
