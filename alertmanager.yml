@@ -1,0 +1,38 @@
+global:
+  smtp_smarthost: "mailhog:1025"
+  smtp_from: "admin@example.com"
+  smtp_auth_username: ""
+  smtp_auth_password: ""
+  smtp_require_tls: false
+
+route:
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 30s
+  repeat_interval: 1h
+  receiver: 'default-receiver'  # se nenhuma rota filha casar
+
+  routes:
+    - receiver: 'email-notifications'
+      match:
+        severity: warning
+
+    - receiver: 'webhook-rabbitmq'
+      match:
+        severity: critical
+
+receivers:
+  - name: 'default-receiver'
+    email_configs:
+      - to: 'admin@example.com'
+        send_resolved: true
+
+  - name: 'email-notifications'
+    email_configs:
+      - to: 'destinatario@email.com'
+        send_resolved: true
+
+  - name: 'webhook-rabbitmq'
+    webhook_configs:
+      - url: 'http://webhook-listener:5001/alert'
+        send_resolved: true

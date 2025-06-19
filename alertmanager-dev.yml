@@ -1,0 +1,15 @@
+global:
+  smtp_smarthost: "$SMTP_HOST"
+  smtp_from: "$FROM_EMAIL"
+  smtp_auth_username: "$SMTP_USER"
+  smtp_auth_password: "$SMTP_PASS"
+  smtp_require_tls: $SMTP_TLS
+
+route:
+  receiver: 'email-team'
+
+receivers:
+  - name: 'email-team'
+    email_configs:
+      - to: 'kdsdesign1@gmail.com'
+        send_resolved: true

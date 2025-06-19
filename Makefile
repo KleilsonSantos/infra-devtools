@@ -4,22 +4,22 @@
 # 📅 Última atualização: 2025-05-11
 #
 # 📦 Serviços Integrados:
-#   🔍 Monitoramento:	   Prometheus, Node Exporter, cAdvisor
-#   📊 Bancos de Dados:	 MongoDB, PostgreSQL, Redis, MySQL
-#   🛠️ DevTools:			Portainer, RedisInsight, phpMyAdmin, pgAdmin
-#   🧹 Qualidade de Código: SonarQube, ESLint, Prettier, OWASP Dependency-Check
+#   🔍 Monitoramento:		→ Prometheus, Node Exporter, cAdvisor
+#   📊 Bancos de Dados:		→ MongoDB, PostgreSQL, Redis, MySQL
+#   🛠️ DevTools:		 	 → Portainer, RedisInsight, phpMyAdmin, pgAdmin
+#   🧹 Qualidade de Código: → SonarQube, ESLint, Prettier, OWASP Dependency-Check
 #
 # 🎯 Comandos Disponíveis (targets):
 #   🔼 up				   → Inicia todos os containers listados
-#   🔽 down				 → Para os containers sem remover volumes
+#   🔽 down				   → Para os containers sem remover volumes
 #   ♻️ force-recreate	   → Força recriação dos containers
-#   📋 logs				 → Mostra os logs do serviço especificado
+#   📋 logs				   → Mostra os logs do serviço especificado
 #   📜 ps / ps-format	   → Lista os containers em diferentes formatos
-#   📊 coverage			 → Executa testes com cobertura
-#   ✨ lint / format		→ Executa ESLint e Prettier para lint e formatação
+#   📊 coverage			   → Executa testes com cobertura
+#   ✨ lint / format		  → Executa ESLint e Prettier para lint e formatação
 #   🔍 check-deps		   → Executa o Dependency Check
-#   🧹 clean				→ Limpa a pasta de relatórios
-#   🔍 sonar-scanner		→ Executa análise com SonarQube
+#   🧹 clean			   → Limpa a pasta de relatórios
+#   🔍 sonar-scanner	   → Executa análise com SonarQube
 # -------------------------------------------
 
 
@@ -28,15 +28,34 @@ MODULE=src
 ENV_FILE=.env
 include $(ENV_FILE)
 
-# 🏷️ Nomes dos Serviços
-REPORTS_DIR=reports
-SERVICES=portainer sonarqube mongo mongo-express postgres pgadmin mysql phpmyadmin prometheus grafana rabbitmq rabbitmq-exporter cadvisor node-exporter redis redisinsight mysql-exporter postgres-exporter mongodb-exporter redis-exporter
-
 # 🏷️ Sonar Configuration
 SONAR_SCANNER=npx sonar-scanner
 SONAR_PROJECT_KEY=infra-devtools
-#SONAR_HOST_URL=${SONAR_HOST_URL}
-#SONAR_TOKEN=${SONAR_TOKEN_INFRA_DEVTOOLS}
+
+# 🏷️ MAIN SERVICES
+SERVICES = \
+  mongo \
+  mongo-express \
+  postgres \
+  pgadmin \
+  mysql \
+  phpmyadmin \
+  redis \
+  redisinsight \
+  rabbitmq \
+  rabbitmq-exporter \
+  prometheus \
+  grafana \
+  cadvisor \
+  node-exporter \
+  postgres-exporter \
+  mysql-exporter \
+  mongodb-exporter \
+  redis-exporter \
+  sonarqube \
+  portainer \
+  keycloak
+>>>>>>> Stashed changes
 
 # 🐳 Configuração do Docker Compose
 DOCKER_COMPOSE=docker compose --env-file $(ENV_FILE)
@@ -107,49 +126,21 @@ rebuild:
 	$(DOCKER_COMPOSE_BUILD) && \
 	$(DOCKER_COMPOSE_UP)
 
-
-# 🧪 Testes e Cobertura
-coverage:
-	@echo "📊 Executando cobertura de testes..."
-	$(PYTEST_COVERAGE_ALL)
-	$(PYTEST_COVERAGE_JUNIT)
-	python3 $(CONVERTER_SCRIPT) $(JUNIT_XML) $(SONAR_XML)
-
-
-# 🎨 Linting e Formatação
-lint:
-	@echo "✨ Executando ESLint..."
-	$(LINT)
-
-format:
-	@echo "🖌️ Formatando código com Prettier..."
-	$(FORMAT)
-
-
-# 🔍 Verificação de Dependências
-CHECK-DEPS=scripts/run-dependency-check.sh
-
+## Check for dependency vulnerabilities
 check-deps:
 	@echo "🔎 Executando Dependency Check..."
 	$(CHECK-DEPS)
 
-check-deps-path:
-	@echo "🔎 Executando Dependency Check para o caminho: $(path)..."
-	$(CHECK-DEPS) $(path)
-
-
-# 🧹 Limpeza de Relatórios
+## Clean reports
 clean:
-	@echo "🧹 Limpando relatórios..."
+	@echo "🧹 Cleaning reports..."
 	rm -rf $(REPORTS_DIR)/*
 
-
-# 🔍 Executar SonarQube Scanner
+## Run SonarQube analysis
 sonar-scanner:
-	@echo "🔍 Executando SonarQube Scanner..."
+	@echo "🔎 Running SonarQube Scanner..."
 	$(SONAR_SCANNER) -Dsonar.projectKey=$(SONAR_PROJECT_KEY) \
 	-Dsonar.sources=. \
 	-Dsonar.host.url=${SONAR_HOST_URL} \
 	-Dsonar.token=${SONAR_TOKEN_INFRA_DEVTOOLS} \
 	-Dsonar.sourceEncoding=UTF-8
-

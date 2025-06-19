@@ -1,4 +1,35 @@
-# 🚀 Infraestrutura Padrão para Desenvolvimento
+<h1 align="center">
+  <span class="rocket">🚀</span> Infraestrutura Padrão para Desenvolvimento
+</h1>
+
+<div align="center">
+
+<p align="center">
+  <img src="https://akumeninc.com/wp-content/uploads/DevSecOps-Animation.gif" alt="Infra DevTools e DevOps" width="600"/>
+
+<strong>🚀 Infra DevTools e Pipelines CI/CD 🔧</strong><br>
+⚙️ Ferramentas para infraestrutura como código, automação, testes, monitoramento.<br>
+✅ Ideal para fluxos modernos com segurança 🔐, observabilidade 📊 e eficiência ⚡.
+
+<em>
+• Docker & Compose • CI/CD • Logs Estruturados • SonarQube • Monitoramento (Prometheus, Grafana, Alertmanager, Blackbox Exporter) • Multi-Bancos de Dados (MongoDB, PostgreSQL, MySQL, Redis, Vault) • RabbitMQ • Portainer • Automação (Makefile)
+</em>
+
+</div>
+
+<br>
+
+<div align="center">
+
+> ⚠️ **Este projeto está 🚀 _(Em Constante Desenvolvimento 🚧)_**
+>
+> Algumas funcionalidades podem estar incompletas ou sujeitas a alterações. Contribuições são bem-vindas! 🛠️
+
+</div>
+
+## 🛠️ Tecnologias Utilizadas
+
+<div align="center">
 
 ![Docker](https://img.shields.io/badge/Docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 ![Makefile](https://img.shields.io/badge/Makefile-%23F7DF1E.svg?style=for-the-badge&logo=gnu&logoColor=black)
@@ -8,20 +39,24 @@
 ![pgAdmin](https://img.shields.io/badge/pgAdmin-%23336791.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 ![phpMyAdmin](https://img.shields.io/badge/phpMyAdmin-%2347A248.svg?style=for-the-badge&logo=mysql&logoColor=white)
 ![RedisInsight](https://img.shields.io/badge/RedisInsight-%23DC382D.svg?style=for-the-badge&logo=redis&logoColor=white)
-![RabbitMQ](https://img.shields.io/badge/RabbitMQ-%23FF6600.svg?style=for-the-badge&logo=rabbitmq&logoColor=white)
 ![Prometheus](https://img.shields.io/badge/Prometheus-%23E6522C.svg?style=for-the-badge&logo=prometheus&logoColor=white)
 ![Grafana](https://img.shields.io/badge/Grafana-%23F46800.svg?style=for-the-badge&logo=grafana&logoColor=white)
+![Alertmanager](https://img.shields.io/badge/Alertmanager-%23E6522C.svg?style=for-the-badge&logo=prometheus&logoColor=white)
+![Blackbox Exporter](https://img.shields.io/badge/Blackbox%20Exporter-%2300BFFF.svg?style=for-the-badge&logo=linux&logoColor=white)
 ![cAdvisor](https://img.shields.io/badge/cAdvisor-%234285F4.svg?style=for-the-badge&logo=google-cloud&logoColor=white)
 ![Node Exporter](https://img.shields.io/badge/Node%20Exporter-%2300BFFF.svg?style=for-the-badge&logo=linux&logoColor=white)
 ![MongoDB Exporter](https://img.shields.io/badge/MongoDB%20Exporter-%2347A248.svg?style=for-the-badge&logo=mongodb&logoColor=white)
 ![Postgres Exporter](https://img.shields.io/badge/Postgres%20Exporter-%23336791.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 ![MySQL Exporter](https://img.shields.io/badge/MySQL%20Exporter-%2347A248.svg?style=for-the-badge&logo=mysql&logoColor=white)
 ![Redis Exporter](https://img.shields.io/badge/Redis%20Exporter-%23DC382D.svg?style=for-the-badge&logo=redis&logoColor=white)
+![RabbitMQ](https://img.shields.io/badge/RabbitMQ-%23FF6600.svg?style=for-the-badge&logo=rabbitmq&logoColor=white)
 ![RabbitMQ Exporter](https://img.shields.io/badge/RabbitMQ%20Exporter-%23FF6600.svg?style=for-the-badge&logo=rabbitmq&logoColor=white)
+![Vault](https://img.shields.io/badge/Vault-%23000000.svg?style=for-the-badge&logo=vault&logoColor=white)
+![Mailhog](https://img.shields.io/badge/Mailhog-%23EA4335.svg?style=for-the-badge&logo=gmail&logoColor=white)
+![Keycloak](https://img.shields.io/badge/Keycloak-%23336791.svg?style=for-the-badge&logo=keycloak&logoColor=white)
+![Eureka](https://img.shields.io/badge/Eureka-%2300BFFF.svg?style=for-the-badge&logo=spring&logoColor=white)
 
-> ⚠️ **Este projeto está 🚀 _(Em Desenvolvimento 🚧)_**
->
-> Algumas funcionalidades podem estar incompletas ou sujeitas a alterações. Contribuições são bem-vindas! 🛠️
+</div>
 
 ## 🌟 **Por que este projeto é importante?**
 
@@ -50,54 +85,103 @@ Se você é um desenvolvedor que busca **otimizar seu fluxo de trabalho**, este 
 3. **Melhore a colaboração:** Garanta que todos os membros da equipe tenham o mesmo ambiente de desenvolvimento.
 4. **Monitore e otimize:** Use ferramentas de monitoramento para identificar gargalos e melhorar o desempenho da sua aplicação.
 
-## ✅ **Concluído**
+## 🚀 **Entregas Implementadas na Infraestrutura**
 
-Esta seção destaca os passos que já foram implementados e estão funcionando na infraestrutura.
+Esta seção destaca os principais componentes já implementados e funcionando na infraestrutura:
 
-- ✅ **Containerização de Serviços:** Todos os serviços essenciais foram empacotados em containers Docker, garantindo isolamento e portabilidade.
-- ✅ **Orquestração com Docker Compose:** A configuração e o gerenciamento dos múltiplos containers são definidos e orquestrados através do Docker Compose, simplificando a inicialização e o desligamento da infraestrutura.
-- ✅ **Análise de Qualidade de Código:** Integração do SonarQube para realizar análise estática de código, auxiliando na manutenção da qualidade e segurança das aplicações.
-- ✅ **Interface de Gerenciamento de Containers:** Implementação do Portainer como uma interface gráfica para facilitar a visualização e o gerenciamento dos containers Docker.
-- ✅ **Interface para MongoDB:** Disponibilização do Mongo Express como uma ferramenta web para interagir e administrar bancos de dados MongoDB.
-- ✅ **Interface para PostgreSQL:** Integração do pgAdmin para fornecer uma interface gráfica completa para a administração de bancos de dados PostgreSQL.
-- ✅ **Interface para MySQL:** Adição do phpMyAdmin para oferecer uma interface web para a gestão de bancos de dados MySQL.
-- ✅ **Interface para Redis:** Implementação do RedisInsight para fornecer uma interface visual para monitorar e interagir com o servidor Redis.
-- ✅ **Monitoramento de Métricas:** Configuração do Prometheus para coletar métricas de diversos serviços da infraestrutura, permitindo o acompanhamento do desempenho.
-- ✅ **Visualização de Dashboards:** Implementação do Grafana para criar dashboards personalizados a partir das métricas do Prometheus, facilitando a análise e a identificação de gargalos ou problemas.
-- ✅ **Monitoramento de Recursos de Containers:** Integração do cAdvisor para coletar e expor métricas de uso de recursos (CPU, memória, rede, disco) dos containers em execução.
-- ✅ **Exportadores de Métricas:** Configuração de exportadores para MongoDB, PostgreSQL, MySQL, Redis e Node Exporter para coleta de métricas detalhadas.
-- ✅ **Serviço de Banco de Dados PostgreSQL:** Um serviço de banco de dados relacional PostgreSQL pronto para ser utilizado pelas aplicações.
-- ✅ **Serviço de Banco de Dados MongoDB:** Um serviço de banco de dados NoSQL MongoDB disponível para armazenamento de dados flexível.
-- ✅ **Serviço de Banco de Dados MySQL:** Um serviço de banco de dados relacional MySQL configurado e pronto para uso.
-- ✅ **Serviço de Cache Distribuído:** Implementação do Redis como um sistema de cache de alta performance para otimizar a velocidade das aplicações.
-- ✅ **Configuração via Arquivo `.env`:** Utilização de um arquivo `.env` para gerenciar as variáveis de ambiente de forma centralizada e segura.
-- ✅ **Automação de Tarefas Comuns:** Criação de um `Makefile` com comandos simplificados para executar tarefas como iniciar, parar e visualizar logs dos serviços.
-- ✅ **Verificação de Segurança de Dependências:** Implementação de um script utilizando OWASP Dependency-Check para identificar possíveis vulnerabilidades nas dependências dos projetos.
-- ✅ **Documentação Detalhada:** Elaboração de um `README.md` abrangente, explicando a finalidade, os serviços incluídos e como utilizar a infraestrutura.
-- ✅ **Testes Automatizados:** Implementação de testes automatizados para validar a infraestrutura utilizando `pytest`, `testinfra` e `Testcontainers`.
-- ✅ **Scripts `npm` Alternativos:** Adição de scripts no `package.json` para substituir comandos do `Makefile`, garantindo maior compatibilidade multiplataforma.
-- ✅ **Compatibilidade Multiplataforma:** Inclusão de instruções e alternativas para usuários de Windows, como o uso de `Taskfile` e `npm scripts`.
-- ✅ **Configuração do SonarQube Scanner:** Adição de suporte ao SonarQube Scanner para análise de qualidade de código diretamente no pipeline.
+#### 🐳 Containerização e Orquestração
+
+- ✅ Containerização de Serviços: Todos os serviços essenciais foram empacotados em containers Docker, garantindo isolamento, portabilidade e fácil replicação do ambiente.
+
+- ✅ Orquestração com Docker Compose: Gerenciamento centralizado de múltiplos containers, facilitando o start, stop e rebuild de toda a stack de forma prática.
+
+#### ⚙️ Configuração e Automação
+
+- ✅ Configuração via Arquivo .env: Gerenciamento centralizado e seguro das variáveis de ambiente.
+
+- ✅ Automação de Tarefas Comuns: Utilização de Makefile, Taskfile e scripts npm para executar tarefas como iniciar, parar, visualizar logs e executar testes.
+
+- ✅ Compatibilidade Multiplataforma: Instruções e scripts alternativos para Windows (Taskfile, npm scripts) garantindo funcionamento multiplataforma.
+
+#### 🧪 Qualidade de Código e Segurança
+
+- ✅ Análise de Qualidade de Código: Integração com SonarQube para análise estática e verificação de segurança do código.
+
+- ✅ Configuração do SonarQube Scanner: Suporte ao scanner para rodar verificações diretamente no pipeline.
+
+- ✅ Verificação de Dependências: Script com OWASP Dependency-Check para identificar vulnerabilidades em dependências de projeto.
+
+#### 🧬 Monitoramento e Observabilidade
+
+- ✅ Monitoramento com Prometheus: Coleta de métricas de diversos serviços da infraestrutura.
+
+- ✅ Visualização com Grafana: Dashboards personalizados para análise de métricas.
+
+- ✅ Alertas e Diagnóstico: Integração com Alertmanager, Blackbox Exporter, cAdvisor e Node Exporter.
+
+- ✅ Exportadores de Métricas: Exporters configurados para MongoDB, PostgreSQL, MySQL, Redis, RabbitMQ e sistema (Node Exporter).
+
+- ✅ Monitoramento de Containers: Uso do cAdvisor para métricas de CPU, memória, rede e disco por container.
+
+#### 🗃️ Banco de Dados e Cache
+
+- ✅ MongoDB: Com interface de administração via Mongo Express.
+
+- ✅ PostgreSQL: Gerenciado com pgAdmin.
+
+- ✅ MySQL: Com administração via phpMyAdmin.
+
+- ✅ Redis: Sistema de cache de alta performance com visualização via RedisInsight.
+
+- ✅ Ambiente Multibanco: Suporte completo e funcional para múltiplos bancos de dados.
+
+#### 📡 Mensageria e APIs
+
+- ✅ RabbitMQ: Serviço de mensageria com painel administrativo e exporters de métricas.
+
+- ✅ APIs e Webhooks: Estrutura pronta para endpoints REST e escuta de webhooks.
+
+#### 🔐 Segurança e Gerenciamento
+
+- ✅ Gerenciamento de Segredos: Vault configurado para armazenamento seguro de segredos e tokens.
+
+- ✅ Autenticação e Autorização: Keycloak integrado como Identity Provider para controle de acesso.
+
+- ✅ Service Discovery: Eureka Server disponível para registro e descoberta de microsserviços.
+
+#### 📧 Outros Serviços
+
+- ✅ Mailhog: Serviço local para captura e visualização de e-mails em ambiente de desenvolvimento.
+
+#### 📝 Documentação
+
+- ✅ README.md Abrangente: Documentação detalhada explicando os serviços incluídos, uso e estrutura da infraestrutura.
 
 ## 📂 **Estrutura do Projeto**
 
 ```plaintext
-├── reports/ 📄 Relatórios gerados pelo OWASP Dependency-Check e testes automatizados
-├── infra-devtools/ 🛠️ Diretório do projeto (caso usado como submódulo)
-│   ├── .env.example 📋 Exemplo de variáveis de ambiente
-│   ├── Makefile ⚙️ Comandos automatizados (make up, make down, etc.)
-│   ├── docker-compose.yml 🐳 Configuração principal dos containers
-│   ├── prometheus.yml 📊 Configuração do Prometheus (monitoramento)
-│   ├── scripts/ 📂 Scripts auxiliares
-│   │   └── run-dependency-check.sh  # Script para executar o OWASP Dependency-Check
-│   ├── src/ 📂 Código-fonte e testes
-│   │   ├── tests/ 📂 Testes automatizados
-│   │   │   ├── test_services.py  # Testes para verificar serviços
-│   │   │   ├── test_volumes.py  # Testes para verificar volumes
-│   │   │   ├── test_networks.py  # Testes para verificar conectividade de redes
-│   │   │   └── test_integration.py  # Testes de integração com Testcontainers
-│   │   └── utils/ 📂 Utilitários
-│   │       └── convert_junit_to_sonar.py  # Script para converter relatórios de testes para o formato do SonarQube
+├── assets/                  # Imagens, GIFs e recursos visuais
+├── reports/                 # Relatórios de testes e segurança
+├── scripts/                 # Scripts auxiliares (ex: run-dependency-check.sh, setup.sh)
+├── src/
+│   ├── tests/               # Testes automatizados
+│   └── utils/               # Utilitários (ex: convert_junit_to_sonar.py)
+├── .env.example             # Exemplo de variáveis de ambiente
+├── [.env.development](http://_vscodecontentref_/2)         # Variáveis para ambiente de desenvolvimento
+├── .prettierrc              # Configuração do Prettier
+├── .prettierignore          # Arquivos ignorados pelo Prettier
+├── .eslintrc.json           # Configuração do ESLint
+├── [eslint.config.ts](http://_vscodecontentref_/3)         # Configuração alternativa do ESLint
+├── [jest.config.ts](http://_vscodecontentref_/4)           # Configuração do Jest
+├── [pytest.ini](http://_vscodecontentref_/5)               # Configuração do Pytest
+├── [sonar-project.properties](http://_vscodecontentref_/6) # Configuração do SonarQube
+├── Makefile                 # Comandos automatizados
+├── Taskfile.yml             # Alternativa multiplataforma ao Makefile
+├── [docker-compose.yml](http://_vscodecontentref_/7)       # Orquestração dos containers
+├── [prometheus.yml](http://_vscodecontentref_/8)           # Configuração do Prometheus
+├── [README.md](http://_vscodecontentref_/9)                # Documentação principal
+├── [package.json](http://_vscodecontentref_/10)             # Dependências e scripts npm
+>>>>>>> Stashed changes
 ```
 
 ## 🛠️ Instalação e Uso do Infra DevTools para Desenvolvedores 👨‍💻
@@ -145,12 +229,6 @@ cp .env.development .env
 nano .env
 ```
 
-### 🚀 Suba a infraestrutura completa
-
-```bash
-make up
-```
-
 ## 🔗 2. Integração como Submódulo Git no Seu Projeto:
 
 **📦 git submodule add [https://github.com/KleilsonSantos/infra-devtools.git](https://github.com/KleilsonSantos/infra-devtools.git) infra-devtools**
@@ -180,17 +258,31 @@ cp .env.development .env
 nano .env
 ```
 
-### 🚀 Suba a stack
+## 🧱 **Como subir a infraestrutura**
+
+Execute o comando abaixo para iniciar todos os serviços:
+
+```
+make up
+```
+
+Para derrubar os serviços:
 
 ```bash
-make up
+make down
+```
+
+Para verificar os logs:
+
+```bash
+make logs
 ```
 
 ## ✅ **Serviços incluídos**
 
 | Serviço                  | Porta   | Acesso                                           |
-| ------------------------ | ------- | ----------------------------------------------   |
-| 🛠 **SonarQube**         | `9000`  | [http://localhost:9000](http://localhost:9000)   |
+| ------------------------ | ------- | ------------------------------------------------ |
+| 🛠 **SonarQube**         | `9002`  | [http://localhost:9002](http://localhost:9002)   |
 | 🐳 **Portainer**         | `9001`  | [http://localhost:9001](http://localhost:9001)   |
 | 🌐 **Mongo Express**     | `8081`  | [http://localhost:8081](http://localhost:8081)   |
 | 🖥️ **pgAdmin**           | `8088`  | [http://localhost:8088](http://localhost:8088)   |
@@ -199,7 +291,14 @@ make up
 | 📈 **Prometheus**        | `9090`  | [http://localhost:9090](http://localhost:9090)   |
 | 📊 **Grafana**           | `3001`  | [http://localhost:3001](http://localhost:3001)   |
 | 🐾 **cAdvisor**          | `8080`  | [http://localhost:8080](http://localhost:8080)   |
+| 🚨 **Alertmanager**      | `9093`  | [http://localhost:9093](http://localhost:9093)   |
+| 🕵️ **Blackbox Exporter** | `9115`  | [http://localhost:9115](http://localhost:9115)   |
 | 🐰 **RabbitMQ**          | `15672` | [http://localhost:15672](http://localhost:15672) |
+| 🔐 **Vault**             | `8200`  | [http://localhost:8200](http://localhost:8200)   |
+| 📧 **Mailhog**           | `8025`  | [http://localhost:8025](http://localhost:8025)   |
+| 🛰️ **Eureka Server**     | `8761`  | [http://localhost:8761](http://localhost:8761)   |
+| 👤 **Users API**         | `8089`  | [http://localhost:8089](http://localhost:8089)   |
+| 🔔 **Webhook Listener**  | `8090`  | [http://localhost:8090](http://localhost:8090)   |
 | 🐘 **PostgreSQL**        | `5432`  | _Acesso interno (via pgAdmin ou app)_            |
 | 🍃 **MongoDB**           | `27017` | _Acesso interno (via Mongo Express ou app)_      |
 | 🐬 **MySQL**             | `3306`  | _Acesso interno (via phpMyAdmin ou app)_         |
@@ -210,10 +309,37 @@ make up
 | 📦 **Redis Exporter**    | `9121`  | _Acesso interno (para métricas do Redis)_        |
 | 🐘 **Postgres Exporter** | `9187`  | _Acesso interno (para métricas do PostgreSQL)_   |
 | 🐰 **RabbitMQ Exporter** | `9419`  | _Acesso interno (para métricas do RabbitMQ)_     |
+| 🔑 **Keycloak**          | `8084`  | [http://localhost:8084](http://localhost:8084)   |
 
-## 🚀 Comandos Principais
+> 💡**Obs:** Consulte o `docker-compose.yml` para detalhes completos de configuração e variáveis de ambiente de cada serviço.
+
+## 🧰 Scripts e Utilitários
 
 Este projeto oferece comandos práticos para gerenciar a infraestrutura e os serviços. Você pode executá-los utilizando o `Makefile` ou os scripts definidos no `package.json` com `npm run`. Escolha a abordagem que preferir.
+
+### convert_junit_to_sonar.py
+
+## 🔄 Importância do Script `convert_junit_to_sonar.py`
+
+O script `convert_junit_to_sonar.py` desempenha um papel fundamental na integração entre os testes automatizados do projeto e a análise de qualidade de código realizada pelo SonarQube.
+
+### Por que ele é importante?
+
+- **Padronização de Relatórios:** Testes executados com frameworks como Pytest ou outros geram relatórios no formato JUnit XML, que nem sempre são totalmente compatíveis com o formato esperado pelo SonarQube.
+- **Integração com SonarQube:** O script converte automaticamente o relatório de testes do padrão JUnit para o formato aceito pelo SonarQube, permitindo que os resultados dos testes sejam corretamente interpretados e exibidos nos dashboards de qualidade.
+- **Automação no Pipeline:** Essa conversão é feita de forma automatizada durante o processo de CI/CD, garantindo que a cobertura de testes e os resultados estejam sempre atualizados e integrados à análise estática de código.
+- **Visibilidade e Qualidade:** Com os relatórios convertidos, é possível visualizar facilmente quais testes passaram, falharam ou foram ignorados diretamente na interface do SonarQube, aumentando a transparência e facilitando a identificação de pontos de melhoria no código.
+
+### Como utilizar
+
+O script é chamado automaticamente pelo Makefile e pelos scripts npm após a execução dos testes, não sendo necessário rodá-lo manualmente na maioria dos casos. Caso precise executar manualmente, utilize:
+
+```bash
+python3 [convert_junit_to_sonar.py](http://_vscodecontentref_/0) <input_junit.xml> <output_sonar.xml>
+```
+
+> 💡Resumo:
+> O convert_junit_to_sonar.py garante que a qualidade dos testes do projeto seja refletida de forma precisa e integrada no SonarQube, fortalecendo o ciclo de feedback e a confiabilidade do seu pipeline de desenvolvimento.
 
 ### 🔹 Inicializar e Gerenciar Containers
 
@@ -271,82 +397,213 @@ Este projeto utiliza **Prometheus** para monitoramento e coleta de métricas. A 
 | `scrape_interval: 15s`     | Intervalo de coleta de métricas (a cada 15 segundos) |
 | `evaluation_interval: 15s` | Intervalo para avaliação de regras                   |
 
-## 📊 Alvos de Monitoramento
+### 📡 Serviços Configurados para Scrape pelo Prometheus
 
-Os seguintes serviços estão configurados para serem **scrapeados** pelo Prometheus:
+Este documento lista os serviços que estão configurados para serem monitorados via Prometheus, conforme definido no arquivo `prometheus.yml`.
 
-### 🔹 Serviços Configurados
-
-| Job Name            | Porta  | Descrição                                     |
-| ------------------- | ------ | --------------------------------------------- |
-| `prometheus`        | `9090` | Monitoramento do próprio Prometheus           |
-| `node-exporter`     | `9100` | Exportador de métricas do sistema operacional |
-| `cadvisor`          | `8080` | Monitoramento de containers Docker            |
-| `mongodb-exporter`  | `9216` | Exportador de métricas do MongoDB             |
-| `postgres-exporter` | `9187` | Exportador de métricas do PostgreSQL          |
-| `mysql-exporter`    | `9104` | Exportador de métricas do MySQL               |
-| `redis-exporter`    | `9121` | Exportador de métricas do Redis               |
+| **Job Name**                  | **Porta** | **Descrição**                                                              |
+| ----------------------------- | --------- | -------------------------------------------------------------------------- |
+| `prometheus`                  | `9090`    | Monitoramento do próprio Prometheus (métricas internas)                    |
+| `node-exporter`               | `9100`    | Coleta métricas do sistema operacional (CPU, memória, disco etc.)          |
+| `cadvisor`                    | `8080`    | Monitoramento dos containers Docker e uso de recursos                      |
+| `mongodb-exporter`            | `9216`    | Exporta métricas das instâncias do MongoDB                                 |
+| `postgres-exporter`           | `9187`    | Exporta métricas dos bancos de dados PostgreSQL                            |
+| `mysql-exporter`              | `9104`    | Exporta métricas dos bancos de dados MySQL                                 |
+| `redis-exporter`              | `9121`    | Exporta métricas das instâncias Redis                                      |
+| `rabbitmq-exporter`           | `9419`    | Exporta métricas da fila de mensageria RabbitMQ                            |
+| `blackbox-exporter`           | `9115`    | Realiza sondagens HTTP e monitoramento de disponibilidade/latência externa |
+| `crud-users-api`              | `8089`    | Expõe métricas personalizadas via Spring Boot Actuator                     |
+| `blackbox-exporter-icmp-ping` | `9115`    | Realiza ping ICMP para monitoramento de hosts externos (ex: DNS do Google) |
 
 ## ⚙️ Exemplo de Configuração
 
 Aqui está um exemplo do trecho YAML utilizado para definir os alvos de monitoramento:
 
 ```yaml
-scrape_configs:  
-  - job_name: 'prometheus'  # 📊 Monitoramento do próprio Prometheus  
-    static_configs:  
-      - targets: ['localhost:9090']  # 🏠 Servidor local onde o Prometheus está rodando  
+# 📊 Monitor Prometheus itself
+- job_name: 'prometheus'
+  static_configs:
+    - targets: ['prometheus:9090'] # 🏠 Local Prometheus server
 
-  - job_name: 'node-exporter'  # 🖥️ Coleta métricas do sistema operacional  
-    static_configs:  
-      - targets: ['node-exporter:9100']  # 🔌 Porta padrão do Node Exporter  
+# 🖥️ Monitor host system resources (CPU, RAM, Disk)
+- job_name: 'node-exporter'
+  static_configs:
+    - targets: ['node-exporter:9100'] # 🔌 Default Node Exporter port
 
-  - job_name: 'cadvisor'  # 🐳 Monitoramento de containers Docker  
-    static_configs:  
-      - targets: ['cadvisor:8080']  # 📡 Porta onde o cAdvisor expõe métricas  
+# 🐳 Monitor running Docker containers
+- job_name: 'cadvisor'
+  static_configs:
+    - targets: ['cadvisor:8080'] # 📦 cAdvisor metrics endpoint
 
-  - job_name: 'mongodb-exporter'  # 🗄️ Exportador de métricas do MongoDB  
-    static_configs:  
-      - targets: ['mongodb-exporter:9216']  # 🔄 Coleta métricas do banco de dados MongoDB  
+# 🍃 MongoDB exporter
+- job_name: 'mongodb-exporter'
+  static_configs:
+    - targets: ['mongodb-exporter:9216'] # 📊 MongoDB metrics
 
-  - job_name: 'postgres-exporter'  # 🗄️ Exportador de métricas do PostgreSQL  
-    static_configs:  
-      - targets: ['postgres-exporter:9187']  # 📊 Monitoramento do banco de dados PostgreSQL
-  
-  - job_name: 'mysql-exporter'  # 🗄️ Exportador de métricas do MySQL  
-    static_configs:  
-      - targets: ['mysql-exporter:9104']  # 📊 Monitoramento do banco de dados MySQL
+# 🐘 PostgreSQL exporter
+- job_name: 'postgres-exporter'
+  static_configs:
+    - targets: ['postgres-exporter:9187'] # 📊 PostgreSQL metrics
 
-  - job_name: 'redis-exporter'  # 🗄️ Exportador de métricas do Redis  
-    static_configs:  
-      - targets: ['redis-exporter:9121']  # 📊 Monitoramento do banco de dados Redis
+# 🐬 MySQL exporter
+- job_name: 'mysql-exporter'
+  static_configs:
+    - targets: ['mysql-exporter:9104'] # 📊 MySQL metrics
 
-  - job_name: 'rabbitmq-exporter'  # 🗄️ Exportador de métricas do RabbitMQ  
-    static_configs:  
-      - targets: ['rabbitmq-exporter:9419']  # 📊 Monitoramento do banco de dados RabbitMQ
+# 🧠 Redis exporter
+- job_name: 'redis-exporter'
+  static_configs:
+    - targets: ['redis-exporter:9121'] # 📊 Redis metrics
+
+# 🐰 RabbitMQ exporter
+- job_name: 'rabbitmq-exporter'
+  static_configs:
+    - targets: ['rabbitmq-exporter:9419'] # 📊 RabbitMQ metrics
+
+# 🌐 Blackbox Exporter (HTTP probe)
+- job_name: 'blackbox-exporter'
+  static_configs:
+    - targets: ['blackbox-exporter:9115'] # 🛰️ Blackbox exporter metrics endpoint
+
+# ⚙️ Spring Boot API metrics via Actuator
+- job_name: 'crud-users-api'
+  metrics_path: /actuator/prometheus
+  params:
+    module: [http_2xx, http_3xx, http_4xx, http_5xx]
+  static_configs:
+    - targets: ['crud-users-api:8089'] # 🧪 Application metrics
+
+# 🌐 Blackbox Exporter for ICMP Ping
+- job_name: 'blackbox-exporter-icmp-ping'
+  metrics_path: /probe
+  params:
+    module: [icmp_ping]
+  static_configs:
+    - targets:
+        - 8.8.8.8 # 📡 Google DNS or target IP to monitor
+  relabel_configs:
+    - source_labels: [__address__]
+      target_label: __param_target
+    - source_labels: [__param_target]
+      target_label: instance
+    - target_label: __address__
+      replacement: blackbox-exporter:9115
 ```
 
 > 💡 **Nota:** Certifique-se de que os serviços listados estão rodando corretamente e acessíveis pelas portas configuradas para uma coleta eficiente de métricas.
 
-## 🧱 **Como subir a infraestrutura**
+## 🚨 Importância do arquivo `alerts.yml`
 
-Execute o comando abaixo para iniciar todos os serviços:
+O arquivo `alerts.yml` é fundamental para a configuração de alertas no ecossistema de monitoramento do projeto, especialmente quando integrado ao Prometheus e ao Alertmanager.
 
-```bash
-make up
+### Por que ele é importante?
+
+- **Centralização das Regras de Alerta:** O `alerts.yml` define todas as regras que determinam quando um alerta deve ser disparado com base nas métricas coletadas pelo Prometheus.
+- **Monitoramento Proativo:** Permite identificar automaticamente situações anômalas, falhas de serviço, uso excessivo de recursos ou indisponibilidade de aplicações, facilitando a resposta rápida a incidentes.
+- **Integração com Alertmanager:** Os alertas definidos neste arquivo são processados pelo Alertmanager, que pode encaminhá-los para e-mails, chats, sistemas de incidentes ou outras ferramentas de notificação.
+- **Personalização:** As regras podem ser adaptadas conforme as necessidades do projeto, permitindo monitorar desde bancos de dados e filas até APIs e infraestrutura.
+
+### Como funciona no projeto
+
+- O arquivo `alerts.yml` é referenciado na configuração do Prometheus (`prometheus.yml`), garantindo que todas as regras de alerta estejam ativas durante a execução da stack.
+- Ao detectar uma condição definida (por exemplo, serviço fora do ar, uso de CPU elevado, falha em banco de dados), o Prometheus dispara um alerta conforme especificado no `alerts.yml`.
+- O Alertmanager recebe o alerta e executa as ações de notificação configuradas.
+
+### Exemplo de uso
+
+```yaml
+groups:
+  - name: example-alerts
+    rules:
+      - alert: InstanceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Instance {{ $labels.instance }} is down'
+          description: 'The service {{ $labels.job }} on {{ $labels.instance }} has not responded for over 1 minute.'
 ```
 
-Para derrubar os serviços:
+> 💡 Resumo:
+> O alerts.yml torna o monitoramento do projeto proativo e inteligente, permitindo que a equipe seja notificada rapidamente sobre problemas críticos, aumentando a confiabilidade e a disponibilidade da infraestrutura.
+
+## 🔐 Vault - Gerenciamento Seguro de Segredos
+
+O **Vault** é utilizado para armazenar e gerenciar segredos, tokens, certificados e outras informações sensíveis de forma centralizada e segura. Ele é fundamental para proteger credenciais e variáveis de ambiente em ambientes de desenvolvimento e produção.
+
+### 📦 Descrição do Serviço
+
+- **Imagem:** Utiliza a imagem oficial do HashiCorp Vault.
+- **Persistência:** Os dados do Vault são armazenados em um volume dedicado para garantir que segredos não sejam perdidos após reinicializações.
+- **Rede:** Integrado à rede compartilhada da infraestrutura para comunicação segura com outros serviços.
+- **Porta:** O serviço é exposto na porta 8200 do host para acesso à interface HTTP/API do Vault.
+
+### ⚙️ Instalação e Configuração
+
+O Vault já está configurado no `docker-compose.yml`. Para subir o serviço:
 
 ```bash
-make down
+make up-service service=vault
+# ou
+docker compose --env-file .env up -d vault
 ```
 
-Para verificar os logs:
+### Configuração Inicial
 
-```bash
-make logs
+1. Acesse a interface do Vault:
+
+> URL: http://localhost:8200
+
+2. Inicialize o Vault (primeira execução):
+
+- No terminal do container:
+
 ```
+docker exec -it infra-default-vault vault operator init
+```
+
+- Guarde as chaves de unseal e o token root gerados.
+
+3. Desbloqueie o Vault (Unseal):
+
+Ainda no terminal do container, execute:
+
+```
+docker exec -it infra-default-vault vault operator unseal <unseal_key>
+```
+
+- Repita o comando com pelo menos 3 chaves de unseal diferentes.
+
+4. Acesse com o token root:
+
+- Use o token root gerado na inicialização para acessar a interface web ou a CLI.
+
+### Variáveis de Ambiente
+
+No arquivo .env, configure as variáveis necessárias para o Vault, por exemplo:
+
+```
+VAULT_DEV_ROOT_TOKEN_ID=changeme
+VAULT_LOCAL_CONFIG={"backend": {"file": {"path": "/vault/file"}}, "listener": [{"tcp": {"address": "0.0.0.0:8200", "tls_disable": 1}}], "ui": true}
+```
+
+### Persistência de Dados
+
+Os dados do Vault são persistidos no volume:
+
+```
+volumes:
+  infra-default-vault_data:
+```
+
+### Referência:
+
+Documentação Oficial do Vault
+https://www.vaultproject.io/docs
+
+> 💡 Dica:
+> Para ambientes de produção, configure o Vault com TLS habilitado e backend de storage seguro (Consul, S3, etc).
 
 ## 🔍 OWASP Dependency-Check
 
@@ -381,11 +638,11 @@ make check-deps-path path=/seu/caminho
 
 Os relatórios serão gerados na pasta `reports/`:
 
-- 📁 **Relatório HTML:** `reports/index.html`
+📁 **Relatório HTML:** `reports/index.html`
 
 ## 🔮 **Passos futuros**
 
-- [ ] 📦 Adicionar suporte ao Redis e RabbitMQ.
+- [x] 📦 Adicionar suporte ao Redis e RabbitMQ.
 - [ ] 🔒 Implementar autenticação para os serviços expostos.
 - [x] 🧪 Criar testes automatizados para validar a infraestrutura.
 - [x] **🛠️ Refatorar build scripts para utilizar `npm`:**
@@ -400,8 +657,8 @@ Os relatórios serão gerados na pasta `reports/`:
 - [ ] **⚙️ Considerar ferramentas de automação de tarefas para DevInfra (Makefile, Task, Shell Scripts)**
   - [x] 🧩 Automatizar tarefas comuns com `Makefile` e scripts shell
   - [ ] 🔐 Integrar hardening de containers com `Docker Bench` ou `Dockle`
-  - [ ] 🧪 Adicionar testes automatizados dos serviços usando `bats` ou `Testcontainers`
-  - [ ] 🧱 Modularizar serviços com uso de redes nomeadas e volumes persistentes
+  - [x] 🧪 Adicionar testes automatizados dos serviços usando `bats` ou `Testcontainers`
+  - [x] 🧱 Modularizar serviços com uso de redes nomeadas e volumes persistentes
   - [ ] 📊 Configurar dashboards personalizados de monitoramento visual com Grafana e alertas no Prometheus
 
 > 💡 **Nota:** Este projeto está em constante desenvolvimento. Algumas funcionalidades podem estar incompletas ou sujeitas a alterações. Contribuições são sempre bem-vindas! 🛠️
@@ -424,7 +681,12 @@ Agradecemos por utilizar este projeto! Caso tenha sugestões, melhorias ou encon
 
 ## ✍️ **Autor**
 
-Desenvolvido com ❤️ por **Kleilson Santos**.
+Desenvolvido por **Kleilson Santos**.
 
-- 🌐 [GitHub](https://github.com/KleilsonSantos) - KleilsonSantos
-- 💼 [LinkedIn](https://www.linkedin.com/in/kleilson-dev-full-stack) - KleilsonSantos
+## 📬 Contato
+
+- 📧 Email: kleilson@icloud.com
+- 🔗 LinkedIn: [linkedin.com/in/kleilson-dev-full-stack](https://linkedin.com/in/kleilson-dev-full-stack)
+- 💻 GitHub: [Kleilson Santos](https://github.com/KleilsonSantos)
+
+<p align="center"><b>⚡ Construa com segurança, teste com propósito, automatize com clareza.<br>by Kleilson Santos 🚀</b></p>

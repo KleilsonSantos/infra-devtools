@@ -62,3 +62,6 @@ Thumbs.db
 # 📦 NPM e Outros Arquivos de Configuração
 .scannerwork
 .coverage
+
+# 🔧 Ambiente Virtual Python
+.venv/*
