@@ -15,6 +15,7 @@ export default [
       'deploy',
       'dependency-check-bin',
       'logs',
+      'vault',
     ],
   },
   {

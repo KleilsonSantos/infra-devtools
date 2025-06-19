@@ -14,5 +14,5 @@ docker run --rm \
   --out /report \
   --project "MyProject"
 
-echo "✅ Relatórios gerados em: $REPORT_PATH"
-echo "📁 Relatório HTML: $REPORT_PATH/index.html"
+echo "✅ Reports generated at: $REPORT_PATH"
+echo "📁 HTML Report: $REPORT_PATH/index.html"

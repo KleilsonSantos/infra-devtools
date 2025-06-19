@@ -10,7 +10,7 @@ load_dotenv()
 def test_postgres_service():
     """Testa se o serviço PostgreSQL do docker-compose está funcionando corretamente."""
     conn = psycopg2.connect(
-        host="172.18.0.3",
+        host="localhost",
         port=5432,
         user=os.getenv("POSTGRES_USER"),
         password=os.getenv("POSTGRES_PASSWORD"),

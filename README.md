@@ -314,11 +314,42 @@ make logs
 
 > 💡**Obs:** Consulte o `docker-compose.yml` para detalhes completos de configuração e variáveis de ambiente de cada serviço.
 
-## 🧰 Scripts e Utilitários
+## 🧰 **Automação e Utilitários**
 
 Este projeto oferece comandos práticos para gerenciar a infraestrutura e os serviços. Você pode executá-los utilizando o `Makefile` ou os scripts definidos no `package.json` com `npm run`. Escolha a abordagem que preferir.
 
-## 🔄 Importância do Script `convert_junit_to_sonar.py`
+## 🛡️ Importância do Script `install-hooks.sh`
+
+O script `install-hooks.sh` é responsável por configurar automaticamente os Git Hooks essenciais no projeto, utilizando a ferramenta Husky, que é amplamente adotada por equipes de desenvolvimento para garantir a qualidade do código antes dos commits e pushes.
+
+### Por que ele é importante?
+
+- **Automatização de Hooks:** Evita a necessidade de configuração manual dos hooks (pre-commit, pre-push, etc.), garantindo que todos os desenvolvedores do time trabalhem com a mesma estrutura e validações locais.
+- **Instalação Padronizada:** Centraliza o processo de instalação do Husky, evitando inconsistências entre ambientes e reduzindo erros humanos na configuração.
+- **Garantia de Qualidade Local:** Os hooks configurados com Husky executam ações como testes, lint e formatação antes de permitir commits ou pushes, prevenindo falhas e mantendo a integridade do repositório.
+- **Facilidade de Uso:** Com apenas um comando, todos os hooks são instalados e prontos para uso, sem exigir conhecimento detalhado sobre o funcionamento interno do Husky.
+
+### O que o script faz?
+
+#### O script executa as seguintes etapas:
+
+- 📦 Instala a dependência husky com npm.
+- 🐶 Inicializa o Husky no repositório Git com npx husky install.
+- ✅ Exibe uma mensagem de sucesso indicando que os Git Hooks foram instalados corretamente.
+
+### Como utilizar
+
+O script é chamado automaticamente pelo Makefile e pelos scripts npm após a execução dos testes, não sendo necessário rodá-lo manualmente na maioria dos casos. Caso precise executar manualmente, utilize:
+
+```bash
+bash scripts/install-hooks.sh
+```
+
+>**💡 Resumo:**
+>O install-hooks.sh garante que todos os desenvolvedores trabalhem com os mesmos padrões de validação e automação local, fortalecendo a qualidade do código, prevenindo falhas e otimizando o fluxo de trabalho em equipe.
+
+
+## 🛡️ Importância do Script `convert_junit_to_sonar.py`
 
 O script `convert_junit_to_sonar.py` desempenha um papel fundamental na integração entre os testes automatizados do projeto e a análise de qualidade de código realizada pelo SonarQube.
 
@@ -334,13 +365,103 @@ O script `convert_junit_to_sonar.py` desempenha um papel fundamental na integra�
 O script é chamado automaticamente pelo Makefile e pelos scripts npm após a execução dos testes, não sendo necessário rodá-lo manualmente na maioria dos casos. Caso precise executar manualmente, utilize:
 
 ```bash
-python3 [convert_junit_to_sonar.py](http://_vscodecontentref_/0) <input_junit.xml> <output_sonar.xml>
+python3 src/utils/convert_junit_to_sonar.py
 ```
 
-> 💡Resumo:
-> O convert_junit_to_sonar.py garante que a qualidade dos testes do projeto seja refletida de forma precisa e integrada no SonarQube, fortalecendo o ciclo de feedback e a confiabilidade do seu pipeline de desenvolvimento.
+> 💡**Resumo:**
+> O `convert_junit_to_sonar.py` garante que a qualidade dos testes do projeto seja refletida de forma precisa e integrada no SonarQube, fortalecendo o ciclo de feedback e a confiabilidade do seu pipeline de desenvolvimento.
 
-### 🔹 Inicializar e Gerenciar Containers
+## 🛡️ Importância do script `setup.sh`
+
+O script `setup.sh` é fundamental para agilizar e padronizar a configuração inicial do ambiente de desenvolvimento do projeto. Ele automatiza tarefas essenciais, como:
+
+- Verificação da instalação do Docker e Docker Compose;
+- Criação do arquivo `.env` a partir do `.env.example`, caso ainda não exista;
+- Instalação de dependências Node.js (se aplicável);
+- Configuração de permissões e scripts auxiliares;
+- Criação de diretórios necessários para relatórios e logs;
+- Checagem de pré-requisitos para ferramentas como SonarQube e OWASP Dependency-Check.
+
+### Por que usar?
+
+- **Economia de tempo:** Elimina a necessidade de configuração manual, reduzindo erros e acelerando o onboarding de novos desenvolvedores.
+- **Padronização:** Garante que todos os membros da equipe iniciem o projeto com o mesmo ambiente e as mesmas dependências.
+- **Automação:** Centraliza tarefas repetitivas em um único comando, facilitando a manutenção e a escalabilidade do projeto.
+
+### Como utilizar
+
+Basta executar o comando abaixo na raiz do projeto:
+
+```bash
+chmod +x scripts/setup.sh
+```
+
+> 💡**Resumo:**  
+> O `setup.sh` acelera e padroniza o onboarding, automatizando a configuração inicial do ambiente e prevenindo erros comuns, garantindo que todos os desenvolvedores iniciem o projeto de forma consistente e eficiente.
+
+## 🛡️ Importância do Script `check-version-alignment`
+
+O script `check-version-alignment` é essencial para garantir a **consistência de versões** entre as dependências e ferramentas utilizadas no projeto. Ele verifica se as versões especificadas nos arquivos de configuração (como `package.json`, `docker-compose.yml`, ou outros manifestos) estão alinhadas, evitando incompatibilidades e problemas de build.
+
+#### Por que é importante?
+
+- **Evita conflitos de dependências:** Garante que todas as ferramentas e bibliotecas estejam usando versões compatíveis, reduzindo erros inesperados durante o desenvolvimento e a execução dos serviços.
+- **Facilita o onboarding:** Novos membros da equipe podem rapidamente identificar e corrigir desalinhamentos de versão.
+- **Padronização:** Mantém o ambiente de desenvolvimento e produção sincronizados, melhorando a confiabilidade dos deploys e builds.
+
+#### Como utilizar
+
+Execute o script na raiz do projeto:
+
+```bash
+chmod +x scripts/check-version-alignment.sh
+```
+> 💡**Resumo:**  
+> O `check-version-alignment` é uma ferramenta preventiva que contribui para a estabilidade e previsibilidade do ambiente, tornando o ciclo de desenvolvimento mais seguro e eficiente.
+
+## 🛡️ Importância do Script `run-dependency-check.sh`
+
+O script `run-dependency-check.sh` é responsável por realizar uma varredura automatizada nas dependências do projeto em busca de vulnerabilidades conhecidas, utilizando a ferramenta **[OWASP Dependency-Check](https://owasp.org/www-project-dependency-check/)** — uma das soluções mais confiáveis para análise de segurança baseada em CVEs.
+
+## Por que ele é importante?
+
+- **Segurança Proativa:** Identifica falhas de segurança conhecidas nas bibliotecas utilizadas pelo projeto, antes que elas possam ser exploradas em produção.
+- **Automação de Segurança:** Permite integrar a verificação de dependências no pipeline de desenvolvimento (CI/CD), tornando o processo contínuo e eficiente.
+- **Relatórios Detalhados:** Gera relatórios completos em múltiplos formatos (HTML, XML, JSON), facilitando a análise técnica e auditorias de segurança.
+- **Conformidade com DevSecOps:** Garante que o projeto siga práticas modernas de segurança desde o início, sem depender exclusivamente de testes manuais ou auditorias externas.
+
+## O que o script faz?
+
+1. 📁 Define os caminhos do projeto e da pasta de relatórios (`reports/`).
+2. 🐳 Executa um container com a imagem oficial `owasp/dependency-check`.
+3. 🔍 Escaneia o diretório do projeto `/src` em busca de vulnerabilidades.
+4. 📊 Gera relatórios no diretório `reports/`, em todos os formatos suportados (`ALL`).
+5. ✅ Exibe as mensagens com a localização dos relatórios, incluindo o relatório HTML final.
+
+## Como utilizar
+
+Execute o script com:
+
+```bash
+bash scripts/run-dependency-check.sh
+```
+
+Opcionalmente, você pode passar um caminho diferente como argumento:
+
+```bash
+bash scripts/run-dependency-check.sh ./backend
+```
+
+## Integração recomendada
+
+- 📦 **Makefile:** Inclua como um target `make check-deps`
+- 🔁 **CI/CD:** Integre no GitHub Actions, GitLab CI ou Jenkins para análise contínua
+- 🔐 **Pipeline de segurança:** Combine com o SonarQube para auditoria estática e dinâmica
+
+> 💡 **Resumo:**  
+> O `run-dependency-check.sh` é uma ferramenta essencial para manter a segurança do seu projeto em dia. Ele automatiza a detecção de vulnerabilidades em dependências e reforça as práticas DevSecOps ao identificar riscos antes que eles cheguem à produção.
+
+## 🚢 Inicializar e Gerenciar Containers
 
 | Comando        | Descrição                                                    | Comando Alternativo (npm) |
 | -------------- | ------------------------------------------------------------ | ------------------------- |
@@ -538,6 +659,20 @@ O **Vault** é utilizado para armazenar e gerenciar segredos, tokens, certificad
 - **Rede:** Integrado à rede compartilhada da infraestrutura para comunicação segura com outros serviços.
 - **Porta:** O serviço é exposto na porta 8200 do host para acesso à interface HTTP/API do Vault.
 
+### ⚠️ Ponto Crítico de Sucesso
+
+    ⚠️ Atenção: Para que o Vault funcione corretamente, é essencial criar manualmente a pasta vault na raiz do projeto com permissões apropriadas.
+
+Exemplo de estrutura e permissões necessárias:
+```textplain
+infra-devtools/
+├── vault/
+│   ├── config/     # drwxrwxr-x 2 dhcpcd operador
+│   └── data/       # drwxrwxr-x 5 dhcpcd operador
+
+```
+>As `permissões` devem garantir acesso de leitura e escrita tanto para o usuário que executa o Docker (dhcpcd no seu caso) quanto para o usuário principal (operador), garantindo que o serviço consiga inicializar, ler e persistir os segredos corretamente.
+
 ### ⚙️ Instalação e Configuração
 
 O Vault já está configurado no `docker-compose.yml`. Para subir o serviço:
@@ -649,16 +784,16 @@ Os relatórios serão gerados na pasta `reports/`:
   - [x] 📝 Criar scripts no `package.json` (por exemplo, `build`, `start`, `test`, `lint`).
   - [x] 🔄 Substituir as chamadas ao `make` por comandos `npm run <script>`.
   - [x] 📄 Documentar a nova estrutura de build com `npm`.
-- [ ] **✨ Otimizar o fluxo de desenvolvimento com `npm`:**
+- [X] **✨ Otimizar o fluxo de desenvolvimento com `npm`:**
   - [x] ➕ Adicionar ferramentas de desenvolvimento como linters (`eslint`, `prettier`) e formatadores como dependências de desenvolvimento (`devDependencies`).
   - [x] ⚙️ Configurar scripts `npm` para executar essas ferramentas (por exemplo, `lint`, `format`).
-  - [ ] 🎣 Integrar essas verificações no ciclo de desenvolvimento (por exemplo, através de hooks de commit com `husky`).
+  - [X] 🎣 Integrar essas verificações no ciclo de desenvolvimento (por exemplo, através de hooks de commit com `husky`).
 - [ ] **⚙️ Considerar ferramentas de automação de tarefas para DevInfra (Makefile, Task, Shell Scripts)**
   - [x] 🧩 Automatizar tarefas comuns com `Makefile` e scripts shell
   - [ ] 🔐 Integrar hardening de containers com `Docker Bench` ou `Dockle`
   - [x] 🧪 Adicionar testes automatizados dos serviços usando `bats` ou `Testcontainers`
   - [x] 🧱 Modularizar serviços com uso de redes nomeadas e volumes persistentes
-  - [ ] 📊 Configurar dashboards personalizados de monitoramento visual com Grafana e alertas no Prometheus
+  - [X] 📊 Configurar dashboards personalizados de monitoramento visual com Grafana e alertas no Prometheus
 
 > 💡 **Nota:** Este projeto está em constante desenvolvimento. Algumas funcionalidades podem estar incompletas ou sujeitas a alterações. Contribuições são sempre bem-vindas! 🛠️
 

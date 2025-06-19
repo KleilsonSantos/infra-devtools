@@ -6,3 +6,6 @@ coverage
 .vscode
 .idea
 *.log
+vault/
+vault/data/
+vault/data/core/

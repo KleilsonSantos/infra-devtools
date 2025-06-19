@@ -34,7 +34,7 @@ SONAR_PROJECT_KEY=infra-devtools
 
 # 🏷️ MAIN SERVICES
 SERVICES = \
-  mongo \
+   mongo \
   mongo-express \
   postgres \
   pgadmin \
@@ -46,6 +46,8 @@ SERVICES = \
   rabbitmq-exporter \
   prometheus \
   grafana \
+  alertmanager \
+  blackbox-exporter \
   cadvisor \
   node-exporter \
   postgres-exporter \
@@ -54,82 +56,121 @@ SERVICES = \
   redis-exporter \
   sonarqube \
   portainer \
-  keycloak
->>>>>>> Stashed changes
+  vault \
+  mailhog \
+  keycloak \
+  eureka-server \
+  users-api \
+  webhook-listener
 
-# 🐳 Configuração do Docker Compose
-DOCKER_COMPOSE=docker compose --env-file $(ENV_FILE)
-DOCKER_COMPOSE_UP=$(DOCKER_COMPOSE) up -d
-DOCKER_COMPOSE_DOWN=$(DOCKER_COMPOSE) down --volumes=false --remove-orphans
-DOCKER_COMPOSE_BUILD=$(DOCKER_COMPOSE) build
-DOCKER_COMPOSE_EXEC=$(DOCKER_COMPOSE) exec
-DOCKER_COMPOSE_PULL=$(DOCKER_COMPOSE) pull
-DOCKER_COMPOSE_RUN=$(DOCKER_COMPOSE) run --rm
+# 📁 DIRECTORIES
+REPORTS_DIR = $(MODULE)/reports
 
-# 🔍 Status & Logs
-DOCKER_COMPOSE_PS=$(DOCKER_COMPOSE) ps
-DOCKER_COMPOSE_LOGS=$(DOCKER_COMPOSE) logs -f
-DOCKER_COMPOSE_FORMAT=$(DOCKER_COMPOSE) ps --format 'table {{.Names}}'
-DOCKER_COMPOSE_FORMAT_DETAILED=$(DOCKER_COMPOSE) ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
+# 🔍 SONARQUBE CONFIG
+SONAR_SCANNER = npx sonar-scanner
+SONAR_PROJECT_KEY = infra-devtools
 
-# 🧪 Testes e Cobertura
-CONVERTER_SCRIPT=src/utils/convert_junit_to_sonar.py
-JUNIT_XML=reports/coverage/test-results.xml
-SONAR_XML=reports/coverage/test-executions.xml
-PYTEST_COVERAGE_ALL=pytest --cov=$(MODULE) --cov-report xml:$(REPORTS_DIR)/coverage/coverage.xml --cov-report html:$(REPORTS_DIR)/coverage
-PYTEST_COVERAGE_JUNIT=pytest --junitxml=reports/coverage/test-results.xml
+# 🐳 DOCKER COMPOSE COMMANDS
+DC = docker compose --env-file $(ENV_FILE)
+DC_UP = $(DC) up -d
+DC_DOWN = $(DC) down --volumes=false --remove-orphans
+DC_BUILD = $(DC) build
+DC_EXEC = $(DC) exec
+DC_PULL = $(DC) pull
+DC_RUN = $(DC) run --rm
+DC_LOGS = $(DC) logs -f
+DC_PS = $(DC) ps
+DC_PS_FORMAT = $(DC) ps --format 'table {{.Names}}'
+DC_PS_DETAILED = $(DC) ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
 
-# 🎨 Linting e Formatação
-LINT=npx eslint --ext .ts,.js --fix
-FORMAT=npx prettier --write "**/*.{ts,js,json,md,py}"
+# 🧪 TEST CONFIGURATION
+#PYTEST = pytest
+PYTEST = python3 -m pytest
+COV_REPORT = --cov-report xml:$(REPORTS_DIR)/coverage/coverage.xml --cov-report html:$(REPORTS_DIR)/coverage
+JUNIT_REPORT = --junitxml=$(REPORTS_DIR)/coverage/test-results.xml
+CONVERTER_SCRIPT = src/utils/convert_junit_to_sonar.py
+
+# 🎨 LINTING TOOLS
+LINT = npx eslint --ext .ts,.js --fix
+FORMAT = npx prettier --write "src/**/*.{ts,js,json,md,py}" --ignore-path .prettierignore --ignore-unknown
 
 
-# 🚀 Comandos para Containers
-.PHONY: up down force-recreate logs ps ps-format ps-format-detailed ps-filter rebuild clean check-deps coverage sonar-scanner lint format convert-tests
+# 🔍 DEPENDENCY CHECK
+CHECK_DEPS = scripts/run-dependency-check.sh
 
+# 🎯 MAIN TARGETS
+.PHONY: up down force-recreate logs ps ps-format ps-detailed rebuild \
+        clean check-deps coverage test lint format sonar-scanner convert-tests
+
+## Start all containers
 up:
-	@echo "🔼 Iniciando containers..."
-	$(DOCKER_COMPOSE_UP) $(SERVICES)
+	@echo "🔼 Starting containers..."
+	$(DC_UP) $(SERVICES)
 
+## Start a specific container: make up-service service=name
+up-service:
+	@echo "🔼 Starting container $(service)..."
+	$(DC_UP) $(service)
+
+## Stop a specific service
+down-service:
+	@echo "🔽 Stopping container $(service)..."
+	$(DC_DOWN) $(service)
+
+## Stop all containers (keep volumes)
 down:
-	@echo "🔽 Parando todos os containers..."
-	$(DOCKER_COMPOSE_DOWN)
+	@echo "🔽 Stopping containers..."
+	$(DC_DOWN)
 
+## Force recreate containers
 force-recreate:
-	@echo "🔄 Recriando containers..."
-	$(DOCKER_COMPOSE_DOWN) && \
-	$(DOCKER_COMPOSE_UP) $(SERVICES)
+	@echo "♻️ Recreating containers..."
+	$(DC_DOWN) && $(DC_UP) $(SERVICES)
 
+## Show logs for a specific service (make logs service=sonarqube)
 logs:
-	@echo "📋 Mostrando logs do serviço $(service)..."
-	$(DOCKER_COMPOSE_LOGS) $(service)
+	@echo "📋 Showing logs for service $(service)..."
+	$(DC_LOGS) $(service)
 
+## List containers (default format)
 ps:
-	@echo "📜 Listando todos os containers..."
-	$(DOCKER_COMPOSE_PS)
+	@echo "📜 Listing containers..."
+	$(DC_PS)
 
+## List containers (compact format)
 ps-format:
-	@echo "📜 Listando containers em formato compacto..."
-	$(DOCKER_COMPOSE_FORMAT)
+	@echo "📜 Compact list of containers..."
+	$(DC_PS_FORMAT)
 
-ps-format-detailed:
-	@echo "📜 Listando containers com detalhes..."
-	$(DOCKER_COMPOSE_FORMAT_DETAILED)
+## List containers with details
+ps-detailed:
+	@echo "📜 Detailed list of containers..."
+	$(DC_PS_DETAILED)
 
-ps-filter:
-	@echo "📜 Filtrando containers por: $(filter)"
-	$(DOCKER_COMPOSE_PS) -a | grep $(filter)
-
+## Rebuild all containers
 rebuild:
-	@echo "♻️ Reconstruindo containers..."
-	$(DOCKER_COMPOSE_DOWN) && \
-	$(DOCKER_COMPOSE_BUILD) && \
-	$(DOCKER_COMPOSE_UP)
+	@echo "🛠️ Rebuilding containers..."
+	$(DC_DOWN) && $(DC_BUILD) && $(DC_UP)
+
+## Run tests with coverage
+coverage:
+	@echo "🧪 Running tests with coverage..."
+	$(PYTEST) --cov=$(MODULE) $(COV_REPORT) $(JUNIT_REPORT)
+
+## Run ESLint analysis
+lint:
+	@echo "✨ Running ESLint..."
+	$(LINT)
+
+## Format code with Prettier
+format:
+	@echo "🖌️ Formatting code..."
+	$(FORMAT)
 
 ## Check for dependency vulnerabilities
 check-deps:
-	@echo "🔎 Executando Dependency Check..."
-	$(CHECK-DEPS)
+	@echo "🔍 Checking dependencies..."
+	$(CHECK_DEPS)
 
 ## Clean reports
 clean:
