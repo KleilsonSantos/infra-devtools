@@ -1,4 +1,4 @@
-name: Python package
+name: 🐍 Python Package CI
 
 on:
   push:
@@ -15,53 +15,67 @@ jobs:
         python-version: ['3.10']
 
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Set up Python ${{ matrix.python-version }}
+      - uses: actions/checkout@v3
+
+      - name: ⚙️ Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install ss (iproute2)
+      - name: 🧱 Install system dependencies
         run: sudo apt-get update && sudo apt-get install -y iproute2
 
-      - name: Install dependencies
+      - name: 📦 Install Python dependencies
         run: |
           python -m pip install --upgrade pip --root-user-action=ignore
           pip install flake8 pytest black psycopg2-binary testcontainers[postgres] testinfra
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Format & Lint
+      - name: 🧽 Format & Lint
         run: |
           black src/
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-      - name: Debug running environment
-        run: echo "Running in ACT? $ACT"
+      - name: Check GITHUB_ACTIONS env
+        run: |
+          echo "Value of GITHUB_ACTIONS: $GITHUB_ACTIONS"
 
-      - name: Generate .env (GitHub)
-        if: env.ACT == 'true'
-        uses: ./.github/actions/generate-env
-        env:
-          NODE_ENV: ${{ secrets.NODE_ENV }}
+      - name: 🔐 Generate .env (CI or local)
+        run: |
+          if [ "$ACT" = "true" ] && [ -x ./.github/actions/generate-env/entrypoint.sh ]; then
+            echo "📦 Running in ACT local environment"
+            ./.github/actions/generate-env/entrypoint.sh
+          else
+            echo "☁️ Running in GitHub Actions environment"
+            echo "${{ secrets.ENV_FILE_B64 }}" | base64 -d > .env
+          fi
 
-      - name: Generate .env (act local)
-        if: env.ACT != 'true'
-        run: echo "${{ secrets.ENV_FILE_B64 }}" | base64 -d > .env
+      - name: ✅ Validate .env variables
+        run: bash scripts/validate-env.sh
 
-      - name: Start Docker services
+      - name: 🔍 Check if .env was created
+        run: |
+          echo "🔍 Checking if .env file exists..."
+          if [ "$ACT" = "true" ]; then
+            echo "📦 Verifying in ACT local environment"
+            GITHUB_WORKSPACE="${GITHUB_WORKSPACE:-$(pwd)}"
+            ENV_FILE="$GITHUB_WORKSPACE/.env"
+            test -f $ENV_FILE || (echo "❌ .env missing!" && exit 1)
+          else
+            echo "☁️ Verifying in GitHub Actions environment"
+            test -f .env || (echo "❌ .env missing!" && exit 1)
+          fi
+
+      - name: 🐳 Start Docker services
         run: docker compose -f docker-compose.yml up -d
 
-      - name: Wait for services to be healthy
+      - name: ⏳ Wait for services to be healthy
         run: docker compose -f docker-compose.yml ps
 
-      - name: Test with pytest
+      - name: 🧪 Test with pytest
         run: pytest
 
-      - name: Tear down Docker services
+      - name: 🧹 Tear down Docker services
         if: always()
         run: docker compose -f docker-compose.yml down
-
-      - name: Fail if .env is incomplete
-        run: test $(grep -cE '^[A-Z_]+=.*' .env) -gt 10 || (echo "⚠️ .env appears too small!" && exit 1)
