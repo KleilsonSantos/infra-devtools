@@ -6,10 +6,6 @@ on:
   pull_request:
     branches: ['main']
 
-env:
-  # Variável para detectar ambiente act local (act define ACT=true automaticamente)
-  ACT: ${{ env.ACT }}
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -49,28 +45,8 @@ jobs:
         uses: ./.github/actions/generate-env
         env:
           NODE_ENV: ${{ secrets.NODE_ENV }}
-          SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: ${{ secrets.SONAR_ES_BOOTSTRAP_CHECKS_DISABLE }}
-          SONAR_JDBC_URL: ${{ secrets.SONAR_JDBC_URL }}
-          SONAR_JDBC_USERNAME: ${{ secrets.SONAR_JDBC_USERNAME }}
-          SONAR_JDBC_PASSWORD: ${{ secrets.SONAR_JDBC_PASSWORD }}
-          SONARQUBE_JVM_OPTIONS: ${{ secrets.SONARQUBE_JVM_OPTIONS }}
-          SONAR_TOKEN_INFRA_DEVTOOLS: ${{ secrets.SONAR_TOKEN_INFRA_DEVTOOLS }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
-          MYSQL_USER: ${{ secrets.MYSQL_USER }}
-          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-          MYSQL_ROOT: ${{ secrets.MYSQL_ROOT }}
-          SMTP_HOST: ${{ secrets.SMTP_HOST }}
-          FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
-          SMTP_USER: ${{ secrets.SMTP_USER }}
-          SMTP_PASS: ${{ secrets.SMTP_PASS }}
-          SMTP_TLS: ${{ secrets.SMTP_TLS }}
+          # ... demais secrets
 
-      # Gera .env decodificando variável base64 no act local (não roda no GitHub)
       - name: Generate .env (act local)
         if: env.ACT == 'true'
         run: echo "${{ secrets.ENV_FILE_B64 }}" | base64 -d > .env
