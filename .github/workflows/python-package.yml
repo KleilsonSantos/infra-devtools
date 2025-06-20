@@ -41,6 +41,12 @@ jobs:
         run: |
           echo "Value of GITHUB_ACTIONS: $GITHUB_ACTIONS"
 
+      - name: Generate .env (act local)
+        if: env.ACT == 'true'
+        uses: ./.github/actions/generate-env
+        env:
+          NODE_ENV: ${{ secrets.NODE_ENV }}
+      
       - name: 🔐 Generate .env (CI or local)
         run: |
           if [ "$ACT" = "true" ] && [ -x ./.github/actions/generate-env/entrypoint.sh ]; then
@@ -50,9 +56,11 @@ jobs:
             echo "☁️ Running in GitHub Actions environment"
             echo "${{ secrets.ENV_FILE_B64 }}" | base64 -d > .env
           fi
-
-      - name: ✅ Validate .env variables
+      - name: ✅ Validate .env file
+        if: env.ACT != 'true'
         run: bash scripts/validate-env.sh
+        env:
+          ENV_FILE_B64: ${{ secrets.ENV_FILE_B64 }}
 
       - name: 🔍 Check if .env was created
         run: |
