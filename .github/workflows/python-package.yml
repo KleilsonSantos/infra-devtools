@@ -1,0 +1,89 @@
+name: Python package
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.10']
+
+    steps:
+      - uses: actions/checkout@v4
+      
+#      - name: Validate required .env variables
+#        run: bash scripts/check_env.sh
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Install ss (iproute2)
+        run: sudo apt-get update && sudo apt-get install -y iproute2
+
+      - name: Install dependencies
+        run: |
+            python -m pip install --upgrade pip --root-user-action=ignore
+            pip install flake8 pytest black psycopg2-binary testcontainers[postgres] testinfra
+            if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Format with black
+        run: |
+            black src/
+
+      - name: Lint with flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      - name: Debug working dir
+        run: |
+            echo "PWD = $(pwd)"
+            ls -la
+
+      - name: Generate .env
+        uses: ./.github/actions/generate-env
+        env:
+          NODE_ENV: ${{ secrets.NODE_ENV }}
+          SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: ${{ secrets.SONAR_ES_BOOTSTRAP_CHECKS_DISABLE }}
+          SONAR_JDBC_URL: ${{ secrets.SONAR_JDBC_URL }}
+          SONAR_JDBC_USERNAME: ${{ secrets.SONAR_JDBC_USERNAME }}
+          SONAR_JDBC_PASSWORD: ${{ secrets.SONAR_JDBC_PASSWORD }}
+          SONARQUBE_JVM_OPTIONS: ${{ secrets.SONARQUBE_JVM_OPTIONS }}
+          SONAR_TOKEN_INFRA_DEVTOOLS: ${{ secrets.SONAR_TOKEN_INFRA_DEVTOOLS }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          MYSQL_ROOT: ${{ secrets.MYSQL_ROOT }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          SMTP_TLS: ${{ secrets.SMTP_TLS }}
+
+      - name: Start Docker services
+        run: docker compose -f docker-compose.yml up -d
+
+      - name: Wait for services to be healthy
+        run: docker compose -f docker-compose.yml ps
+
+      - name: Test with pytest
+        run: |
+          pytest
+      - name: Tear down Docker services
+        if: always()
+        run: docker compose -f docker-compose.yml down

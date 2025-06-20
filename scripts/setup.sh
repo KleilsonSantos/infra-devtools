@@ -67,7 +67,7 @@ fi
 
 # Check if Python is installed
 print_message "Setting Python virtual environment..."
-python3 -m venv .venv
+/usr/bin/python3 -m venv .venv
 if [ -d ".venv" ]; then
   echo "✅ Python virtual environment created at '.venv'."
 else
@@ -76,7 +76,7 @@ else
 fi
 
 # Activate the virtual environment
-source .venv/bin/activate
+/usr/bin/python3 .venv/bin/activate
 
 # Install Python dependencies
 print_message "Installing Python dependencies..."

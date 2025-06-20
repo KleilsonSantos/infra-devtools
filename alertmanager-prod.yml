@@ -2,7 +2,6 @@ global:
   resolve_timeout: 5m
 
 route:
-  #receiver: 'default'
   receiver: 'email-team'
 
 receivers:
@@ -14,8 +13,3 @@ receivers:
         auth_username: "$SMTP_USER"
         auth_password: "$SMTP_PASS"
         require_tls: $SMTP_TLS
- 
-  # - name: 'webhook-team'
-  #   webhook_configs:
-  #     - url: 'http://meu-servico-webhook:5001/alert'
-  #       send_resolved: true

@@ -21,6 +21,7 @@ containers = [
     "infra-default-sonarqube"
 ]
 
+@pytest.mark.integration
 @pytest.mark.parametrize("container", containers)
 def test_containers_running(host, container):
     service = host.docker(container)

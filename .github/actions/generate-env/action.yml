@@ -1,0 +1,9 @@
+name: 'Generate .env'
+description: 'Generates a .env file using secrets'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Generate .env
+      shell: bash
+      run: ${{ github.action_path }}/entrypoint.sh

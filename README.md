@@ -314,6 +314,43 @@ make logs
 
 > 💡**Obs:** Consulte o `docker-compose.yml` para detalhes completos de configuração e variáveis de ambiente de cada serviço.
 
+## 🧪 Estratégia de Testes
+
+Este projeto segue boas práticas para garantir a qualidade de código e estabilidade dos serviços utilizando **testes organizados por tipo**.
+
+### 🔍 Tipos de Testes
+
+| Tipo                 | Descrição                                                                 | Requer Containers? |
+|----------------------|---------------------------------------------------------------------------|--------------------|
+| 🧪 **Unitários**       | Testam funções, lógica interna e scripts isolados                        | ❌ Não              |
+| 🔗 **Integração**      | Testam conexão real com bancos de dados, serviços, etc.                  | ✅ Sim              |
+| 🐳 **Infraestrutura**  | Validam containers, DNS, portas, volumes e rede Docker                   | ✅ Sim              |
+
+---
+
+### 🗂️ Organização dos Testes
+
+| Pasta                      | Conteúdo                                              |
+|---------------------------|-------------------------------------------------------|
+| `tests/unit/`             | Testes com mocks, sem dependência externa             |
+| `tests/integration/`      | Testes reais com banco, serviços, containers          |
+| `tests/docker/`           | Testes de rede, DNS, portas e volumes Docker          |
+
+> ⚠️ Os testes de integração e infraestrutura só funcionam corretamente com os containers ativos.
+
+---
+
+### 🏷️ Marcação com `pytest`
+
+Os testes são organizados com marcadores para facilitar a execução seletiva:
+
+```python
+@pytest.mark.unit         # Testes unitários
+@pytest.mark.integration  # Testes com containers (Postgres, Redis etc.)
+@pytest.mark.network      # Testes de rede/DNS/infraestrutura
+```
+
+
 ## 🧰 **Automação e Utilitários**
 
 Este projeto oferece comandos práticos para gerenciar a infraestrutura e os serviços. Você pode executá-los utilizando o `Makefile` ou os scripts definidos no `package.json` com `npm run`. Escolha a abordagem que preferir.
