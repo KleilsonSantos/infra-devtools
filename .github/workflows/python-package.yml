@@ -34,46 +34,54 @@ jobs:
             pip install flake8 pytest black psycopg2-binary testcontainers[postgres] testinfra
             if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Format with black
-        run: |
-            black src/
+      # - name: Format with black
+      #   run: |
+      #       black src/
 
-      - name: Lint with flake8
+      # - name: Lint with flake8
+      #   run: |
+      #     # stop the build if there are Python syntax errors or undefined names
+      #     flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+      #     # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+      #     flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      - name: Format & Lint
         run: |
-          # stop the build if there are Python syntax errors or undefined names
+          black src/
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
       - name: Debug working dir
         run: |
             echo "PWD = $(pwd)"
             ls -la
+      - name: Generate .env file from secret
+        run: echo "${{ secrets.ENV_FILE_B64 }}" | base64 -d > .env
 
-      - name: Generate .env
-        uses: ./.github/actions/generate-env
-        env:
-          NODE_ENV: ${{ secrets.NODE_ENV }}
-          SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: ${{ secrets.SONAR_ES_BOOTSTRAP_CHECKS_DISABLE }}
-          SONAR_JDBC_URL: ${{ secrets.SONAR_JDBC_URL }}
-          SONAR_JDBC_USERNAME: ${{ secrets.SONAR_JDBC_USERNAME }}
-          SONAR_JDBC_PASSWORD: ${{ secrets.SONAR_JDBC_PASSWORD }}
-          SONARQUBE_JVM_OPTIONS: ${{ secrets.SONARQUBE_JVM_OPTIONS }}
-          SONAR_TOKEN_INFRA_DEVTOOLS: ${{ secrets.SONAR_TOKEN_INFRA_DEVTOOLS }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
-          MYSQL_USER: ${{ secrets.MYSQL_USER }}
-          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-          MYSQL_ROOT: ${{ secrets.MYSQL_ROOT }}
-          SMTP_HOST: ${{ secrets.SMTP_HOST }}
-          FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
-          SMTP_USER: ${{ secrets.SMTP_USER }}
-          SMTP_PASS: ${{ secrets.SMTP_PASS }}
-          SMTP_TLS: ${{ secrets.SMTP_TLS }}
+      # - name: Generate .env
+      #   uses: ./.github/actions/generate-env
+      #   env:
+      #     NODE_ENV: ${{ secrets.NODE_ENV }}
+      #     SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: ${{ secrets.SONAR_ES_BOOTSTRAP_CHECKS_DISABLE }}
+      #     SONAR_JDBC_URL: ${{ secrets.SONAR_JDBC_URL }}
+      #     SONAR_JDBC_USERNAME: ${{ secrets.SONAR_JDBC_USERNAME }}
+      #     SONAR_JDBC_PASSWORD: ${{ secrets.SONAR_JDBC_PASSWORD }}
+      #     SONARQUBE_JVM_OPTIONS: ${{ secrets.SONARQUBE_JVM_OPTIONS }}
+      #     SONAR_TOKEN_INFRA_DEVTOOLS: ${{ secrets.SONAR_TOKEN_INFRA_DEVTOOLS }}
+      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      #     POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      #     POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      #     POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+      #     MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+      #     MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+      #     MYSQL_USER: ${{ secrets.MYSQL_USER }}
+      #     MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+      #     MYSQL_ROOT: ${{ secrets.MYSQL_ROOT }}
+      #     SMTP_HOST: ${{ secrets.SMTP_HOST }}
+      #     FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
+      #     SMTP_USER: ${{ secrets.SMTP_USER }}
+      #     SMTP_PASS: ${{ secrets.SMTP_PASS }}
+      #     SMTP_TLS: ${{ secrets.SMTP_TLS }}
 
       - name: Start Docker services
         run: docker compose -f docker-compose.yml up -d
@@ -84,6 +92,12 @@ jobs:
       - name: Test with pytest
         run: |
           pytest
+      
       - name: Tear down Docker services
         if: always()
         run: docker compose -f docker-compose.yml down
+      
+#      - name: Fail if .env is incomplete
+#        run: test $(grep -cE '^[A-Z_]+=.*' .env) -gt 10 || (echo "⚠️ .env appears too small!" && exit 1)
+
+      
