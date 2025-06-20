@@ -1,38 +1,48 @@
-# -------------------------------------------
-# 🐳 Infraestrutura Base - Makefile
-# 🧑‍💻 Autor: Kleilson Santos
-# 📅 Última atualização: 2025-05-11
+# -------------------------------------------------------------
+# 🐳 Infrastructure DevTools - Makefile
+# 👨‍💻 Author: Kleilson Santos
+# 📅 Last Updated: 2025-06-19
 #
-# 📦 Serviços Integrados:
-#   🔍 Monitoramento:		→ Prometheus, Node Exporter, cAdvisor
-#   📊 Bancos de Dados:		→ MongoDB, PostgreSQL, Redis, MySQL
-#   🛠️ DevTools:		 	 → Portainer, RedisInsight, phpMyAdmin, pgAdmin
-#   🧹 Qualidade de Código: → SonarQube, ESLint, Prettier, OWASP Dependency-Check
+# 📦 Integrated Services:
+#   🔍 Monitoring:        → Prometheus, Node Exporter, cAdvisor
+#   🧮 Databases:         → MongoDB, PostgreSQL, Redis, MySQL
+#   🛠️ Dev Tools:         → Portainer, RedisInsight, phpMyAdmin, pgAdmin
+#   🧹 Code Quality:      → SonarQube, ESLint, Prettier, OWASP Dependency-Check
 #
-# 🎯 Comandos Disponíveis (targets):
-#   🔼 up				   → Inicia todos os containers listados
-#   🔽 down				   → Para os containers sem remover volumes
-#   ♻️ force-recreate	   → Força recriação dos containers
-#   📋 logs				   → Mostra os logs do serviço especificado
-#   📜 ps / ps-format	   → Lista os containers em diferentes formatos
-#   📊 coverage			   → Executa testes com cobertura
-#   ✨ lint / format		  → Executa ESLint e Prettier para lint e formatação
-#   🔍 check-deps		   → Executa o Dependency Check
-#   🧹 clean			   → Limpa a pasta de relatórios
-#   🔍 sonar-scanner	   → Executa análise com SonarQube
-# -------------------------------------------
+# 🎯 Available Targets:
+#   ┌───────────── Container Management ─────────────┐
+#   │ up               → Start all containers         │
+#   │ down             → Stop containers (keep data)  │
+#   │ force-recreate   → Recreate all containers      │
+#   │ up-service       → Start specific container     │
+#   │ down-service     → Stop specific container      │
+#   │ logs             → Show container logs          │
+#   │ ps / ps-format   → List containers (detailed)   │
+#   └────────────────────────────────────────────────┘
+#   ┌───────────── Testing & Linting ────────────────┐
+#   │ test-all          → Run all tests              │
+#   │ test-unit         → Run unit tests             │
+#   │ test-integration  → Run integration tests      │
+#   │ test-docker       → Run docker/network tests   │
+#   │ test-volumes      → Run volume-related tests   │
+#   │ coverage          → Run tests with coverage    │
+#   │ lint / format     → Run ESLint / Prettier      │
+#   └────────────────────────────────────────────────┘
+#   🔍 check-deps        → Run OWASP Dependency Check
+#   🔍 sonar-scanner     → Run SonarQube static analysis
+#   🧹 clean             → Clean generated reports
+# -------------------------------------------------------------
 
-
-# 🌍 Configurações de Ambiente
-MODULE=src
-ENV_FILE=.env
+# 🌍 Environment Configuration
+MODULE = src
+ENV_FILE = .env
 include $(ENV_FILE)
 
-# 🏷️ Sonar Configuration
-SONAR_SCANNER=npx sonar-scanner
-SONAR_PROJECT_KEY=infra-devtools
+# 🔍 SonarQube Configuration
+SONAR_SCANNER = npx sonar-scanner
+SONAR_PROJECT_KEY = infra-devtools
 
-# 🏷️ MAIN SERVICES
+# 🐳 Docker Compose Service List
 SERVICES = \
   mongo \
   mongo-express \
@@ -46,6 +56,8 @@ SERVICES = \
   rabbitmq-exporter \
   prometheus \
   grafana \
+  alertmanager \
+  blackbox-exporter \
   cadvisor \
   node-exporter \
   postgres-exporter \
@@ -54,93 +66,152 @@ SERVICES = \
   redis-exporter \
   sonarqube \
   portainer \
-  keycloak
->>>>>>> Stashed changes
+  vault \
+  mailhog \
+  keycloak \
+  eureka-server \
+  users-api \
+  webhook-listener
 
-# 🐳 Configuração do Docker Compose
-DOCKER_COMPOSE=docker compose --env-file $(ENV_FILE)
-DOCKER_COMPOSE_UP=$(DOCKER_COMPOSE) up -d
-DOCKER_COMPOSE_DOWN=$(DOCKER_COMPOSE) down --volumes=false --remove-orphans
-DOCKER_COMPOSE_BUILD=$(DOCKER_COMPOSE) build
-DOCKER_COMPOSE_EXEC=$(DOCKER_COMPOSE) exec
-DOCKER_COMPOSE_PULL=$(DOCKER_COMPOSE) pull
-DOCKER_COMPOSE_RUN=$(DOCKER_COMPOSE) run --rm
+# 📁 Directory Paths
+REPORTS_DIR = $(MODULE)/reports
 
-# 🔍 Status & Logs
-DOCKER_COMPOSE_PS=$(DOCKER_COMPOSE) ps
-DOCKER_COMPOSE_LOGS=$(DOCKER_COMPOSE) logs -f
-DOCKER_COMPOSE_FORMAT=$(DOCKER_COMPOSE) ps --format 'table {{.Names}}'
-DOCKER_COMPOSE_FORMAT_DETAILED=$(DOCKER_COMPOSE) ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
+# 🐳 Docker Compose Shortcuts
+DC = docker compose --env-file $(ENV_FILE)
+DC_UP = $(DC) up -d
+DC_DOWN = $(DC) down --volumes=false --remove-orphans
+DC_BUILD = $(DC) build
+DC_EXEC = $(DC) exec
+DC_PULL = $(DC) pull
+DC_RUN = $(DC) run --rm
+DC_LOGS = $(DC) logs -f
+DC_PS = $(DC) ps
+DC_PS_FORMAT = $(DC) ps --format 'table {{.Names}}'
+DC_PS_DETAILED = $(DC) ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
 
-# 🧪 Testes e Cobertura
-CONVERTER_SCRIPT=src/utils/convert_junit_to_sonar.py
-JUNIT_XML=reports/coverage/test-results.xml
-SONAR_XML=reports/coverage/test-executions.xml
-PYTEST_COVERAGE_ALL=pytest --cov=$(MODULE) --cov-report xml:$(REPORTS_DIR)/coverage/coverage.xml --cov-report html:$(REPORTS_DIR)/coverage
-PYTEST_COVERAGE_JUNIT=pytest --junitxml=reports/coverage/test-results.xml
+# 🧪 Test Configuration
+PYTEST = python3 -m pytest
+COV_REPORT = --cov-report xml:$(REPORTS_DIR)/coverage/coverage.xml --cov-report html:$(REPORTS_DIR)/coverage
+JUNIT_REPORT = --junitxml=$(REPORTS_DIR)/coverage/test-results.xml
 
-# 🎨 Linting e Formatação
-LINT=npx eslint --ext .ts,.js --fix
-FORMAT=npx prettier --write "**/*.{ts,js,json,md,py}"
+# 🎨 Linting & Formatting
+LINT = npx eslint --ext .ts,.js --fix
+FORMAT = npx prettier --write "src/**/*.{ts,js,json,md,py}" --ignore-path .prettierignore --ignore-unknown
 
+# 🛡️ OWASP Dependency Check
+CHECK_DEPS = scripts/run-dependency-check.sh
 
-# 🚀 Comandos para Containers
-.PHONY: up down force-recreate logs ps ps-format ps-format-detailed ps-filter rebuild clean check-deps coverage sonar-scanner lint format convert-tests
+# 📦 Common Targets
+.PHONY: up down force-recreate logs ps ps-format ps-detailed rebuild \
+        clean check-deps coverage test lint format sonar-scanner \
+        test-unit test-integration test-volumes test-docker test-all
 
+## 🚀 Start all containers
 up:
-	@echo "🔼 Iniciando containers..."
-	$(DOCKER_COMPOSE_UP) $(SERVICES)
+	@echo "🔼 Starting containers..."
+	$(DC_UP) $(SERVICES)
 
+## 🚀 Start a specific service: make up-service service=name
+up-service:
+	@echo "🔼 Starting container $(service)..."
+	$(DC_UP) $(service)
+
+## ⛔ Stop a specific service
+down-service:
+	@echo "🔽 Stopping container $(service)..."
+	$(DC_DOWN) $(service)
+
+## ⛔ Stop all containers (preserve volumes)
 down:
-	@echo "🔽 Parando todos os containers..."
-	$(DOCKER_COMPOSE_DOWN)
+	@echo "🔽 Stopping containers..."
+	$(DC_DOWN)
 
+## ♻️ Force recreate all containers
 force-recreate:
-	@echo "🔄 Recriando containers..."
-	$(DOCKER_COMPOSE_DOWN) && \
-	$(DOCKER_COMPOSE_UP) $(SERVICES)
+	@echo "♻️ Recreating containers..."
+	$(DC_DOWN) && $(DC_UP) $(SERVICES)
 
+## 📋 Show logs of a specific container: make logs service=name
 logs:
-	@echo "📋 Mostrando logs do serviço $(service)..."
-	$(DOCKER_COMPOSE_LOGS) $(service)
+	@echo "📋 Showing logs for service $(service)..."
+	$(DC_LOGS) $(service)
 
+## 📜 List all containers
 ps:
-	@echo "📜 Listando todos os containers..."
-	$(DOCKER_COMPOSE_PS)
+	@echo "📜 Listing containers..."
+	$(DC_PS)
 
+## 📜 List containers (compact format)
 ps-format:
-	@echo "📜 Listando containers em formato compacto..."
-	$(DOCKER_COMPOSE_FORMAT)
+	@echo "📜 Compact list of containers..."
+	$(DC_PS_FORMAT)
 
-ps-format-detailed:
-	@echo "📜 Listando containers com detalhes..."
-	$(DOCKER_COMPOSE_FORMAT_DETAILED)
+## 📜 List containers with details
+ps-detailed:
+	@echo "📜 Detailed container list..."
+	$(DC_PS_DETAILED)
 
-ps-filter:
-	@echo "📜 Filtrando containers por: $(filter)"
-	$(DOCKER_COMPOSE_PS) -a | grep $(filter)
-
+## 🔄 Rebuild all containers
 rebuild:
-	@echo "♻️ Reconstruindo containers..."
-	$(DOCKER_COMPOSE_DOWN) && \
-	$(DOCKER_COMPOSE_BUILD) && \
-	$(DOCKER_COMPOSE_UP)
+	@echo "🛠️ Rebuilding containers..."
+	$(DC_DOWN) && $(DC_BUILD) && $(DC_UP)
 
-## Check for dependency vulnerabilities
+## 🧪 Run all tests with coverage report
+coverage:
+	@echo "🧪 Running tests with coverage..."
+	$(PYTEST) --cov=$(MODULE) $(COV_REPORT) $(JUNIT_REPORT)
+
+## 🧪 Run only unit tests
+test-unit:
+	@echo "🧪 Running unit tests..."
+	$(PYTEST) -m "unit" $(JUNIT_REPORT)
+
+## 🔗 Run only integration tests
+test-integration:
+	@echo "🔗 Running integration tests..."
+	$(PYTEST) -m "integration" $(JUNIT_REPORT)
+
+## 💾 Run only volume-related tests
+test-volumes:
+	@echo "💾 Running volume tests..."
+	$(PYTEST) -m "volumes" $(JUNIT_REPORT)
+
+## 🐳 Run only docker/network related tests
+test-docker:
+	@echo "🐳 Running docker/network tests..."
+	$(PYTEST) -m "docker or network" $(JUNIT_REPORT)
+
+## 🧪 Run all tests without coverage
+test-all:
+	@echo "🧪 Running all tests..."
+	$(PYTEST) $(JUNIT_REPORT)
+
+## ✨ Run ESLint
+lint:
+	@echo "✨ Running ESLint..."
+	$(LINT)
+
+## 🖌️ Format code using Prettier
+format:
+	@echo "🖌️ Formatting code..."
+	$(FORMAT)
+
+## 🔍 Run OWASP Dependency Check
 check-deps:
-	@echo "🔎 Executando Dependency Check..."
-	$(CHECK-DEPS)
+	@echo "🔍 Checking for dependency vulnerabilities..."
+	$(CHECK_DEPS)
 
-## Clean reports
+## 🧹 Clean generated reports
 clean:
 	@echo "🧹 Cleaning reports..."
 	rm -rf $(REPORTS_DIR)/*
 
-## Run SonarQube analysis
+## 🔍 Run SonarQube scanner
 sonar-scanner:
-	@echo "🔎 Running SonarQube Scanner..."
-	$(SONAR_SCANNER) -Dsonar.projectKey=$(SONAR_PROJECT_KEY) \
-	-Dsonar.sources=. \
-	-Dsonar.host.url=${SONAR_HOST_URL} \
-	-Dsonar.token=${SONAR_TOKEN_INFRA_DEVTOOLS} \
-	-Dsonar.sourceEncoding=UTF-8
+	@echo "🔎 Running SonarQube analysis..."
+	$(SONAR_SCANNER) \
+		-Dsonar.projectKey=$(SONAR_PROJECT_KEY) \
+		-Dsonar.sources=. \
+		-Dsonar.host.url=${SONAR_HOST_URL} \
+		-Dsonar.token=${SONAR_TOKEN_INFRA_DEVTOOLS} \
+		-Dsonar.sourceEncoding=UTF-8

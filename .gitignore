@@ -16,7 +16,9 @@ test-results/
 .nyc_output/
 jest-cache/
 jest-test-results.json
-src/tests/__pycache__/
+src/tests/__pycache__/*
+src/tests/integration/__pycache__/*
+src/tests/unit/__pycache__/*
 
 # 📝 Logs e Relatórios
 logs/
