@@ -1,36 +1,26 @@
-import pytest
+"""
+Unit tests that verify, using mocks, whether the infrastructure containers are running.
+
+This module uses mocks to simulate the state of the listed Docker containers,
+ensuring that tests do not depend on the real infrastructure during execution.
+"""
+
 from unittest.mock import MagicMock
 
-containers = [
-    "infra-default-cadvisor",
-    "infra-default-grafana",
-    "infra-default-mongo",
-    "infra-default-mongo-express",
-    "infra-default-mongodb-exporter",
-    "infra-default-mysql",
-    "infra-default-mysql-exporter",
-    "infra-default-node-exporter",
-    "infra-default-pgadmin",
-    "infra-default-phpmyadmin",
-    "infra-default-portainer",
-    "infra-default-postgres",
-    "infra-default-postgres-exporter",
-    "infra-default-prometheus",
-    "infra-default-redis",
-    "infra-default-redis-exporter",
-    "infra-default-redisinsight",
-    "infra-default-sonarqube"
-]
+import pytest
+
+from src.utils.constants import CONTAINERS
+
 
 @pytest.mark.unit
-@pytest.mark.parametrize("container", containers)
-def test_containers_running_mock(container):
+@pytest.mark.parametrize("container", CONTAINERS)
+def test_container_is_running_mocked(container: str) -> None:
+    """🧪 Checks if the container is running (mocked)."""
     mock_service = MagicMock()
     mock_service.is_running = True
-    
+
     mock_host = MagicMock()
     mock_host.docker.return_value = mock_service
-    
-    for container in containers:
-        service = mock_host.docker(container)
-        assert service.is_running, f"❌ Mock: Container {container} não está rodando!"
+
+    service = mock_host.docker(container)
+    assert service.is_running, f"❌ Mock: Container {container} is not running!"
