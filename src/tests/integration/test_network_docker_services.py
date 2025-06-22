@@ -1,11 +1,22 @@
-import socket
-import pytest
+"""
+Integration tests to verify Docker network existence, container accessibility, and DNS resolution.
+
+This module checks if the main Docker network exists, if containers are accessible via
+localhost and mapped ports, and if containers correctly resolve DNS names both externally
+and internally.
+"""
+
 import logging
+import socket
+from typing import Tuple
+
+import pytest
+from testinfra.host import Host
 
 logging.basicConfig(level=logging.INFO)
 
-# Lista de containers e respectivas portas para validação de acessibilidade
-containers = [
+# List of containers and their respective ports
+CONTAINER_PORTS: list[Tuple[str, int]] = [
     ("infra-default-mongo", 27017),
     ("infra-default-mongo-express", 8081),
     ("infra-default-mysql", 3306),
@@ -26,33 +37,34 @@ containers = [
     ("infra-default-postgres-exporter", 9187),
 ]
 
+
 @pytest.mark.integration
 @pytest.mark.network
-def test_network_exists(host):
-    """🕸️ Verifica se a rede Docker principal 'infra-default-shared-net' existe."""
+def test_network_exists(host: Host) -> None:
+    """🕸️ Checks if the main Docker network 'infra-default-shared-net' exists."""
     network_name = "infra-default-shared-net"
     networks = host.check_output(
         "docker network ls --filter name=%s --format '{{.Name}}'", network_name
     )
-    assert network_name in networks, f"❌ A rede {network_name} não foi encontrada!"
+    assert network_name in networks, f"❌ Network {network_name} not found!"
+
 
 @pytest.mark.integration
 @pytest.mark.network
-@pytest.mark.parametrize("container_name, port", containers)
-def test_container_accessible(host, container_name, port):
-    """🔌 Verifica se os containers estão acessíveis via localhost e porta mapeada."""
-    connected = False
+@pytest.mark.parametrize("container_name, port", CONTAINER_PORTS)
+def test_container_accessible(container_name: str, port: int) -> None:
+    """🔌 Checks if containers are accessible via localhost and mapped port."""
     try:
         with socket.create_connection(("localhost", port), timeout=5):
-            connected = True
-    except Exception as e:
-        print(f"Erro ao conectar com {container_name}:{port} -> {e}")
-    assert connected, f"❌ Falha ao conectar em {container_name}:{port}"
+            pass
+    except OSError as e:
+        pytest.fail(f"❌ Failed to connect to {container_name}:{port} → {e}")
+
 
 @pytest.mark.integration
 @pytest.mark.network
-def test_dns_resolution_getent(host):
-    """🌐 Verifica se os containers resolvem DNS via getent hosts."""
+def test_dns_resolution_getent(host: Host) -> None:
+    """🌐 Checks if containers resolve DNS via getent hosts."""
     services = [
         "infra-default-mongo",
         "infra-default-redis",
@@ -70,27 +82,30 @@ def test_dns_resolution_getent(host):
 
     for service in services:
         result = host.run(f"docker exec {service} getent hosts {target_host}")
-        assert result.rc == 0 and target_host in result.stdout, f"❌ [getent] DNS FAIL: {service} → {target_host}"
+        assert (
+            result.rc == 0 and target_host in result.stdout
+        ), f"❌ [getent] DNS FAIL: {service} → {target_host}"
+
 
 @pytest.mark.integration
 @pytest.mark.network
-def test_service_dns_resolution(host):
-    """📡 Verifica se os serviços resolvem seu próprio DNS antes de conectar."""
+def test_service_dns_resolution(host: Host) -> None:
+    """📡 Checks if services resolve their own DNS before connecting."""
     services = [
         "infra-default-mysql",
         "infra-default-postgres",
         "infra-default-redis",
-        "infra-default-mongo"
+        "infra-default-mongo",
     ]
 
     for service in services:
         try:
             result = host.run(f"docker exec {service} getent hosts {service}")
             if result.rc == 0 and service in result.stdout:
-                logging.info(f"✅ DNS resolvido corretamente para {service}")
+                logging.info("✅ DNS successfully resolved for %s", service)
             else:
-                logging.error(f"❌ Falha na resolução DNS para {service}")
-                pytest.fail(f"❌ Serviço {service} não conseguiu resolver DNS corretamente")
-        except Exception as e:
-            logging.error(f"❌ Erro ao testar DNS para {service} → {e}")
-            pytest.fail(f"❌ Erro crítico na verificação DNS para {service}: {e}")
+                logging.error("❌ DNS resolution failed for %s", service)
+                pytest.fail(f"❌ Service {service} could not resolve its DNS correctly")
+        except OSError as e:
+            logging.error("❌ Error testing DNS for %s → %s", service, e)
+            pytest.fail(f"❌ Critical DNS check failure for {service}: {e}")

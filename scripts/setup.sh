@@ -90,6 +90,15 @@ pip3 install requests
 pip3 install pytest-mock
 pip3 install logging
 pip3 install testinfra
+pip3 install black
+pip3 install flake8
+pip3 install isort
+pip3 install mypy
+pip3 install bandit
+pip3 install pydocstyle
+pip3 install pylint
+pip3 install types-psycopg2
+pip3 install types-defusedxml
 echo "✅ Python dependencies installed."
 
 # Done!
