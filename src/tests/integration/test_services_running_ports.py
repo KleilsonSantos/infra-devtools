@@ -1,11 +1,9 @@
-from typing import Any
-
 import pytest
 
 
 @pytest.mark.integration
 @pytest.mark.services
-def test_services_running(host: Any) -> None:
+def test_services_running(host):
     """🟢 Verifica se os containers de serviços essenciais estão em execução."""
     services = [
         "infra-default-cadvisor",
@@ -35,7 +33,7 @@ def test_services_running(host: Any) -> None:
 
 @pytest.mark.integration
 @pytest.mark.services
-def test_services_ports(host: Any) -> None:
+def test_services_ports(host):
     """🔌 Verifica se os serviços estão ouvindo nas portas esperadas."""
     services_ports = {
         "infra-default-mongo": 27017,
@@ -67,7 +65,7 @@ def test_services_ports(host: Any) -> None:
 
 @pytest.mark.integration
 @pytest.mark.services
-def test_prometheus_config(host: Any) -> None:
+def test_prometheus_config(host):
     """📊 Valida se a configuração do Prometheus está correta utilizando promtool."""
     result = host.run(
         "docker exec infra-default-prometheus promtool check config /etc/prometheus/prometheus.yml"
