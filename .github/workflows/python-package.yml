@@ -16,7 +16,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
       - name: ⚙️ Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v3
         with:
@@ -82,6 +81,8 @@ jobs:
         run: docker compose -f docker-compose.yml ps
 
       - name: 🧪 Test with pytest
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: pytest
 
       - name: 🧹 Tear down Docker services

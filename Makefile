@@ -42,6 +42,11 @@ include $(ENV_FILE)
 SONAR_SCANNER = npx sonar-scanner
 SONAR_PROJECT_KEY = infra-devtools
 
+# 📦 Python Environment Configuration
+PYTHON := .venv/bin/python3
+PIP := .venv/bin/pip3
+VENV_BIN = .venv/bin
+
 # 🐳 Docker Compose Service List
 SERVICES = \
   mongo \
@@ -94,10 +99,6 @@ PYTEST = python3 -m pytest
 COV_REPORT = --cov-report xml:$(REPORTS_DIR)/coverage/coverage.xml --cov-report html:$(REPORTS_DIR)/coverage
 JUNIT_REPORT = --junitxml=$(REPORTS_DIR)/coverage/test-results.xml
 
-# 🎨 Linting & Formatting
-LINT = npx eslint --ext .ts,.js --fix
-FORMAT = npx prettier --write "src/**/*.{ts,js,json,md,py}" --ignore-path .prettierignore --ignore-unknown
-
 # 🛡️ OWASP Dependency Check
 CHECK_DEPS = scripts/run-dependency-check.sh
 
@@ -105,6 +106,18 @@ CHECK_DEPS = scripts/run-dependency-check.sh
 .PHONY: up down force-recreate logs ps ps-format ps-detailed rebuild \
         clean check-deps coverage test lint format sonar-scanner \
         test-unit test-integration test-volumes test-docker test-all
+
+# 🛠️ Setup Python Environment
+setup:
+	@echo "🔧 Setting up environment..." && \
+	python3 -m venv .venv && \
+	make install
+
+# 📦 Install Python dependencies
+install:
+	@echo "📦 Installing dependencies..." && \
+	$(PIP) install --upgrade pip && \
+	$(PIP) install black defusedxml types-defusedxml types-psycopg2 isort flake8 mypy bandit pydocstyle pylint pytest pytest-cov pytest-html testcontainers psycopg2-binary python-dotenv requests pytest-mock testinfra
 
 ## 🚀 Start all containers
 up:
@@ -156,55 +169,106 @@ rebuild:
 	@echo "🛠️ Rebuilding containers..."
 	$(DC_DOWN) && $(DC_BUILD) && $(DC_UP)
 
-## 🧪 Run all tests with coverage report
-coverage:
-	@echo "🧪 Running tests with coverage..."
-	$(PYTEST) --cov=$(MODULE) $(COV_REPORT) $(JUNIT_REPORT)
-
 ## 🧪 Run only unit tests
 test-unit:
 	@echo "🧪 Running unit tests..."
-	$(PYTEST) -m "unit" $(JUNIT_REPORT)
+	$(PYTHON) -m pytest -m "unit" $(JUNIT_REPORT)
 
 ## 🔗 Run only integration tests
 test-integration:
 	@echo "🔗 Running integration tests..."
-	$(PYTEST) -m "integration" $(JUNIT_REPORT)
+	$(PYTHON) -m pytest -m "integration" $(JUNIT_REPORT)
 
 ## 💾 Run only volume-related tests
 test-volumes:
 	@echo "💾 Running volume tests..."
-	$(PYTEST) -m "volumes" $(JUNIT_REPORT)
+	$(PYTHON) -m pytest -m "volumes" $(JUNIT_REPORT)
 
 ## 🐳 Run only docker/network related tests
 test-docker:
 	@echo "🐳 Running docker/network tests..."
-	$(PYTEST) -m "docker or network" $(JUNIT_REPORT)
+	$(PYTHON) -m pytest -m "docker or network" $(JUNIT_REPORT)
 
 ## 🧪 Run all tests without coverage
 test-all:
 	@echo "🧪 Running all tests..."
-	$(PYTEST) $(JUNIT_REPORT)
-
-## ✨ Run ESLint
-lint:
-	@echo "✨ Running ESLint..."
-	$(LINT)
+	$(PYTHON) -m pytest $(JUNIT_REPORT)
 
 ## 🖌️ Format code using Prettier
-format:
-	@echo "🖌️ Formatting code..."
-	$(FORMAT)
+format-black:
+	@echo "🖌️ Formatting Python code with Black..."
+	$(PYTHON) -m black src/
+
+# 🔍 Check code formatting with Black
+check-black:
+	@echo "🔍 Checking Python code formatting with Black..."
+	$(VENV_BIN)/black src/ --check
+
+# 🖌️ Format code using Prettier
+format-isort:
+	@echo "🖌️ Formatting imports with isort..."
+	$(VENV_BIN)/isort src/
+
+# 🔍 Check import order with isort
+check-isort:
+	@echo "🔍 Checking import order with isort..."
+	$(VENV_BIN)/isort src/ --check-only
+
+# 🔍 Run flake8 for critical errors
+lint-flake8-critical:
+	@echo "🔍 Running flake8 (critical errors)..."
+	$(VENV_BIN)/flake8 . --exclude=.venv --count --select=E9,F63,F7,F82 --show-source --statistics
+
+# 🔍 Run flake8 for style and complexity checks
+lint-flake8-style:
+	@echo "🔍 Running flake8 (style and complexity)..."
+	$(VENV_BIN)/flake8 . --exclude=.venv --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+# 🔍 Run mypy 
+lint-mypy:
+	@echo "🔍 Running mypy type checking..."
+	$(VENV_BIN)/mypy src/ --config-file mypy.ini
+
+# 🔍 Run bandit for security analysis
+lint-bandit:
+	@echo "🔍 Running bandit security analysis..."
+	$(VENV_BIN)/bandit -r src/ -ll --ini .bandit
+
+# 🔍 Run pydocstyle for docstring checks
+lint-pydocstyle:
+	@echo "🔍 Checking docstrings with pydocstyle..."
+	$(VENV_BIN)/pydocstyle src/
+
+# 🔍 Run pylint for code quality
+lint-pylint:
+	@echo "🔍 Running pylint code quality check..."
+	$(VENV_BIN)/pylint src/ --rcfile=.pylintrc
+#	$(PYTHON) -m pylint src/
+
+## 📊 Run test 
+lint-python: format-black \
+format-isort \
+check-black \
+check-isort \
+lint-flake8-critical \
+lint-flake8-style \
+lint-mypy \
+lint-bandit \
+lint-pydocstyle \
+lint-pylint
+	@echo "✅ All Python lint checks passed."
+
 
 ## 🔍 Run OWASP Dependency Check
 check-deps:
 	@echo "🔍 Checking for dependency vulnerabilities..."
 	$(CHECK_DEPS)
 
-## 🧹 Clean generated reports
+## 🧹 Clean environment
 clean:
-	@echo "🧹 Cleaning reports..."
-	rm -rf $(REPORTS_DIR)/*
+	@echo "🧹 Limpando arquivos temporários..." && \
+	rm -rf .venv __pycache__ .pytest_cache .mypy_cache dist build src/reports
+	@echo "🧹 Limpeza concluída."
 
 ## 🔍 Run SonarQube scanner
 sonar-scanner:

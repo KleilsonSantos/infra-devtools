@@ -1,24 +1,44 @@
-import pytest
+"""
+Integration test for a temporary PostgreSQL container using Testcontainers.
+
+This module loads environment variables from a .env file to configure the
+PostgreSQL container with a fixed password, then verifies that the container
+starts correctly and accepts connections.
+"""
+
+import os
+
 import psycopg2
+import pytest
+from dotenv import load_dotenv
+from psycopg2.extensions import connection
 from testcontainers.postgres import PostgresContainer
 
+from src.utils.db_asserts import assert_postgres_connection
+
+load_dotenv()
+
+
 @pytest.mark.integration
-def test_postgres_container():
-    """Testa container PostgreSQL temporário com Testcontainers."""
-    with PostgresContainer("postgres:15") as postgres:
+def test_postgres_container() -> None:
+    """🧪 Tests a temporary PostgreSQL container using Testcontainers."""
+    fixed_password = os.getenv("POSTGRES_PASSWORD")
+
+    # ⛔️ Important: configure all environment variables BEFORE entering the `with`
+    postgres = PostgresContainer("postgres:15")
+    postgres = (
         postgres.with_env("POSTGRES_DB", "defaultdb")
-        postgres.with_env("POSTGRES_USER", "admin")
-        postgres.with_env("POSTGRES_PASSWORD", "adminpass")
-        
-        conn = psycopg2.connect(
+        .with_env("POSTGRES_USER", "admin")
+        .with_env("POSTGRES_PASSWORD", fixed_password)
+    )
+
+    with postgres:  # The container starts here, with environment variables already set
+        conn: connection = psycopg2.connect(
             host=postgres.get_container_host_ip(),
             port=postgres.get_exposed_port(5432),
             user="admin",
-            password="adminpass",
+            password=fixed_password,
             database="defaultdb",
         )
-        cursor = conn.cursor()
-        cursor.execute("SELECT 1;")
-        result = cursor.fetchone()
-        assert result[0] == 1, "❌ Container PostgreSQL (isolado) não respondeu corretamente."
-        conn.close()
+
+        assert_postgres_connection(conn)
