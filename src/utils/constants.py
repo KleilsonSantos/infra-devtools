@@ -1,7 +1,9 @@
 """Constants used across the application."""
 
+from typing import Any, Dict, List
+
 # Container names
-CONTAINERS = [
+CONTAINERS: List[str] = [
     "infra-default-mongo",
     "infra-default-postgres",
     "infra-default-mysql",
@@ -11,7 +13,7 @@ CONTAINERS = [
 ]
 
 # Database service configurations
-DATABASE_SERVICES = {
+DATABASE_SERVICES: Dict[str, Dict[str, Any]] = {
     "infra-default-postgres": {
         "host": "localhost",
         "port": 5432,
@@ -43,7 +45,7 @@ DATABASE_SERVICES = {
 }
 
 # Web service configurations
-WEB_SERVICES = {
+WEB_SERVICES: Dict[str, Dict[str, Any]] = {
     "infra-default-grafana": {
         "host": "localhost",
         "port": 3000,
@@ -59,15 +61,15 @@ WEB_SERVICES = {
 }
 
 # Metrics exporter configurations
-METRICS_EXPORTERS = {
+METRICS_EXPORTERS: Dict[str, Dict[str, Any]] = {
     "node-exporter": {"port": 9100, "url": "http://localhost:9100/metrics"},
     "cadvisor": {"port": 8080, "url": "http://localhost:8080/metrics"},
 }
 
 # Security service configurations
-SECURITY_SERVICES = {
+SECURITY_SERVICES: Dict[str, Dict[str, Any]] = {
     "vault": {"host": "localhost", "port": 8200, "url": "http://localhost:8200"},
     "keycloak": {"host": "localhost", "port": 8080, "url": "http://localhost:8080"},
 }
 
-ESSENTIAL_SERVICES = CONTAINERS
+ESSENTIAL_SERVICES: List[str] = CONTAINERS
