@@ -1,9 +1,11 @@
+from typing import Any
+
 import pytest
 
 
 @pytest.mark.integration
 @pytest.mark.volumes
-def test_volumes_exist(host):
+def test_volumes_exist(host: Any) -> None:
     """💾 Verifica se os volumes Docker necessários estão criados no sistema."""
     volumes = [
         "infra-default-mongo_data",
@@ -21,7 +23,7 @@ def test_volumes_exist(host):
 
 @pytest.mark.integration
 @pytest.mark.volumes
-def test_volumes_mounted(host):
+def test_volumes_mounted(host: Any) -> None:
     """📦 Verifica se os volumes estão corretamente montados nos containers associados."""
     containers_volumes = {
         "infra-default-mongo": "/data/db",

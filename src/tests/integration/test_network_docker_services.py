@@ -1,5 +1,6 @@
 import logging
 import socket
+from typing import Any
 
 import pytest
 
@@ -30,7 +31,7 @@ containers = [
 
 @pytest.mark.integration
 @pytest.mark.network
-def test_network_exists(host):
+def test_network_exists(host: Any) -> None:
     """🕸️ Verifica se a rede Docker principal 'infra-default-shared-net' existe."""
     network_name = "infra-default-shared-net"
     networks = host.check_output(
@@ -42,7 +43,7 @@ def test_network_exists(host):
 @pytest.mark.integration
 @pytest.mark.network
 @pytest.mark.parametrize("container_name, port", containers)
-def test_container_accessible(host, container_name, port):
+def test_container_accessible(host: Any, container_name: str, port: int) -> None:
     """🔌 Verifica se os containers estão acessíveis via localhost e porta mapeada."""
     connected = False
     try:
@@ -55,7 +56,7 @@ def test_container_accessible(host, container_name, port):
 
 @pytest.mark.integration
 @pytest.mark.network
-def test_dns_resolution_getent(host):
+def test_dns_resolution_getent(host: Any) -> None:
     """🌐 Verifica se os containers resolvem DNS via getent hosts."""
     services = [
         "infra-default-mongo",
@@ -81,7 +82,7 @@ def test_dns_resolution_getent(host):
 
 @pytest.mark.integration
 @pytest.mark.network
-def test_service_dns_resolution(host):
+def test_service_dns_resolution(host: Any) -> None:
     """📡 Verifica se os serviços resolvem seu próprio DNS antes de conectar."""
     services = [
         "infra-default-mysql",

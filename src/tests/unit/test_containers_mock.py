@@ -26,7 +26,7 @@ containers = [
 
 @pytest.mark.unit
 @pytest.mark.parametrize("container", containers)
-def test_containers_running_mock(container):
+def test_containers_running_mock(container: str) -> None:
     mock_service = MagicMock()
     mock_service.is_running = True
 

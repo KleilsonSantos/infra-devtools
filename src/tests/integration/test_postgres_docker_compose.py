@@ -8,7 +8,7 @@ load_dotenv()
 
 
 @pytest.mark.integration
-def test_postgres_service():
+def test_postgres_service() -> None:
     """Testa se o PostgreSQL via docker-compose está funcionando."""
     conn = psycopg2.connect(
         host="localhost",

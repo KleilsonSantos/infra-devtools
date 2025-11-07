@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 
 containers = [
@@ -24,6 +26,6 @@ containers = [
 
 @pytest.mark.integration
 @pytest.mark.parametrize("container", containers)
-def test_containers_running(host, container):
+def test_containers_running(host: Any, container: str) -> None:
     service = host.docker(container)
     assert service.is_running, f"❌ Container {container} não está rodando!"

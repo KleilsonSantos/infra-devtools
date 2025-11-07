@@ -4,7 +4,7 @@ from testcontainers.postgres import PostgresContainer
 
 
 @pytest.mark.integration
-def test_postgres_container():
+def test_postgres_container() -> None:
     """Testa container PostgreSQL temporário com Testcontainers."""
     with PostgresContainer("postgres:15") as postgres:
         postgres.with_env("POSTGRES_DB", "defaultdb")
