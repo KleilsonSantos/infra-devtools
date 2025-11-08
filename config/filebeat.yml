@@ -1,0 +1,59 @@
+# ================================================================================
+# 📊 Filebeat Configuration
+# 👨‍💻 Author: Kleilson Santos
+# 📅 Created: 2025-11-07
+#
+# 📖 Purpose: Lightweight shipper for logs from Docker containers
+#
+# ================================================================================
+
+# Filebeat modules
+filebeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: false
+
+# Prospectors / Inputs
+filebeat.inputs:
+  - type: container
+    enabled: true
+    paths:
+      - '/var/lib/docker/containers/*/*.log'
+    # Decode JSON logs from Docker
+    json.message_key: log
+    json.keys_under_root: true
+    processors:
+      - add_docker_metadata:
+          host: "unix:///var/run/docker.sock"
+      - add_kubernetes_metadata:
+          in_cluster: false
+    fields:
+      service: infra-devtools
+      environment: development
+
+# Output to Logstash
+output.logstash:
+  enabled: true
+  hosts: ["logstash:5000"]
+  worker: 1
+  batch_size: 2048
+  compression_level: 1
+
+# Processors
+processors:
+  - add_host_metadata: ~
+  - add_docker_metadata: ~
+  - add_log_metadata: ~
+
+# Logging
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: /var/log/filebeat
+  name: filebeat
+  keepfiles: 7
+  permissions: 0644
+
+# Metrics
+http.enabled: true
+http.host: 0.0.0.0
+http.port: 5066
