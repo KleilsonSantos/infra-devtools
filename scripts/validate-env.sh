@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# -------------------------------------------
+# 🛠️ Environment Validation Script
+# -------------------------------------------
 
 ENV_FILE=".env"
 EXAMPLE_FILE=".env.development"
@@ -8,6 +11,7 @@ echo "🔍 Validating .env using $EXAMPLE_FILE as reference..."
 
 # 🔁 Detect if running inside GitHub Actions
 if [ "$ACT" != "true" ] && [ "$GITHUB_ACTIONS" = "true" ]; then
+  ENV_FILE_B64=".env"
   echo "☁️ GitHub Actions environment detected"
   if [ -n "$ENV_FILE_B64" ]; then
     echo "📥 Decoding ENV_FILE_B64 into $ENV_FILE"
