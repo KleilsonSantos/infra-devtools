@@ -26,13 +26,12 @@ containers = [
 
 @pytest.mark.unit
 @pytest.mark.parametrize("container", containers)
-def test_containers_running_mock(container):
+def test_container_is_running_mocked(container: str) -> None:
     mock_service = MagicMock()
     mock_service.is_running = True
 
     mock_host = MagicMock()
     mock_host.docker.return_value = mock_service
 
-    for container in containers:
-        service = mock_host.docker(container)
-        assert service.is_running, f"❌ Mock: Container {container} não está rodando!"
+    service = mock_host.docker(container)
+    assert service.is_running, f"❌ Mock: Container {container} não está rodando!"

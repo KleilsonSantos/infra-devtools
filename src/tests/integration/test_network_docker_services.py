@@ -1,12 +1,14 @@
 import logging
 import socket
+from typing import Tuple
 
 import pytest
+from testinfra.host import Host
 
 logging.basicConfig(level=logging.INFO)
 
-# Lista de containers e respectivas portas para validação de acessibilidade
-containers = [
+# Lista de containers e respectivas portas
+CONTAINER_PORTS: list[Tuple[str, int]] = [
     ("infra-default-mongo", 27017),
     ("infra-default-mongo-express", 8081),
     ("infra-default-mysql", 3306),
@@ -30,7 +32,7 @@ containers = [
 
 @pytest.mark.integration
 @pytest.mark.network
-def test_network_exists(host):
+def test_network_exists(host: Host) -> None:
     """🕸️ Verifica se a rede Docker principal 'infra-default-shared-net' existe."""
     network_name = "infra-default-shared-net"
     networks = host.check_output(
@@ -41,21 +43,19 @@ def test_network_exists(host):
 
 @pytest.mark.integration
 @pytest.mark.network
-@pytest.mark.parametrize("container_name, port", containers)
-def test_container_accessible(host, container_name, port):
+@pytest.mark.parametrize("container_name, port", CONTAINER_PORTS)
+def test_container_accessible(host: Host, container_name: str, port: int) -> None:
     """🔌 Verifica se os containers estão acessíveis via localhost e porta mapeada."""
-    connected = False
     try:
         with socket.create_connection(("localhost", port), timeout=5):
-            connected = True
+            pass
     except Exception as e:
-        print(f"Erro ao conectar com {container_name}:{port} -> {e}")
-    assert connected, f"❌ Falha ao conectar em {container_name}:{port}"
+        pytest.fail(f"❌ Falha ao conectar em {container_name}:{port} → {e}")
 
 
 @pytest.mark.integration
 @pytest.mark.network
-def test_dns_resolution_getent(host):
+def test_dns_resolution_getent(host: Host) -> None:
     """🌐 Verifica se os containers resolvem DNS via getent hosts."""
     services = [
         "infra-default-mongo",
@@ -81,7 +81,7 @@ def test_dns_resolution_getent(host):
 
 @pytest.mark.integration
 @pytest.mark.network
-def test_service_dns_resolution(host):
+def test_service_dns_resolution(host: Host) -> None:
     """📡 Verifica se os serviços resolvem seu próprio DNS antes de conectar."""
     services = [
         "infra-default-mysql",

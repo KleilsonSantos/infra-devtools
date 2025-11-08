@@ -54,7 +54,6 @@ readonly GREEN='\033[0;32m'
 readonly YELLOW='\033[1;33m'
 readonly BLUE='\033[0;34m'
 readonly PURPLE='\033[0;35m'
-readonly MAGENTA='\033[0;35m'
 readonly CYAN='\033[0;36m'
 readonly WHITE='\033[1;37m'
 readonly GRAY='\033[0;37m'
@@ -74,10 +73,6 @@ log_success() {
 
 log_warning() {
     echo -e "${YELLOW}⚠️  $*${NC}"
-}
-
-log_warn() {
-    log_warning "$@"
 }
 
 log_error() {

@@ -24,12 +24,5 @@ extend-exclude = '''
   | buck-out
   | build
   | dist
-  | node_modules
 )/
 '''
-
-[tool.flake8]
-exclude = node_modules/,__pycache__/,.git/,.venv/
-max-complexity = 15
-ignore = E203,W503,F541
-per-file-ignores = __init__.py:F401

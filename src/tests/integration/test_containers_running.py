@@ -1,6 +1,7 @@
 import pytest
+from testinfra.host import Host
 
-containers = [
+CONTAINERS: list[str] = [
     "infra-default-cadvisor",
     "infra-default-grafana",
     "infra-default-mongo",
@@ -23,7 +24,8 @@ containers = [
 
 
 @pytest.mark.integration
-@pytest.mark.parametrize("container", containers)
-def test_containers_running(host, container):
+@pytest.mark.parametrize("container", CONTAINERS)
+def test_containers_running(host: Host, container: str) -> None:
+    """🧪 Verifica se o container está em execução."""
     service = host.docker(container)
     assert service.is_running, f"❌ Container {container} não está rodando!"

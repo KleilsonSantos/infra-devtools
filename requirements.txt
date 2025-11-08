@@ -3,36 +3,39 @@ pytest>=7.0.0
 pytest-cov>=4.0.0
 pytest-html>=3.1.1
 pytest-mock>=3.10.0
-testinfra==6.0.0
+testinfra>=9.0.0
 
 # Database connectors
-psycopg2-binary==2.9.11
-pymongo==4.3.0
-redis==4.5.0
-mysql-connector-python==8.0.33
+psycopg2-binary>=2.9.0
+pymongo>=4.3.0
+redis>=4.5.0
+mysql-connector-python>=8.0.33
 
 # HTTP testing
-requests==2.32.5
-aiohttp==3.8.0
+requests>=2.28.0
+aiohttp>=3.8.0
 
 # Message queue
-pika==1.3.0
+pika>=1.3.0
 
 # Security and auth
-requests-oauthlib==1.3.1
-PyJWT==2.6.0
+requests-oauthlib>=1.3.1
+PyJWT>=2.6.0
 
 # Environment and configuration
-python-dotenv==1.0.0
-defusedxml==0.7.1
+python-dotenv>=1.0.0
+defusedxml>=0.7.1
 
-# Code quality (minimal set to avoid conflicts)
-black==23.0.0
-isort==5.12.0
-flake8==6.0.0
-mypy==1.0.0
+# Code quality
+black>=23.0.0
+isort>=5.12.0
+flake8>=6.0.0
+mypy>=1.0.0
+bandit>=1.7.5
+pydocstyle>=6.3.0
+pylint>=2.17.0
 
 # Type stubs
-types-psycopg2==2.9.21
-types-defusedxml==0.7.0
-types-requests==2.28.11
+types-psycopg2>=2.9.21
+types-defusedxml>=0.7.0
+types-requests>=2.28.11
