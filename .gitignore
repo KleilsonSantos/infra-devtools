@@ -69,4 +69,4 @@ Thumbs.db
 # 🔧 Ambiente Virtual Python
 .venv/*
 vault/
-node_modules
+node_modules__pycache__/

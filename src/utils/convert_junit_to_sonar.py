@@ -1,38 +1,38 @@
 """
-JUnit XML report converter to SonarQube-compatible format.
+Conversor de relatórios JUnit XML para o formato compatível com o SonarQube.
 
-This module performs secure parsing of XML files containing test results
-and transforms them into the `testExecutions` format used by SonarQube
-for coverage and test execution analysis.
+Este módulo realiza parsing seguro de arquivos XML contendo resultados de testes
+e os transforma no formato `testExecutions` usado para análise de cobertura.
 """
 
 import os
 import sys
-import xml.etree.ElementTree as ET
 from typing import Optional
 
-from defusedxml.ElementTree import parse  # ✅ Usamos só o parse seguro
+import defusedxml.ElementTree as ET  # type: ignore[import-untyped]
 
 
 def convert_junit_to_sonar(junit_xml_path: str, sonar_xml_path: str) -> None:
     """Convert a JUnit XML report to the format expected by SonarQube."""
     if not os.path.exists(junit_xml_path):
-        print(f"❌ File '{junit_xml_path}' not found.")
+        print(f"❌ Arquivo '{junit_xml_path}' não encontrado.")
         sys.exit(1)
 
     try:
-        tree = parse(junit_xml_path)  # ✅ seguro contra XML malicioso
+        tree = ET.parse(junit_xml_path)  # type: ignore[attr-defined]
         root = tree.getroot()
         assert root is not None
-    except ET.ParseError as e:
-        print(f"❌ Error parsing XML: {e}")
+    except ET.ParseError as e:  # type: ignore[attr-defined]
+        print(f"❌ Erro ao parsear XML: {e}")
         sys.exit(1)
 
     if root.tag != "testsuites":
-        print(f"❌ Unexpected format: expected 'testsuites', but found '{root.tag}'")
+        print(
+            f"❌ Formato inesperado: esperado 'testsuites', mas encontrado '{root.tag}'"
+        )
         sys.exit(1)
 
-    sonar_root = ET.Element("testExecutions", version="1")
+    sonar_root = ET.Element("testExecutions", version="1")  # type: ignore[attr-defined]
 
     for testsuite in root.findall("testsuite"):
         for testcase in testsuite.findall("testcase"):
@@ -41,28 +41,26 @@ def convert_junit_to_sonar(junit_xml_path: str, sonar_xml_path: str) -> None:
             duration: Optional[str] = testcase.get("time")
 
             if not classname or not testname or not duration:
-                print(f"⚠️ Ignoring test with incomplete data: {testcase.attrib}")
+                print(f"⚠️ Ignorando teste com dados incompletos: {testcase.attrib}")
                 continue
 
-            file_element = ET.Element("file", path=classname)
-            ET.SubElement(file_element, "testCase", name=testname, duration=duration)
-            sonar_root.append(file_element)
+            file_element = ET.SubElement(sonar_root, "file", path=classname)  # type: ignore[attr-defined]
+            ET.SubElement(file_element, "testCase", name=testname, duration=duration)  # type: ignore[attr-defined]
 
     if not list(sonar_root):
-        print("⚠️ No tests found in the original XML.")
+        print("⚠️ Nenhum teste encontrado no XML original.")
         sys.exit(1)
 
-    tree_sonar = ET.ElementTree(sonar_root)
+    tree_sonar = ET.ElementTree(sonar_root)  # type: ignore[attr-defined]
     tree_sonar.write(sonar_xml_path, encoding="utf-8", xml_declaration=True)
 
-    print(f"✅ Conversion completed! File saved at '{sonar_xml_path}'.")
+    print(f"✅ Conversão concluída! Arquivo salvo em '{sonar_xml_path}'.")
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         print(
-            "❌ Incorrect usage! Expected: python convert_junit_to_sonar.py "
-            "<junit_xml_path> <sonar_xml_path>"
+            "❌ Uso incorreto! Esperado: python convert_junit_to_sonar.py <junit_xml_path> <sonar_xml_path>"
         )
         sys.exit(1)
 
