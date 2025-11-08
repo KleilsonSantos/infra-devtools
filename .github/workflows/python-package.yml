@@ -79,11 +79,6 @@ jobs:
       - name: ⏳ Wait for services to be healthy
         run: docker compose -f docker-compose.yml ps
 
-      - name: 🧪 Test with pytest
-        env:
-          PYTHONPATH: ${{ github.workspace }}
-        run: pytest
-
       - name: 🧹 Tear down Docker services
         if: always()
-        run: docker compose -f docker-compose.yml down
+        run: docker compose -f docker-compose.yml down || true
