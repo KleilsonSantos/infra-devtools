@@ -47,7 +47,7 @@
     "sonar-scanner": "npx sonar-scanner -Dsonar.projectKey=infra-devtools -Dsonar.sources=. -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.token=$SONAR_TOKEN_INFRA_DEVTOOLS -Dsonar.sourceEncoding=UTF-8"
   },
   "dependencies": {
-    "bcrypt": "^5.1.1",
+    "bcrypt": "^6.0.0",
     "browserify-zlib": "^0.2.0",
     "config": "^3.3.12",
     "crypto-browserify": "^3.12.1",
