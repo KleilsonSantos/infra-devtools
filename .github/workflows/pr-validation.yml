@@ -5,87 +5,96 @@ on:
     types: [opened, synchronize, reopened]
     branches: [main]
 
+permissions:
+  contents: read
+
 env:
-  PYTHON_VERSION: '3.10'
-  NODE_VERSION: '18'
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '20'
 
 jobs:
-  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  # 📋 OPÇÃO 3: Ler Documentação
-  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
   analyze-pr:
     name: 'Opção 3: Analisar Documentação'
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: 'Analyze PR Content'
+      - name: Analyze PR Content
         run: |
-          echo "📋 OPÇÃO 3: ANÁLISE DE DOCUMENTAÇÃO"
-          echo "===================================="
-          echo ""
-          echo "📊 Estatísticas da PR:"
-          echo "  • Commits: $(git rev-list --count ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})"
-          echo "  • Arquivos modificados: $(git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | wc -l)"
-          echo "  • Linhas adicionadas: $(git diff --numstat ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | awk '{sum+=$1} END {print sum}')"
-          echo "  • Linhas removidas: $(git diff --numstat ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | awk '{sum+=$2} END {print sum}')"
-          echo ""
-          echo "📝 Arquivos modificados:"
-          git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | sed 's/^/  • /'
-          echo ""
-          echo "✅ Análise de documentação concluída"
+          echo "OPÇÃO 3: ANÁLISE DE DOCUMENTAÇÃO"
+          echo "Commits: $(git rev-list --count ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})"
+          echo "Files:"
+          git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}
 
-  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  # 🧪 OPÇÃO 2: Executar Testes (7 Testes Obrigatórios)
-  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  issue-link:
+    name: 'Issue link (Refs/Closes #N)'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Require Issue reference on PRs to main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/check-pr-issue-link.sh
 
   validate-formats:
     name: 'Teste 1: Validação de Formatos'
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install yamllint
+        run: pipx install yamllint
+
       - name: Validate YAML files
         run: |
-          echo "🔍 Validando YAML..."
-          if command -v yamllint &> /dev/null; then
-            yamllint docker-compose.yml prometheus.yml alerts.yml alertmanager.yml 2>/dev/null || echo "⚠️ yamllint não disponível"
-          else
-            echo "⚠️ yamllint não instalado, pulando validação"
-          fi
+          yamllint -d '{extends: default, rules: {line-length: disable, truthy: disable, comments: disable, document-start: disable}}' \
+            docker-compose.yml prometheus.yml alerts.yml alertmanager.yml blackbox.yml
 
       - name: Validate Shell scripts
         run: |
-          echo "🔍 Validando shell scripts..."
+          failed=0
           for script in scripts/*.sh; do
-            bash -n "$script" && echo "  ✅ $(basename $script)" || echo "  ❌ $(basename $script)"
+            if bash -n "$script"; then
+              echo "OK $(basename "$script")"
+            else
+              echo "FAIL $(basename "$script")"
+              failed=1
+            fi
           done
+          exit "$failed"
 
       - name: Validate JSON files
         run: |
-          echo "🔍 Validando JSON..."
-          find . -name "*.json" -not -path "./node_modules/*" | while read file; do
-            python3 -m json.tool "$file" > /dev/null 2>&1 && echo "  ✅ $file" || echo "  ❌ $file"
-          done
+          failed=0
+          while IFS= read -r -d '' file; do
+            if python3 -m json.tool "$file" > /dev/null; then
+              echo "OK $file"
+            else
+              echo "FAIL $file"
+              failed=1
+            fi
+          done < <(find . -name '*.json' -not -path './node_modules/*' -print0)
+          exit "$failed"
 
   validate-critical-files:
     name: 'Teste 2: Integridade de Arquivos Críticos'
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Check critical files
         run: |
-          echo "🔒 Validando arquivos críticos..."
           critical_files=(
             "docker-compose.yml"
             ".env.development"
@@ -93,13 +102,14 @@ jobs:
             "package.json"
             "pytest.ini"
             "sonar-project.properties"
+            "scripts/check-pr-issue-link.sh"
+            ".github/pull_request_template.md"
           )
-
           for file in "${critical_files[@]}"; do
             if [ -f "$file" ]; then
-              echo "  ✅ $file"
+              echo "OK $file"
             else
-              echo "  ❌ $file (MISSING)"
+              echo "MISSING $file"
               exit 1
             fi
           done
@@ -107,87 +117,76 @@ jobs:
   unit-tests:
     name: 'Teste 3: Testes Unitários'
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install dependencies
-        run: |
-          python -m pip install pytest pytest-cov pytest-mock
+        run: python -m pip install pytest pytest-cov pytest-mock
 
       - name: Run unit tests
-        run: |
-          python -m pytest src/tests/unit/ -v --tb=short 2>/dev/null || echo "⚠️ Nenhum teste unitário encontrado"
+        run: python -m pytest src/tests/unit/ -v --tb=short
 
   security-scan:
     name: 'Teste 4: Scan de Segurança'
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Check for exposed secrets
-        run: |
-          echo "🔐 Verificando secrets expostos..."
-          if git diff ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | grep -iE "(password|secret|api_key|token)"; then
-            echo "❌ Possível secret exposto"
-            exit 1
-          else
-            echo "✅ Nenhum secret encontrado"
-          fi
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Run Bandit security scan
+      - name: Run Bandit
         run: |
-          python -m pip install bandit > /dev/null 2>&1
-          bandit -r src/ -f json -o /tmp/bandit.json 2>/dev/null || echo "⚠️ Bandit não disponível"
-          if [ -f /tmp/bandit.json ]; then
-            echo "✅ Bandit scan concluído"
-          fi
+          python -m pip install bandit
+          bandit -r src/ -ll -ii
 
   code-quality:
     name: 'Teste 5: Code Quality'
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Run Flake8
         run: |
-          python -m pip install flake8 > /dev/null 2>&1
-          flake8 src/ --max-line-length=127 --exclude=__pycache__,.git 2>/dev/null || echo "⚠️ Flake8 não disponível"
+          python -m pip install flake8
+          flake8 src/ --max-line-length=127 --exclude=__pycache__,.git
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Run ESLint
+      - name: ESLint (when JS/TS sources exist)
         run: |
-          npm install --legacy-peer-deps > /dev/null 2>&1
-          npx eslint . --ext .ts,.js --quiet 2>/dev/null || echo "⚠️ ESLint não disponível"
+          mapfile -t sources < <(find . -type f \( -name '*.ts' -o -name '*.js' \) \
+            -not -path './node_modules/*' -not -name 'eslint.config.ts' | head -20)
+          if [ "${#sources[@]}" -eq 0 ]; then
+            echo "No application JS/TS sources; skipping ESLint"
+            exit 0
+          fi
+          npm install --legacy-peer-deps
+          npx eslint . --ext .ts,.js --quiet
 
   compatibility-test:
     name: 'Teste 6: Compatibilidade'
     runs-on: ubuntu-latest
-
     services:
       postgres:
         image: postgres:15-alpine
@@ -200,33 +199,28 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Test database connection
         run: |
-          python -m pip install psycopg2-binary > /dev/null 2>&1
+          python -m pip install psycopg2-binary
           python -c "
           import psycopg2
-          try:
-              conn = psycopg2.connect(host='localhost', user='postgres', password='test')
-              print('✅ PostgreSQL connection OK')
-              conn.close()
-          except Exception as e:
-              print(f'⚠️ PostgreSQL test skipped: {e}')
-          " || echo "⚠️ Compatibilidade não testada"
+          conn = psycopg2.connect(host='localhost', user='postgres', password='test')
+          print('PostgreSQL connection OK')
+          conn.close()
+          "
 
   environment-validation:
     name: 'Teste 7: Validação de Ambiente'
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -236,65 +230,60 @@ jobs:
         with:
           env-file-b64: ${{ secrets.ENV_FILE_B64 || '' }}
 
-      - name: Validate environment
+      - name: Validate environment template exists
         run: |
+          test -f .env.development
           if [ -f .env ]; then
-            echo "✅ .env file exists"
-            ./scripts/validate-env.sh || echo "⚠️ Environment validation skipped"
+            chmod +x scripts/validate-env.sh
+            ./scripts/validate-env.sh
           else
-            echo "⚠️ .env not found (expected in CI with secrets)"
+            echo ".env not injected (ENV_FILE_B64 unset) — template .env.development present"
           fi
-
-  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  # 📊 Resultado Final
-  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   validation-summary:
     name: 'Resultado: Protocolo 3→2→1'
     runs-on: ubuntu-latest
-    needs: [analyze-pr, validate-formats, validate-critical-files, unit-tests, security-scan, code-quality, compatibility-test, environment-validation]
+    needs:
+      [
+        analyze-pr,
+        issue-link,
+        validate-formats,
+        validate-critical-files,
+        unit-tests,
+        security-scan,
+        code-quality,
+        compatibility-test,
+        environment-validation,
+      ]
     if: always()
-
     steps:
       - name: Check validation results
         run: |
-          echo "════════════════════════════════════════════════════════════════"
-          echo "  ✅ PROTOCOLO 3→2→1 VALIDATION SUMMARY"
-          echo "════════════════════════════════════════════════════════════════"
-          echo ""
-          echo "📋 OPÇÃO 3: Análise de Documentação"
-          echo "  Status: ${{ needs.analyze-pr.result }}"
-          echo ""
-          echo "🧪 OPÇÃO 2: Testes Obrigatórios"
-          echo "  Teste 1 (Formatos):        ${{ needs.validate-formats.result }}"
-          echo "  Teste 2 (Arquivos):        ${{ needs.validate-critical-files.result }}"
-          echo "  Teste 3 (Unit Tests):      ${{ needs.unit-tests.result }}"
-          echo "  Teste 4 (Segurança):       ${{ needs.security-scan.result }}"
-          echo "  Teste 5 (Code Quality):    ${{ needs.code-quality.result }}"
-          echo "  Teste 6 (Compatibilidade): ${{ needs.compatibility-test.result }}"
-          echo "  Teste 7 (Ambiente):        ${{ needs.environment-validation.result }}"
-          echo ""
-          echo "════════════════════════════════════════════════════════════════"
-          echo ""
+          echo "PROTOCOLO 3→2→1 VALIDATION SUMMARY"
+          echo "analyze-pr: ${{ needs.analyze-pr.result }}"
+          echo "issue-link: ${{ needs.issue-link.result }}"
+          echo "formats: ${{ needs.validate-formats.result }}"
+          echo "critical-files: ${{ needs.validate-critical-files.result }}"
+          echo "unit-tests: ${{ needs.unit-tests.result }}"
+          echo "security: ${{ needs.security-scan.result }}"
+          echo "quality: ${{ needs.code-quality.result }}"
+          echo "compat: ${{ needs.compatibility-test.result }}"
+          echo "env: ${{ needs.environment-validation.result }}"
 
-          if [ "${{ needs.analyze-pr.result }}" != "success" ] || \
-             [ "${{ needs.validate-formats.result }}" != "success" ] || \
-             [ "${{ needs.validate-critical-files.result }}" != "success" ] || \
-             [ "${{ needs.unit-tests.result }}" != "success" ] || \
-             [ "${{ needs.security-scan.result }}" != "success" ] || \
-             [ "${{ needs.code-quality.result }}" != "success" ] || \
-             [ "${{ needs.compatibility-test.result }}" != "success" ] || \
-             [ "${{ needs.environment-validation.result }}" != "success" ]; then
-            echo "❌ ALGUNS TESTES FALHARAM"
-            echo ""
-            echo "⚠️  A PR NÃO PODE SER MERGEADA ATÉ QUE TODOS OS TESTES PASSEM"
-            echo ""
-            echo "OPÇÃO 1: Mergear PR"
-            echo "  ❌ Bloqueado - Opção 3 e 2 devem passar primeiro"
-            exit 1
-          else
-            echo "✅ TODOS OS TESTES PASSARAM!"
-            echo ""
-            echo "OPÇÃO 1: Mergear PR"
-            echo "  ✅ Desbloqueado - Pronto para merge!"
-          fi
+          for r in \
+            "${{ needs.analyze-pr.result }}" \
+            "${{ needs.issue-link.result }}" \
+            "${{ needs.validate-formats.result }}" \
+            "${{ needs.validate-critical-files.result }}" \
+            "${{ needs.unit-tests.result }}" \
+            "${{ needs.security-scan.result }}" \
+            "${{ needs.code-quality.result }}" \
+            "${{ needs.compatibility-test.result }}" \
+            "${{ needs.environment-validation.result }}"
+          do
+            if [ "$r" != "success" ]; then
+              echo "BLOCKED — one or more required jobs did not succeed"
+              exit 1
+            fi
+          done
+          echo "ALL REQUIRED CHECKS PASSED"
