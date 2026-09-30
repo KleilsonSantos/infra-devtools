@@ -68,5 +68,7 @@ Thumbs.db
 
 # 🔧 Ambiente Virtual Python
 .venv/*
+.venv-*/
+.venv-audit/
 vault/
 node_modules__pycache__/

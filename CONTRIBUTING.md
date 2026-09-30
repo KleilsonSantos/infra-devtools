@@ -147,11 +147,18 @@ git push --tags
 
 - ❌ **PROIBIDO**: Merge direto em `main`
 - ❌ **PROIBIDO**: Push direto para branch principal
+- ✅ **OBRIGATÓRIO**: Abrir (ou reutilizar) uma **GitHub Issue** antes da branch
+- ✅ **OBRIGATÓRIO**: PR com `Refs #<N>` ou `Closes #<N>` (CI job `issue-link`, #53)
 - ✅ **OBRIGATÓRIO**: Criar PR para QUALQUER mudança
 - ✅ **OBRIGATÓRIO**: Code review antes de mergear
 - ✅ **OBRIGATÓRIO**: GitHub Actions green antes do merge
 
+Bypass raro: label `ci:no-issue-required`. Bots Dependabot/Snyk são ignorados pelo gate.
+
 ### 🎯 Workflow com PRs — Passo a Passo
+
+#### 0️⃣ Abrir Issue
+Use os templates em `.github/ISSUE_TEMPLATE/` (bug / feature). Anote o número `#N`.
 
 #### 1️⃣ Criar Feature Branch
 ```bash
