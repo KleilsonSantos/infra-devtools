@@ -7,16 +7,16 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Added
+- CodeQL workflow (Python + JavaScript) for GitHub code scanning (#102)
+- `scripts/check-pr-delivery-gate.sh` + `docs/guides/delivery-automation.md` (AIOS-aligned) (#91)
+- Canonical `merge-pr.sh` + npm `delivery-gate` / `merge-pr` (#91, #97)
+
 ### Fixed
 - `merge-pr.sh` uses latest check conclusion per name (ignore stale FAILURE) (#97)
 
 ### Changed
 - Delivery cycle is project standard: preflight runs delivery-gate; CONTRIBUTING/README → delivery-automation (#97)
-- npm scripts `delivery-gate` / `merge-pr` (#97)
-
-### Added
-- `scripts/check-pr-delivery-gate.sh` + `docs/guides/delivery-automation.md` (AIOS-aligned) (#91)
-- Canonical `merge-pr.sh` + git-workflow Dependabot/babysit notes (#91)
 
 ## [1.3.4] - 2026-10-01
 

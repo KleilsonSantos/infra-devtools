@@ -100,7 +100,8 @@ This repository is a **local Docker Compose DevOps kit**. Default posture assume
 - GitHub secret scanning + push protection enabled at repo settings
 - Branch protection enabled on `main` and `sandbox` (required status checks) — #69
 - Dependabot config targets `sandbox` (`.github/dependabot.yml`); Delivery watch inventories open PRs (#78)
-- CodeQL workflow still a follow-up
+- **CodeQL** workflow in-tree (`.github/workflows/codeql.yml`) for Python + JavaScript — #102
+- Making CodeQL a **required** branch-protection check is optional (enable after first green runs)
 
 ### 🔍 Code Quality & Security Tools
 
