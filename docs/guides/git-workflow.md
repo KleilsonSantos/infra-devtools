@@ -37,12 +37,30 @@ On promote `sandbox` → `main`, prefer `Closes #<N>` ([GitHub linking docs](htt
 
 ## Local parity before push
 
+Enable hooks once (also runs on `npm install` via `prepare`):
+
 ```bash
-# when a PR already exists:
-PR_NUMBER=<n> bash scripts/check-pr-delivery-gate.sh   # if present
-# or:
+git config core.hooksPath .githooks
+# or: npm run prepare
+```
+
+| Hook | Role |
+|------|------|
+| `pre-commit` | Fast: `bash -n` on staged `.sh`, flake8 on staged `src/**/*.py`, optional `ggshield` |
+| `pre-push` | Blocks direct push to `main`/`sandbox`; runs `scripts/preflight.sh` |
+
+```bash
+bash scripts/preflight.sh   # VERSION SSOT, SemVer, unit tests, bandit, yamllint, shell -n
+npm run preflight           # same
+```
+
+When a PR already exists, issue-link can be checked with:
+
+```bash
 PR_NUMBER=<n> bash scripts/check-pr-issue-link.sh
 ```
+
+Hooks are early feedback; GitHub Actions remain the enforcement layer. Prefer not to use `--no-verify`.
 
 ## Merges
 

@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# pre-commit: fast checks on staged files only.
+# Full CI parity runs on pre-push via scripts/preflight.sh.
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+failed=0
+py_list=""
+
+while IFS= read -r f; do
+  [[ -z "$f" || ! -f "$f" ]] && continue
+
+  if [[ "$f" == *.sh ]]; then
+    if ! bash -n "$f"; then
+      echo "pre-commit: bash -n failed: $f" >&2
+      failed=1
+    fi
+  fi
+
+  if [[ "$f" == src/* && "$f" == *.py ]]; then
+    py_list="${py_list} ${f}"
+  fi
+done <<EOF
+$(git diff --cached --name-only --diff-filter=ACMR)
+EOF
+
+if [[ -n "${py_list}" ]]; then
+  # shellcheck disable=SC2086
+  if python3 -m flake8 --version >/dev/null 2>&1; then
+    if ! python3 -m flake8 ${py_list} --max-line-length=127 --exclude=__pycache__,.git; then
+      echo "pre-commit: flake8 failed" >&2
+      failed=1
+    fi
+  else
+    echo "pre-commit: flake8 not installed — skip (CI Teste 5 will enforce)" >&2
+  fi
+fi
+
+if command -v ggshield >/dev/null 2>&1; then
+  if ! ggshield secret scan pre-commit; then
+    echo "pre-commit: ggshield found secrets (or auth error)" >&2
+    failed=1
+  fi
+else
+  echo "pre-commit: ggshield not in PATH — skip (GitGuardian still runs on GitHub)" >&2
+fi
+
+[[ "$failed" -eq 0 ]] || exit 1
+echo "pre-commit: ok"
+exit 0
