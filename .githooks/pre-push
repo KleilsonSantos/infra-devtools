@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# pre-push: block direct pushes to protected branches; run local CI preflight.
+# Bypass (--no-verify) is discouraged; GitHub CI remains the enforcement layer.
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+_remote="${1:-}"
+_url="${2:-}"
+: "${_remote}" "${_url}"
+
+while read -r _local_ref _local_sha remote_ref _remote_sha; do
+  [[ -z "${remote_ref:-}" ]] && continue
+  case "$remote_ref" in
+    refs/heads/main|refs/heads/sandbox)
+      echo "pre-push: direct push to ${remote_ref#refs/heads/} is forbidden." >&2
+      echo "pre-push: open a PR (feature → sandbox → promote → main)." >&2
+      exit 1
+      ;;
+  esac
+done
+
+echo "pre-push: running scripts/preflight.sh..."
+bash scripts/preflight.sh
+
+echo "pre-push: ok"
+exit 0

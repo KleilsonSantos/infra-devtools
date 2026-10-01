@@ -355,35 +355,26 @@ Os testes são organizados com marcadores para facilitar a execução seletiva:
 
 Este projeto oferece comandos práticos para gerenciar a infraestrutura e os serviços. Você pode executá-los utilizando o `Makefile` ou os scripts definidos no `package.json` com `npm run`. Escolha a abordagem que preferir.
 
-## 🛡️ Importância do Script `install-hooks.sh`
+## 🛡️ Local Git hooks + `preflight.sh`
 
-O script `install-hooks.sh` é responsável por configurar automaticamente os Git Hooks essenciais no projeto, utilizando a ferramenta Husky, que é amplamente adotada por equipes de desenvolvimento para garantir a qualidade do código antes dos commits e pushes.
-
-### Por que ele é importante?
-
-- **Automatização de Hooks:** Evita a necessidade de configuração manual dos hooks (pre-commit, pre-push, etc.), garantindo que todos os desenvolvedores do time trabalhem com a mesma estrutura e validações locais.
-- **Instalação Padronizada:** Centraliza o processo de instalação do Husky, evitando inconsistências entre ambientes e reduzindo erros humanos na configuração.
-- **Garantia de Qualidade Local:** Os hooks configurados com Husky executam ações como testes, lint e formatação antes de permitir commits ou pushes, prevenindo falhas e mantendo a integridade do repositório.
-- **Facilidade de Uso:** Com apenas um comando, todos os hooks são instalados e prontos para uso, sem exigir conhecimento detalhado sobre o funcionamento interno do Husky.
-
-### O que o script faz?
-
-#### O script executa as seguintes etapas:
-
-- 📦 Instala a dependência husky com npm.
-- 🐶 Inicializa o Husky no repositório Git com npx husky install.
-- ✅ Exibe uma mensagem de sucesso indicando que os Git Hooks foram instalados corretamente.
-
-### Como utilizar
-
-O script é chamado automaticamente pelo Makefile e pelos scripts npm após a execução dos testes, não sendo necessário rodá-lo manualmente na maioria dos casos. Caso precise executar manualmente, utilize:
+Hooks versionados em `.githooks/` (Git `core.hooksPath`), ativados com:
 
 ```bash
-bash scripts/install-hooks.sh
+npm run prepare
+# ou: git config core.hooksPath .githooks
 ```
 
->**💡 Resumo:**
->O install-hooks.sh garante que todos os desenvolvedores trabalhem com os mesmos padrões de validação e automação local, fortalecendo a qualidade do código, prevenindo falhas e otimizando o fluxo de trabalho em equipe.
+| Hook | Função |
+|------|--------|
+| `pre-commit` | Checks rápidos em arquivos staged (`bash -n`, flake8, `ggshield` se instalado) |
+| `pre-push` | Bloqueia push direto a `main`/`sandbox` e roda o preflight |
+
+```bash
+bash scripts/preflight.sh
+# ou: npm run preflight
+```
+
+Espelha os gates do PR Validation que mais falhavam localmente (VERSION SSOT, SemVer, unit tests, Bandit, yamllint, shell). Detalhes: [docs/guides/git-workflow.md](./docs/guides/git-workflow.md) · [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 
 ## 🛡️ Importância do Script `convert_junit_to_sonar.py`
@@ -436,25 +427,17 @@ chmod +x scripts/setup.sh
 > 💡**Resumo:**  
 > O `setup.sh` acelera e padroniza o onboarding, automatizando a configuração inicial do ambiente e prevenindo erros comuns, garantindo que todos os desenvolvedores iniciem o projeto de forma consistente e eficiente.
 
-## 🛡️ Importância do Script `check-version-alignment`
+## 🛡️ Version SSOT (SemVer)
 
-O script `check-version-alignment` é essencial para garantir a **consistência de versões** entre as dependências e ferramentas utilizadas no projeto. Ele verifica se as versões especificadas nos arquivos de configuração (como `package.json`, `docker-compose.yml`, ou outros manifestos) estão alinhadas, evitando incompatibilidades e problemas de build.
-
-#### Por que é importante?
-
-- **Evita conflitos de dependências:** Garante que todas as ferramentas e bibliotecas estejam usando versões compatíveis, reduzindo erros inesperados durante o desenvolvimento e a execução dos serviços.
-- **Facilita o onboarding:** Novos membros da equipe podem rapidamente identificar e corrigir desalinhamentos de versão.
-- **Padronização:** Mantém o ambiente de desenvolvimento e produção sincronizados, melhorando a confiabilidade dos deploys e builds.
-
-#### Como utilizar
-
-Execute o script na raiz do projeto:
+Canônico: [docs/guides/releases.md](./docs/guides/releases.md) · ADR-0002.
 
 ```bash
-chmod +x scripts/check-version-alignment.sh
+bash scripts/version.sh check
+bash scripts/check-semver-alignment.sh
+bash scripts/preflight.sh   # inclui os dois acima + testes/lint de CI
 ```
-> 💡**Resumo:**  
-> O `check-version-alignment` é uma ferramenta preventiva que contribui para a estabilidade e previsibilidade do ambiente, tornando o ciclo de desenvolvimento mais seguro e eficiente.
+
+O script legado `scripts/check-version-alignment.sh` está **deprecated** (exit 2).
 
 ## 🛡️ Importância do Script `run-dependency-check.sh`
 
@@ -813,7 +796,7 @@ Os relatórios serão gerados na pasta `reports/`:
 - [X] **✨ Otimizar o fluxo de desenvolvimento com `npm`:**
   - [x] ➕ Adicionar ferramentas de desenvolvimento como linters (`eslint`, `prettier`) e formatadores como dependências de desenvolvimento (`devDependencies`).
   - [x] ⚙️ Configurar scripts `npm` para executar essas ferramentas (por exemplo, `lint`, `format`).
-  - [X] 🎣 Integrar essas verificações no ciclo de desenvolvimento (por exemplo, através de hooks de commit com `husky`).
+  - [X] 🎣 Integrar essas verificações no ciclo de desenvolvimento (`.githooks` + `scripts/preflight.sh`).
 - [ ] **⚙️ Considerar ferramentas de automação de tarefas para DevInfra (Makefile, Task, Shell Scripts)**
   - [x] 🧩 Automatizar tarefas comuns com `Makefile` e scripts shell
   - [ ] 🔐 Integrar hardening de containers com `Docker Bench` ou `Dockle`
