@@ -86,20 +86,21 @@ This repository is a **local Docker Compose DevOps kit**. Default posture assume
 - **Portainer is opt-in** (`--profile tools`) because it mounts the Docker socket (host-root equivalent) — see #71
 - cAdvisor mounts host paths read-only when enabled — treat as sensitive
 - Non-root users recommended for any production fork of this stack
-- Image pins are partial (Vault pinned; many services still float — tracked in #73)
+- **Image pins:** Compose infra/admin images use immutable tags (Vault, Portainer, Prometheus, Grafana, Alertmanager, exporters, DBs). Owned `kleilsonsantos/*` apps may still float on `:latest` until versioned tags exist (#73)
 
 ### 📊 Monitoring & Observability
 - Prometheus / Grafana / Alertmanager present in Compose
-- Some alert expressions are still stubs (`expr: 1 == bool 1`) — tracked in #74; do not treat them as real detection yet
+- Infra alert rules use real PromQL against exporters / blackbox probes (`alerts.yml`); only `Test_Always_Firing` is intentionally always-true (#74)
 - SonarQube available as a local service (manual scanner)
 
 ### 🔄 CI/CD Security
-- **Fail-closed** PR Validation on `sandbox` / `main` (formats, unit tests, Bandit, VERSION SSOT, issue-link)
+- **Fail-closed** PR Validation on `sandbox` / `main` (formats, unit tests, Bandit, VERSION SSOT, issue-link, PR base policy)
 - Local hooks: `.githooks` + `scripts/preflight.sh` (`npm run prepare`) — bypassable with `--no-verify`; CI remains authoritative
 - Scheduled workflow runs **Bandit fail-closed**; deep Trivy/host audits are **local** via `scripts/security-audit.sh` (not claimed as merge gates) — #70
 - GitHub secret scanning + push protection enabled at repo settings
 - Branch protection enabled on `main` and `sandbox` (required status checks) — #69
-- Dependabot config file and CodeQL workflow are not in-tree yet (#73/#09 follow-ups)
+- Dependabot config targets `sandbox` (`.github/dependabot.yml`); Delivery watch inventories open PRs (#78)
+- CodeQL workflow still a follow-up
 
 ### 🔍 Code Quality & Security Tools
 

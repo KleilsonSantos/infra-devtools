@@ -11,6 +11,23 @@ Todos os alertas são definidos em `alerts.yml` e roteirizados pelo Alertmanager
 **Dashboard:** http://localhost:9093 (Alertmanager UI)
 **Definição:** http://localhost:9090/alerts (Prometheus Alerts)
 
+### Exporter / probe requirements
+
+| Alert | Requires |
+|-------|----------|
+| HighCPUUsage, HighMemoryUsage, LowDiskSpace | `job=node-exporter` |
+| MongoDBDown | `job=mongodb-exporter` (`percona/mongodb_exporter`) |
+| PostgreSQLDown | `job=postgres-exporter` |
+| MySQLDown | `job=mysql-exporter` |
+| RedisDown | `job=redis-exporter` |
+| RabbitMQDown / Queue / Consumers | `job=rabbitmq-exporter` (`rabbitmq_*` metrics) |
+| BlackboxDown | `job=blackbox-exporter` |
+| BlackboxICMPDown | `job=blackbox-exporter-icmp-ping` (`probe_success`) |
+| KeycloakDown | `job=blackbox-keycloak` (`http_2xx` → `http://keycloak:8080`) |
+| Test_Always_Firing | none (test group only; always true) |
+
+Production-named rules must not use constant-true expressions (`1 == bool 1`). Only `Test_Always_Firing` under `test-rules` is allowed to use `vector(1)`.
+
 ---
 
 ## Test Alerts
@@ -31,7 +48,7 @@ Todos os alertas são definidos em `alerts.yml` e roteirizados pelo Alertmanager
 
 **Severidade:** warning
 **Serviço:** node-exporter
-**Condição:** CPU > 80% por >1 minuto
+**Condição:** CPU > 80% por >2 minutos
 **Significado:** Host está com alta utilização de CPU
 
 **Ações:**
@@ -65,7 +82,7 @@ Todos os alertas são definidos em `alerts.yml` e roteirizados pelo Alertmanager
 
 **Severidade:** warning
 **Serviço:** node-exporter
-**Condição:** Memory > 85% por >1 minuto
+**Condição:** Memory > 85% por >2 minutos
 **Significado:** Host está ficando sem memória
 
 **Ações:**
@@ -413,14 +430,16 @@ docker compose logs rabbitmq --tail=20
 
 ### KeycloakDown
 
-**Severidade:** warning
-**Condição:** Keycloak unreachable
-**Significado:** Serviço de autenticação offline
+**Severidade:** critical
+**Serviço:** blackbox-keycloak (`http_2xx`)
+**Condição:** `probe_success == 0` por >1 minuto
+**Significado:** Keycloak HTTP endpoint unreachable from blackbox
 
 **Ações:**
 ```bash
 docker compose restart keycloak
 docker compose logs keycloak --tail=20
+curl -sS -o /dev/null -w '%{http_code}\n' http://localhost:8099
 ```
 
 **SLA:** Investigar dentro de 15 minutos

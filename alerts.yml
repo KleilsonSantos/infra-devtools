@@ -1,168 +1,131 @@
 groups:
   - name: test-rules
     rules:
-      # ============================================
-      # 🧪 TEST ALERT: Always firing (for testing flow)
-      # ============================================
+      # Test-only: always fires. Keep out of production-named groups.
       - alert: Test_Always_Firing
         expr: vector(1)
         for: 10s
         labels:
           severity: test
         annotations:
-          summary: "Test alert that always fires 🚨"
-          description: "This alert is used to test the Prometheus → Alertmanager → Email pipeline."
+          summary: "Test alert that always fires"
+          description: "Validates Prometheus → Alertmanager → Email. Disable in non-dev if noisy."
 
   - name: infra_alerts
     rules:
-      # ========================
-      # 🔥 ALERT: High CPU Usage
-      # ========================
+      # Requires: job=node-exporter (prom/node-exporter)
       - alert: HighCPUUsage
-        expr: 1 == bool 1
-        for: 1m
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 2m
         labels:
           severity: warning
           service: node-exporter
         annotations:
-          summary: "High CPU usage detected on {{ $labels.instance }}"
-          description: "CPU usage is above 80% for more than 2 minutes on host {{ $labels.instance }}."
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is above 80% for more than 2 minutes on {{ $labels.instance }}."
 
-      # ============================
-      # 🧠 ALERT: High Memory Usage
-      # ============================
+      # Requires: job=node-exporter
       - alert: HighMemoryUsage
-        expr: 1 == bool 1
-        for: 1m
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 2m
         labels:
           severity: warning
           service: node-exporter
         annotations:
           summary: "High memory usage on {{ $labels.instance }}"
-          description: "Memory usage is above 85% for more than 2 minutes."
+          description: "Memory usage is above 85% for more than 2 minutes on {{ $labels.instance }}."
 
-      # =============================
-      # 💽 ALERT: Low Disk Space
-      # =============================
+      # Requires: job=node-exporter
       - alert: LowDiskSpace
-        expr: 1 == bool 1
-        for: 1m
+        expr: (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs"}) * 100 < 10
+        for: 2m
         labels:
           severity: critical
           service: node-exporter
         annotations:
           summary: "Low disk space on {{ $labels.instance }}"
-          description: "Less than 10% of free disk space on host {{ $labels.instance }}."
+          description: "Less than 10% free on {{ $labels.mountpoint }} ({{ $labels.instance }})."
 
-      # =====================================
-      # 🍃 ALERT: MongoDB - Availability
-      # =====================================
+      # Requires: job=mongodb-exporter (percona/mongodb_exporter)
       - alert: MongoDBDown
-        expr: 1 == bool 1
+        expr: up{job="mongodb-exporter"} == 0
         for: 1m
         labels:
           severity: critical
           service: mongo
         annotations:
-          summary: "MongoDB is down on {{ $labels.instance }}"
-          description: "MongoDB Exporter has been unreachable for over 1 minute."
+          summary: "MongoDB exporter down on {{ $labels.instance }}"
+          description: "mongodb-exporter target unreachable for over 1 minute (MongoDB likely down or scrape failed)."
 
-      # ====================================
-      # 🐘 ALERT: PostgreSQL - Availability
-      # ====================================
+      # Requires: job=postgres-exporter
       - alert: PostgreSQLDown
-        expr: 1 == bool 1
+        expr: up{job="postgres-exporter"} == 0
         for: 1m
         labels:
           severity: critical
           service: postgres
         annotations:
-          summary: "PostgreSQL is down on {{ $labels.instance }}"
-          description: "PostgreSQL Exporter has been unreachable for over 1 minute."
+          summary: "PostgreSQL exporter down on {{ $labels.instance }}"
+          description: "postgres-exporter target unreachable for over 1 minute."
 
-      # ====================================
-      # 🐬 ALERT: MySQL - Availability
-      # ====================================
+      # Requires: job=mysql-exporter
       - alert: MySQLDown
-        expr: 1 == bool 1
+        expr: up{job="mysql-exporter"} == 0
         for: 1m
         labels:
           severity: critical
           service: mysql
         annotations:
-          summary: "MySQL is down on {{ $labels.instance }}"
-          description: "MySQL Exporter has been unreachable for over 1 minute."
+          summary: "MySQL exporter down on {{ $labels.instance }}"
+          description: "mysql-exporter target unreachable for over 1 minute."
 
-      # ====================================
-      # 🔑 ALERT: Keycloak - Availability
-      # ====================================
+      # Requires: job=blackbox-keycloak (blackbox http_2xx → keycloak:8080)
       - alert: KeycloakDown
-        expr: 1 == bool 1
+        expr: probe_success{job="blackbox-keycloak"} == 0
         for: 1m
         labels:
           severity: critical
           service: keycloak
         annotations:
-          summary: "Keycloak is down on {{ $labels.instance }}"
-          description: "Keycloak Exporter has been unreachable for over 1 minute."
+          summary: "Keycloak HTTP probe failed on {{ $labels.instance }}"
+          description: "Blackbox http_2xx probe to Keycloak failed for over 1 minute."
 
-      # ====================================
-      # 🔑 ALERT: Redis - Availability
-      # ====================================
+      # Requires: job=redis-exporter
       - alert: RedisDown
-        expr: 1 == bool 1
+        expr: up{job="redis-exporter"} == 0
         for: 1m
         labels:
           severity: critical
           service: redis
         annotations:
-          summary: "Redis is down on {{ $labels.instance }}"
-          description: "Redis Exporter has been unreachable for over 1 minute."
+          summary: "Redis exporter down on {{ $labels.instance }}"
+          description: "redis-exporter target unreachable for over 1 minute."
 
-      # ====================================
-      # 🔑 ALERT: RabbitMQ - Availability
-      # ====================================
-      - alert: RabbitMQDown
-        expr: 1 == bool 1
-        for: 1m
-        labels:
-          severity: critical
-          service: rabbitmq
-        annotations:
-          summary: "RabbitMQ is down on {{ $labels.instance }}"
-          description: "RabbitMQ Exporter has been unreachable for over 1 minute."
-
-      # ====================================
-      # 🔍 ALERT: Blackbox Exporter - Availability
-      # ====================================
+      # Requires: job=blackbox-exporter
       - alert: BlackboxDown
-        expr: 1 == bool 1
+        expr: up{job="blackbox-exporter"} == 0
         for: 1m
         labels:
           severity: critical
           service: blackbox
         annotations:
-          summary: "Blackbox Exporter is down on {{ $labels.instance }}"
-          description: "Blackbox Exporter has been unreachable for over 1 minute."
+          summary: "Blackbox Exporter down on {{ $labels.instance }}"
+          description: "blackbox-exporter scrape target unreachable for over 1 minute."
 
-      # ============================================
-      # 📡 ALERT: Blackbox ICMP - Availability
-      # ============================================
+      # Requires: job=blackbox-exporter-icmp-ping
       - alert: BlackboxICMPDown
-        expr: 1 == bool 1
+        expr: probe_success{job="blackbox-exporter-icmp-ping"} == 0
         for: 1m
         labels:
           severity: critical
           service: blackbox-icmp
         annotations:
-          summary: "Blackbox ICMP probe is down on {{ $labels.instance }}"
-          description: "Blackbox ICMP Exporter has been unreachable for over 1 minute."
+          summary: "Blackbox ICMP probe failed on {{ $labels.instance }}"
+          description: "ICMP probe_success == 0 for over 1 minute."
 
   - name: rabbitmq_alerts
     rules:
-      # ============================================
-      # 📦 ALERT: RabbitMQ queue size too large
-      # ============================================
+      # Requires: job=rabbitmq-exporter
       - alert: RabbitMQQueueTooLarge
         expr: rabbitmq_queue_messages_ready{queue="alerts.queue"} > 20
         for: 2m
@@ -171,24 +134,18 @@ groups:
           service: rabbitmq
         annotations:
           summary: "Too many messages in queue: {{ $labels.queue }}"
-          description: "The queue '{{ $labels.queue }}' has more than 20 pending messages for over 2 minutes. This may indicate processing delay."
+          description: "Queue '{{ $labels.queue }}' has more than 20 ready messages for over 2 minutes."
 
-      # ============================================
-      # 🔴 ALERT: RabbitMQ is down
-      # ============================================
       - alert: RabbitMQDown
-        expr: rabbitmq_up == 0
+        expr: rabbitmq_up == 0 or up{job="rabbitmq-exporter"} == 0
         for: 30s
         labels:
           severity: critical
           service: rabbitmq
         annotations:
           summary: "RabbitMQ is down on {{ $labels.instance }}"
-          description: "RabbitMQ service has not responded for more than 30 seconds."
+          description: "rabbitmq_up == 0 or rabbitmq-exporter scrape failed for more than 30 seconds."
 
-      # ============================================
-      # ⚠️ ALERT: Queue has no active consumers
-      # ============================================
       - alert: RabbitMQConsumersZero
         expr: rabbitmq_queue_consumers{queue="alerts.queue"} == 0
         for: 30s
@@ -197,4 +154,4 @@ groups:
           service: rabbitmq
         annotations:
           summary: "No active consumers on queue {{ $labels.queue }}"
-          description: "The queue '{{ $labels.queue }}' has no active consumers for more than 30 seconds. Messages may be piling up."
+          description: "Queue '{{ $labels.queue }}' has no consumers for more than 30 seconds."
