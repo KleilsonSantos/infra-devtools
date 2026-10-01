@@ -170,10 +170,13 @@ check_databases() {
         fi
     fi
 
-    # MySQL
-    if command -v mysql &> /dev/null; then
-        if timeout $TIMEOUT_CONNECT docker exec infra-default-mysql \
-            mysql -u root -ppassword -e "SELECT 1" > /dev/null 2>&1; then
+    # MySQL — password from env only (never hardcode; #75)
+    if command -v mysql &> /dev/null || docker ps --format '{{.Names}}' 2>/dev/null | grep -qx infra-default-mysql; then
+        if [[ -z "${MYSQL_ROOT_PASSWORD:-}" ]]; then
+            log_warning "  ⚠️  MySQL: skip (set MYSQL_ROOT_PASSWORD)"
+            ((UNKNOWN++))
+        elif timeout $TIMEOUT_CONNECT docker exec -e MYSQL_PWD="$MYSQL_ROOT_PASSWORD" infra-default-mysql \
+            mysql -u root -e "SELECT 1" > /dev/null 2>&1; then
             log_success "  ✅ MySQL: Connected"
             ((HEALTHY++))
         else

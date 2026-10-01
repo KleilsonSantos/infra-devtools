@@ -8,11 +8,22 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Added
-- Local preflight hooks (`.githooks` + `scripts/preflight.sh`) mirroring PR Validation gates before push (#66)
+- (none yet)
+
+## [1.3.2] - 2026-10-01
+
+### Added
+- Local preflight hooks (`.githooks` + `scripts/preflight.sh`) (#66)
 
 ### Changed
-- Replace dead Husky path with Git-native `core.hooksPath=.githooks`; `npm run prepare` enables hooks
-- `npm run version:check` now calls `scripts/version.sh check` (not the deprecated alignment script)
+- Replace dead Husky path with Git-native `core.hooksPath=.githooks` (#66)
+- Portainer Compose profile `tools` + pin `portainer-ce:2.21.4` (#71)
+- Scheduled security workflow: Bandit fail-closed only (#70)
+- SECURITY.md honesty + `.gitignore` `*.p12`/`*.pfx`/`backups/` (#72)
+- Branch protection on `main`/`sandbox` (#69)
+
+### Fixed
+- `health-check.sh` no longer hardcodes MySQL root password (#75)
 
 ## [1.3.1] - 2026-10-01
 
