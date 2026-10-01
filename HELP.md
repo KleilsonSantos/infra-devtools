@@ -745,7 +745,7 @@ O workflow `.github/workflows/pr-validation.yml` executa **9 validações automa
 | Serviço | Porta | URL |
 |---------|-------|-----|
 | SonarQube | 9002 | http://localhost:9002 |
-| Portainer | 9001 | http://localhost:9001 |
+| Portainer | 9001 | Opt-in `--profile tools` → http://localhost:9001 |
 | pgAdmin | 8088 | http://localhost:8088 |
 | phpMyAdmin | 8082 | http://localhost:8082 |
 | Mongo Express | 8081 | http://localhost:8081 |

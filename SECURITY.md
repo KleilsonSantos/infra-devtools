@@ -6,9 +6,9 @@ Versões do projeto que recebem atualizações de segurança:
 
 | Version | Supported          | Security Status |
 | ------- | ------------------ | --------------- |
-| 1.2.x   | ✅ Yes             | 🟢 Active       |
-| 1.1.x   | ⚠️ Limited         | 🟡 Maintenance  |
-| < 1.1   | ❌ No              | 🔴 End of Life  |
+| 1.3.x   | Yes                | Active          |
+| 1.2.x   | Limited            | Maintenance     |
+| < 1.2   | No                 | End of Life     |
 
 ## 🚨 Reporting a Vulnerability
 
@@ -64,47 +64,42 @@ Para relatar vulnerabilidades de segurança:
 
 ## 🛡️ Security Measures Implemented
 
+### Trust boundary (read this first)
+
+This repository is a **local Docker Compose DevOps kit**. Default posture assumes a single-developer laptop. It is **not** production-hardened. Published Compose ports bind on all interfaces unless you override them; Vault local config disables TLS on purpose (`vault/config/vault-config.hcl`).
+
 ### 🔐 Credential Management
-- ✅ No hardcoded credentials in source code
-- ✅ `.env.development` template with safe placeholders
-- ✅ Sensitive data excluded from version control via .gitignore
-- ✅ Vault service for secret management
-- ✅ Environment variable validation in CI/CD
-- ✅ Base64 encoding for CI secrets
+- `.env` gitignored; `.env.development` is an empty tracked template
+- Local Vault (file backend) with init/seed scripts; root/unseal files under `target/vault-dev-*.txt` (gitignored)
+- PR CI validates `.env.development` **template presence** only (does not inject live secrets)
+- Optional Base64 encode helper for GitHub secrets (`scripts/encode-env.sh`) — operator-managed
 
 ### 🗂️ File System Security
-- ✅ Logs excluded from version control (`logs/` in `.gitignore`)
-- ✅ Backup files protection (`backups/`, `*.bak`, `*.backup`)
-- ✅ Temporary files exclusion (`*.tmp`, `.cache/`)
-- ✅ IDE files excluded (`.vscode/`, `.idea/`)
-- ✅ Python cache files ignored (`__pycache__/`, `*.pyc`)
-- ✅ Security-sensitive extensions protected (`*.key`, `*.pem`, `*.p12`, `*.pfx`)
+- Logs / caches ignored (`logs/`, `__pycache__/`, etc.)
+- Backup artifacts ignored (`backups/`, `*.backup`, `*.bak`)
+- Key material patterns ignored (`*.key`, `*.pem`, `*.crt`, `*.p12`, `*.pfx`)
+- Vault data dir ignored (`vault/data/*`)
 
 ### 🐳 Container Security
-- ✅ Network isolation via dedicated bridge network
-- ✅ Health checks for all critical services
-- ✅ Volume persistence with named volumes
-- ✅ Resource monitoring via cAdvisor
-- ✅ Non-root users recommended for production
-- ⚠️ Docker socket access (development only - restrict in production)
+- Shared bridge network for the kit stack
+- Named volumes for persistence
+- **Portainer is opt-in** (`--profile tools`) because it mounts the Docker socket (host-root equivalent) — see #71
+- cAdvisor mounts host paths read-only when enabled — treat as sensitive
+- Non-root users recommended for any production fork of this stack
+- Image pins are partial (Vault pinned; many services still float — tracked in #73)
 
 ### 📊 Monitoring & Observability
-- ✅ Prometheus metrics collection (15-day retention)
-- ✅ Grafana dashboards for security monitoring
-- ✅ Alertmanager for critical alerts
-- ✅ SonarQube code quality and security analysis
-- ✅ Database exporters for PostgreSQL, MongoDB, MySQL, Redis
-- ✅ Blackbox Exporter for endpoint health
-- ✅ Node Exporter for system metrics
+- Prometheus / Grafana / Alertmanager present in Compose
+- Some alert expressions are still stubs (`expr: 1 == bool 1`) — tracked in #74; do not treat them as real detection yet
+- SonarQube available as a local service (manual scanner)
 
 ### 🔄 CI/CD Security
-- ✅ GitHub Actions workflow with automated testing
-- ✅ Python security scanning with Bandit
-- ✅ OWASP Dependency-Check for vulnerability scanning
-- ✅ Code quality gates with Flake8, Pylint, MyPy
-- ✅ Environment validation before deployment
-- ✅ Husky pre-commit hooks
-- ⚠️ SonarQube configured (manual execution)
+- **Fail-closed** PR Validation on `sandbox` / `main` (formats, unit tests, Bandit, VERSION SSOT, issue-link)
+- Local hooks: `.githooks` + `scripts/preflight.sh` (`npm run prepare`) — bypassable with `--no-verify`; CI remains authoritative
+- Scheduled workflow runs **Bandit fail-closed**; deep Trivy/host audits are **local** via `scripts/security-audit.sh` (not claimed as merge gates) — #70
+- GitHub secret scanning + push protection enabled at repo settings
+- Branch protection enabled on `main` and `sandbox` (required status checks) — #69
+- Dependabot config file and CodeQL workflow are not in-tree yet (#73/#09 follow-ups)
 
 ### 🔍 Code Quality & Security Tools
 
@@ -129,10 +124,10 @@ Para relatar vulnerabilidades de segurança:
 ### 🏠 Local Development Focus
 This project is designed for **local development environments** and includes:
 
-- Default credentials for ease of setup
-- Exposed service ports on localhost (HTTP, not HTTPS)
-- Simplified authentication for development workflow
-- All services accessible without VPN/firewall
+- Operator-supplied credentials via `.env` (template is empty)
+- Service ports published on the Docker host (default bind is all interfaces — restrict with firewall or `127.0.0.1:` binds)
+- HTTP (not HTTPS) between kit services; Vault TLS disabled locally on purpose
+- Portainer only when explicitly started with Compose profile `tools`
 
 ### 🚀 Production Hardening Required
 Before production deployment:
@@ -293,7 +288,7 @@ pip-audit
 
 ---
 
-**Last Updated**: 2025-11-06
-**Version**: 1.2.9
-**Next Review**: 2026-02-06
+**Last Updated**: 2026-10-01
+**Version**: 1.3.1
+**Next Review**: 2026-12-01
 **Security Contact**: kleilsonsantos0907@gmail.com

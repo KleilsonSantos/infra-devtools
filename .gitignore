@@ -46,6 +46,10 @@ myenv/
 *.pem
 *.key
 *.crt
+*.p12
+*.pfx
+backups/
+*.backup
 
 # ⚙️ Configurações de IDE e Editores
 .vscode/
