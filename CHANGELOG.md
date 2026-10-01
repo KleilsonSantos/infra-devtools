@@ -8,10 +8,11 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Added
-- (none yet)
+- `scripts/check-pr-delivery-gate.sh` + `docs/guides/delivery-automation.md` (AIOS-aligned) (#91)
 
 ### Changed
-- (none yet)
+- `scripts/merge-pr.sh` → thin `gh pr merge --merge --subject` (refuses red checks) (#91)
+- `git-workflow.md` Dependabot + babysit discipline aligned with AIOS (#91)
 
 ## [1.3.4] - 2026-10-01
 

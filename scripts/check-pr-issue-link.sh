@@ -74,13 +74,20 @@ if [[ "$BASE_REF" != "$INTEGRATION_BASE_REF" ]]; then
   exit 0
 fi
 
-# IMPORTANT: quote bot logins — unquoted dependabot[bot] is a bash character class and never matches.
-case "$ACTOR" in
-  "dependabot[bot]"|dependabot|"snyk[bot]"|snyk|"github-actions[bot]")
-    echo "issue-link: skip (bot actor: ${ACTOR})"
-    exit 0
-    ;;
-esac
+# IMPORTANT: compare with == and quoted bot login (AIOS style).
+# Never use unquoted dependabot[bot] inside a bash `case` — `[bot]` is a character class.
+if [[ "$ACTOR" == "dependabot[bot]" || "$ACTOR" == "dependabot" ]]; then
+  echo "issue-link: skip (Dependabot)"
+  exit 0
+fi
+if [[ "$ACTOR" == "snyk[bot]" || "$ACTOR" == "snyk" ]]; then
+  echo "issue-link: skip (Snyk)"
+  exit 0
+fi
+if [[ "$ACTOR" == "github-actions[bot]" ]]; then
+  echo "issue-link: skip (github-actions)"
+  exit 0
+fi
 
 # Dependabot head branches are always exempt even if author login format changes.
 if [[ "$HEAD_REF" == dependabot/* || "$HEAD_REF" == snyk-* ]]; then
@@ -92,7 +99,6 @@ if [[ " $LABELS " == *" ci:no-issue-required "* ]]; then
   echo "issue-link: skip (label ci:no-issue-required)"
   exit 0
 fi
-
 HAYSTACK="${PR_TITLE}"$'\n'"${PR_BODY}"$'\n'"${HEAD_REF}"
 export HAYSTACK
 
