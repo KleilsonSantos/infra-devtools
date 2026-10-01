@@ -18,6 +18,15 @@ STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 JSON_OUT="$OUT_DIR/open-prs-${STAMP}.json"
 MD_OUT="$OUT_DIR/summary-${STAMP}.md"
 FAIL_DRAFTS="${POLICY_FAIL_DRAFTS:-0}"
+# On pull_request events: hard-fail only base-policy (avoid deadlock while fixing others).
+# On schedule / workflow_dispatch / workflow_run / check_suite: also hard-fail on red checks.
+ENFORCE_CI_FAILURES="${ENFORCE_CI_FAILURES:-}"
+if [[ -z "$ENFORCE_CI_FAILURES" ]]; then
+  case "${GITHUB_EVENT_NAME:-}" in
+    pull_request|pull_request_target) ENFORCE_CI_FAILURES=0 ;;
+    *) ENFORCE_CI_FAILURES=1 ;;
+  esac
+fi
 
 : "${GH_TOKEN:=${GITHUB_TOKEN:-}}"
 
@@ -88,11 +97,11 @@ json.dump(prs, open(path, "w"), indent=2)
 print(f"delivery-watch: enriched {len(prs)} PR(s) with check runs")
 PY
 
-python3 - "$JSON_OUT" "$MD_OUT" "$FAIL_DRAFTS" <<'PY'
+python3 - "$JSON_OUT" "$MD_OUT" "$FAIL_DRAFTS" "$ENFORCE_CI_FAILURES" <<'PY'
 import json, sys
 from pathlib import Path
 
-path, md_path, fail_drafts = sys.argv[1], sys.argv[2], sys.argv[3] == "1"
+path, md_path, fail_drafts, enforce_ci = sys.argv[1], sys.argv[2], sys.argv[3] == "1", sys.argv[4] == "1"
 prs = json.load(open(path))
 base_violations = []
 ci_failures = []
@@ -112,6 +121,7 @@ lines = [
     f"Total open: **{len(prs)}**",
     f"Base-policy violations (main ← non-sandbox): **{len(base_violations)}**",
     f"PRs with failing checks: **{len(ci_failures)}**",
+    f"Enforce CI failures (exit 1): **{enforce_ci}**",
     "",
     "| # | Base | Head | Author | Checks | Title |",
     "|---|------|------|--------|--------|-------|",
@@ -149,8 +159,12 @@ if ci_failures:
     for p in ci_failures:
         lines.append(f"- #{p['number']}: {', '.join(p.get('check_failures') or [])}")
     lines.append("")
+    if not enforce_ci:
+        lines.append("_Reported only on this event (`ENFORCE_CI_FAILURES=0`); schedule/dispatch will fail the job._")
+        lines.append("")
 
 Path(md_path).write_text("\n".join(lines) + "\n", encoding="utf-8")
 print("\n".join(lines))
-sys.exit(1 if (base_violations or ci_failures) else 0)
+hard = bool(base_violations) or (enforce_ci and bool(ci_failures))
+sys.exit(1 if hard else 0)
 PY

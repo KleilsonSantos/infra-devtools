@@ -57,6 +57,18 @@ fi
 
 echo "issue-link: PR #${PR_NUMBER} ${HEAD_REF} → ${BASE_REF} (actor=${ACTOR})"
 
+# Always refresh labels/actor from API when token is available (reruns keep a stale
+# GITHUB_EVENT_PATH without newly added labels).
+export GH_TOKEN="${GH_TOKEN:-${GITHUB_TOKEN:-}}"
+if [[ -n "${GH_TOKEN}" ]]; then
+  REPO_FOR_META="${GITHUB_REPOSITORY:-KleilsonSantos/infra-devtools}"
+  if META_JSON="$(gh api "repos/${REPO_FOR_META}/pulls/${PR_NUMBER}" 2>/dev/null)"; then
+    ACTOR="$(printf '%s' "$META_JSON" | python3 -c "import json,sys; print((json.load(sys.stdin).get('user') or {}).get('login') or '')")"
+    LABELS="$(printf '%s' "$META_JSON" | python3 -c "import json,sys; print(' '.join(l['name'] for l in json.load(sys.stdin).get('labels') or []))")"
+    echo "issue-link: refreshed from API (actor=${ACTOR}; labels=${LABELS})"
+  fi
+fi
+
 if [[ "$BASE_REF" != "$INTEGRATION_BASE_REF" ]]; then
   echo "issue-link: skip (base is '${BASE_REF}', not ${INTEGRATION_BASE_REF}) — use Closes/Fixes/Resolves #N on promote → main"
   exit 0

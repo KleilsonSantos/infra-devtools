@@ -11,11 +11,16 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - (none yet)
 
 ### Changed
-- Delivery watch also reports failing check runs; triggers on sandbox PRs + PR Validation completion (#87)
+- (none yet)
+
+## [1.3.4] - 2026-10-01
+
+### Changed
+- Delivery watch reports failing check runs; triggers on sandbox + PR Validation completion (#87)
 
 ### Fixed
-- Issue-link bot bypass: quote `dependabot[bot]` (bash character-class bug) + skip `dependabot/*` heads (#87)
-- Create repo labels `ci:no-issue-required` / `ci:allow-main-base` referenced by Dependabot (#87)
+- Issue-link bot bypass: quote `dependabot[bot]` (bash character-class bug); refresh labels via API (#87)
+- Create repo labels `ci:no-issue-required` / `ci:allow-main-base` (#87)
 
 ## [1.3.3] - 2026-10-01
 
