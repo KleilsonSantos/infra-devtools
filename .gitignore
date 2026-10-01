@@ -70,5 +70,8 @@ Thumbs.db
 .venv/*
 .venv-*/
 .venv-audit/
-vault/
+# Vault: commit config; ignore local file-backend data and init secrets
+vault/data/*
+!vault/data/.gitkeep
+target/vault-dev-*.txt
 node_modules__pycache__/

@@ -698,17 +698,24 @@ O **Vault** é utilizado para armazenar e gerenciar segredos, tokens, certificad
 
 ### ⚠️ Ponto Crítico de Sucesso
 
-    ⚠️ Atenção: Para que o Vault funcione corretamente, é essencial criar manualmente a pasta vault na raiz do projeto com permissões apropriadas.
+A árvore `vault/config` (HCL) e `vault/data/.gitkeep` **já vêm no repositório**.  
+Não é necessário criar pastas manualmente. Dados locais em `vault/data/` são gitignored.
 
-Exemplo de estrutura e permissões necessárias:
+Guia canônico: [docs/guides/vault-local.md](./docs/guides/vault-local.md)
+
+```bash
+docker compose --env-file .env up -d vault
+bash scripts/vault-init-dev.sh
+```
+
+Exemplo de estrutura:
 ```textplain
 infra-devtools/
 ├── vault/
-│   ├── config/     # drwxrwxr-x 2 dhcpcd operador
-│   └── data/       # drwxrwxr-x 5 dhcpcd operador
-
+│   ├── config/vault-config.hcl   # committed
+│   └── data/                     # local only (gitignored)
+└── target/vault-dev-*.txt        # init secrets (gitignored)
 ```
->As `permissões` devem garantir acesso de leitura e escrita tanto para o usuário que executa o Docker (dhcpcd no seu caso) quanto para o usuário principal (operador), garantindo que o serviço consiga inicializar, ler e persistir os segredos corretamente.
 
 ### ⚙️ Instalação e Configuração
 
@@ -722,41 +729,23 @@ docker compose --env-file .env up -d vault
 
 ### Configuração Inicial
 
-1. Acesse a interface do Vault:
+Preferir o script canônico (1 key share / 1 threshold for local):
 
-> URL: http://localhost:8200
-
-2. Inicialize o Vault (primeira execução):
-
-- No terminal do container:
-
-```
-docker exec -it infra-default-vault vault operator init
+```bash
+bash scripts/vault-init-dev.sh
+export VAULT_ADDR=http://127.0.0.1:8200
+export VAULT_TOKEN=$(tr -d '[:space:]' < target/vault-dev-root-token.txt)
 ```
 
-- Guarde as chaves de unseal e o token root gerados.
-
-3. Desbloqueie o Vault (Unseal):
-
-Ainda no terminal do container, execute:
-
-```
-docker exec -it infra-default-vault vault operator unseal <unseal_key>
-```
-
-- Repita o comando com pelo menos 3 chaves de unseal diferentes.
-
-4. Acesse com o token root:
-
-- Use o token root gerado na inicialização para acessar a interface web ou a CLI.
+UI: http://localhost:8200 — detalhes em [docs/guides/vault-local.md](./docs/guides/vault-local.md).
 
 ### Variáveis de Ambiente
 
-No arquivo .env, configure as variáveis necessárias para o Vault, por exemplo:
+No `.env` (template: `.env.development`):
 
 ```
-VAULT_DEV_ROOT_TOKEN_ID=changeme
-VAULT_LOCAL_CONFIG={"backend": {"file": {"path": "/vault/file"}}, "listener": [{"tcp": {"address": "0.0.0.0:8200", "tls_disable": 1}}], "ui": true}
+VAULT_ADDR=http://127.0.0.1:8200
+# VAULT_DEV_ROOT_TOKEN_ID is unused for vault server -config (non -dev mode)
 ```
 
 ### Persistência de Dados
