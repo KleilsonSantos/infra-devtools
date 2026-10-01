@@ -35,7 +35,8 @@ if [[ -n "${GITHUB_EVENT_PATH:-}" && -f "${GITHUB_EVENT_PATH}" ]]; then
   PR_TITLE="$(python3 -c "import json; print(json.load(open('${GITHUB_EVENT_PATH}'))['pull_request'].get('title') or '')")"
   PR_BODY="$(python3 -c "import json; print(json.load(open('${GITHUB_EVENT_PATH}'))['pull_request'].get('body') or '')")"
   PR_NUMBER="$(python3 -c "import json; print(json.load(open('${GITHUB_EVENT_PATH}'))['pull_request']['number'])")"
-  ACTOR="$(python3 -c "import json; print(json.load(open('${GITHUB_EVENT_PATH}')).get('sender',{}).get('login') or '')")"
+  # Prefer PR author over event sender (re-runs / label edits may change sender).
+  ACTOR="$(python3 -c "import json; d=json.load(open('${GITHUB_EVENT_PATH}')); print(((d.get('pull_request') or {}).get('user') or {}).get('login') or (d.get('sender') or {}).get('login') or '')")"
   LABELS="$(python3 -c "import json; print(' '.join(l['name'] for l in json.load(open('${GITHUB_EVENT_PATH}'))['pull_request'].get('labels') or []))")"
 else
   : "${PR_NUMBER:?PR_NUMBER required when GITHUB_EVENT_PATH is unset}"
@@ -61,12 +62,19 @@ if [[ "$BASE_REF" != "$INTEGRATION_BASE_REF" ]]; then
   exit 0
 fi
 
+# IMPORTANT: quote bot logins — unquoted dependabot[bot] is a bash character class and never matches.
 case "$ACTOR" in
-  dependabot[bot]|dependabot|snyk[bot]|snyk)
+  "dependabot[bot]"|dependabot|"snyk[bot]"|snyk|"github-actions[bot]")
     echo "issue-link: skip (bot actor: ${ACTOR})"
     exit 0
     ;;
 esac
+
+# Dependabot head branches are always exempt even if author login format changes.
+if [[ "$HEAD_REF" == dependabot/* || "$HEAD_REF" == snyk-* ]]; then
+  echo "issue-link: skip (bot head branch: ${HEAD_REF})"
+  exit 0
+fi
 
 if [[ " $LABELS " == *" ci:no-issue-required "* ]]; then
   echo "issue-link: skip (label ci:no-issue-required)"
