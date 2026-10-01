@@ -114,6 +114,20 @@ Git Tags (v1.2.10)
 
 ### 📝 Workflow de Release
 
+> **Canônico:** [docs/guides/releases.md](./docs/guides/releases.md) · [ADR-0002](./docs/adr/0002-canonical-semver-releases.md)
+
+Resumo:
+
+```bash
+bash scripts/version.sh check
+bash scripts/version.sh minor   # bump SSOT; tag NÃO é criada aqui
+# PR via sandbox → main, depois:
+# git tag -a vX.Y.Z && git push origin vX.Y.Z && gh release create vX.Y.Z ...
+bash scripts/check-semver-alignment.sh
+```
+
+SSOT: `VERSION` → `package.json` → `sonar.projectVersion` → CHANGELOG `## [X.Y.Z]` → tag `vX.Y.Z`.
+
 #### Passo 1: Verificar Versão Atual
 
 ```bash

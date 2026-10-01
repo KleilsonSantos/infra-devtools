@@ -1,6 +1,7 @@
 # 🔒 Configuração de Branch Protection Rules
 
 > Guia para configurar proteção de branch em GitHub seguindo Protocolo Canônico 3→2→1
+> e [ADR-0001](./adr/0001-sandbox-branching-strategy.md) (`sandbox` + `main`).
 
 ## 📌 Localização no GitHub
 
@@ -8,6 +9,13 @@
 Repository → Settings → Branches → Branch protection rules
 https://github.com/KleilsonSantos/infra-devtools/settings/branches
 ```
+
+Configure **duas** rules (ou um ruleset covering both): `main` e `sandbox`.
+
+Required status checks (mínimo):
+
+- `Issue link (Refs/Closes #N)` — obrigatório em PRs → `sandbox`
+- `Resultado: Protocolo 3→2→1`
 
 ---
 

@@ -8,12 +8,23 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Added
-- VERSION file para centralizar versionamento
-- CHANGELOG.md para documentar histórico de mudanças
-- Enhanced .gitignore com proteções de segurança adicionais
+- ADR-0002: canonical SemVer tags + GitHub Releases (`docs/guides/releases.md`)
+- `scripts/check-semver-alignment.sh` (anti-drift; bootstrap-safe)
+- CI job `version-ssot` (VERSION = package.json = sonar)
+- ADR-0001: sandbox branching strategy (`docs/adr/`)
+- Guides: `docs/guides/git-workflow.md`, `docs/guides/delivery-verification.md`
+- Permanent `sandbox` integration branch; PR validation runs on `sandbox` and `main`
+- Issue templates, PR template, fail-closed PR CI, issue-link gate (via #52/#53 / PR #54)
 
 ### Changed
-- Melhorias na documentação do projeto
+- `VERSION` confirmed SSOT; `package.json` realigned from drift `1.4.0` → `1.2.9` (ADR-0002)
+- `version.sh` no longer implies auto-tag on bump; tag only on `main` after merge
+- `check-version-alignment.sh` deprecated (exit 2 + pointer)
+- CONTRIBUTING and branch-protection docs align with two-stage delivery (sandbox → main)
+- `scripts/check-pr-issue-link.sh` enforces Issue refs on PRs targeting `sandbox`
+
+### Fixed
+- Bandit B501 nosec for local self-signed helpers in web service integration tests
 
 ## [1.2.9] - 2025-11-06
 

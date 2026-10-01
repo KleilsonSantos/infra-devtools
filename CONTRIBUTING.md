@@ -100,58 +100,47 @@ Signed-off-by: Kleilson Santos <kleilsonsantos0907@gmail.com>
 
 ## 📌 Versionamento Semântico (SemVer)
 
-Seguimos **Semantic Versioning** (`MAJOR.MINOR.PATCH`):
+**Canônico:** [docs/guides/releases.md](./docs/guides/releases.md) · [ADR-0002](./docs/adr/0002-canonical-semver-releases.md)
 
-### Format: `vX.Y.Z`
-
-```
-v1.2.9
-│ │ │
-│ │ └─ PATCH (1.2.X) — Bugfixes, melhorias
-│ └─── MINOR (1.X.0) — Novas features, compatível
-└───── MAJOR (X.0.0) — Breaking changes
-```
-
-### Quando Incrementar?
-
-| Tipo de Mudança | Versão | Exemplo |
-|-----------------|--------|---------|
-| **feat:** | MINOR | v1.2.0 → v1.3.0 |
-| **fix:** / **perf:** | PATCH | v1.2.0 → v1.2.1 |
-| **BREAKING CHANGE** | MAJOR | v1.2.0 → v2.0.0 |
-| **docs, style, test, chore, ci** | Nenhum | Não incrementa versão |
-
-### Exemplos
+- SSOT: `VERSION` (= `package.json` = `sonar.projectVersion`)
+- Release **só em `main`** após promote `sandbox → main`
+- Tag anotada `vX.Y.Z` + GitHub Release **depois** do bump mergeado
+- Não bumpar em todo PR de feature; agregar no release
 
 ```bash
-# Adicionar feature → MINOR
-make version-minor  # 1.2.9 → 1.3.0
-git push --tags
-
-# Corrigir bug → PATCH
-make version-patch  # 1.2.9 → 1.2.10
-git push --tags
-
-# Breaking change → MAJOR
-make version-major  # 1.2.9 → 2.0.0
-git push --tags
+bash scripts/version.sh show|check|patch|minor|major
+bash scripts/check-semver-alignment.sh
 ```
+
+| Tipo de Mudança | Versão |
+|-----------------|--------|
+| **feat:** | MINOR |
+| **fix:** / **perf:** | PATCH |
+| **BREAKING CHANGE** | MAJOR |
+| **docs, style, test, chore, ci** | Não força bump sozinho |
 
 ---
 
 ## 🔄 Pull Requests — Workflow Obrigatório
 
+Canonical flow after [ADR-0001](./docs/adr/0001-sandbox-branching-strategy.md):
+
+```text
+Issue → branch from sandbox → PR → sandbox → promote PR → main
+```
+
+Details: [docs/guides/git-workflow.md](./docs/guides/git-workflow.md) · checklist: [docs/guides/delivery-verification.md](./docs/guides/delivery-verification.md).
+
 ### 🚨 **ATENÇÃO: PR OBRIGATÓRIO**
 
 **⚠️ TODAS as mudanças DEVEM usar Pull Requests - sem exceções:**
 
-- ❌ **PROIBIDO**: Merge direto em `main`
-- ❌ **PROIBIDO**: Push direto para branch principal
+- ❌ **PROIBIDO**: Merge / push direto em `main` ou `sandbox`
 - ✅ **OBRIGATÓRIO**: Abrir (ou reutilizar) uma **GitHub Issue** antes da branch
-- ✅ **OBRIGATÓRIO**: PR com `Refs #<N>` ou `Closes #<N>` (CI job `issue-link`, #53)
-- ✅ **OBRIGATÓRIO**: Criar PR para QUALQUER mudança
-- ✅ **OBRIGATÓRIO**: Code review antes de mergear
-- ✅ **OBRIGATÓRIO**: GitHub Actions green antes do merge
+- ✅ **OBRIGATÓRIO**: PR de trabalho → **`sandbox`** com `Refs #<N>` (CI job `issue-link`)
+- ✅ **OBRIGATÓRIO**: Promote `sandbox` → `main` com `Closes #<N>` quando a Issue estiver completa
+- ✅ **OBRIGATÓRIO**: Code review + GitHub Actions green antes do merge
+- ✅ **OBRIGATÓRIO**: Ao finalizar a entrega, executar o checklist de [delivery-verification](./docs/guides/delivery-verification.md)
 
 Bypass raro: label `ci:no-issue-required`. Bots Dependabot/Snyk são ignorados pelo gate.
 
@@ -162,8 +151,8 @@ Use os templates em `.github/ISSUE_TEMPLATE/` (bug / feature). Anote o número `
 
 #### 1️⃣ Criar Feature Branch
 ```bash
-git checkout main
-git pull origin main
+git checkout sandbox
+git pull origin sandbox
 git checkout -b feat/minha-feature
 ```
 
@@ -178,9 +167,9 @@ git commit -m "feat(escopo): descrição clara"
 git push -u origin feat/minha-feature
 ```
 
-#### 4️⃣ Abrir PR no GitHub
+#### 4️⃣ Abrir PR no GitHub (base = sandbox)
 
-Ir em: `https://github.com/KleilsonSantos/infra-devtools/compare/feat/minha-feature`
+Ir em: `https://github.com/KleilsonSantos/infra-devtools/compare/sandbox...feat/minha-feature`
 
 **PR Title:**
 ```
@@ -211,21 +200,25 @@ Breve descrição da mudança e por quê.
 - [ ] SECURITY.md revisado (se aplicável)
 ```
 
-#### 5️⃣ Merge da PR
+#### 5️⃣ Merge da PR (→ sandbox)
 
-Na interface do GitHub:
-1. Aguardar GitHub Actions completar (✅ green)
+Na interface do GitHub (ou `bash scripts/merge-pr.sh <N>`):
+1. Aguardar GitHub Actions completar (✅ green), incluindo `issue-link`
 2. Solicitar code review
-3. Após aprovação, clicar em **Merge pull request**
-4. Escolher "Squash and merge" ou "Create a merge commit"
-5. Confirmar merge
+3. Após aprovação, merge para **`sandbox`**
+4. Preferir merge commit com subject `merge: PR #<n> — <branch>`
 
-#### 6️⃣ Atualizar Local
+#### 6️⃣ Promote e atualizar local
 ```bash
+# Depois do merge em sandbox: abrir PR sandbox → main (Closes #N)
+# Após o promote:
 git checkout main
 git pull origin main
+git checkout sandbox && git pull origin sandbox
 git branch -d feat/minha-feature  # Deletar branch local
 ```
+
+Ver checklist completo: [docs/guides/delivery-verification.md](./docs/guides/delivery-verification.md).
 
 ### 📊 Exemplo Completo com PR
 
@@ -269,7 +262,8 @@ Exemplos:
 
 Antes de criar PR, valide:
 
-- [ ] Branch criada a partir de `main` atualizado
+- [ ] Branch criada a partir de `sandbox` atualizado
+- [ ] PR de trabalho com base `sandbox` e `Refs #<N>`
 - [ ] Todos os commits têm mensagens semânticas
 - [ ] Código testado localmente (`make test-all`)
 - [ ] Linters passam sem erros (`make lint-python`, `npm run lint`)
@@ -664,32 +658,11 @@ def backup_database(db_name: str, output_path: str) -> bool:
 
 ## 🚀 Release Process
 
-### Creating a Release
+Procedimento canônico completo: **[docs/guides/releases.md](./docs/guides/releases.md)** (ADR-0002).
 
-```bash
-# 1. Ensure main is up to date
-git checkout main
-git pull origin main
+Não faça `git push origin main` direto. Fluxo: bump → PR → `sandbox` → promote → `main` → tag + `gh release create`.
 
-# 2. Bump version
-make version-minor  # ou version-patch, version-major
-
-# 3. Update CHANGELOG.md
-# Adicionar entry para a nova versão
-
-# 4. Commit version bump
-git add VERSION CHANGELOG.md package.json sonar-project.properties
-git commit -m "chore(release): bump version to X.Y.Z"
-git push origin main
-
-# 5. Create GitHub Release
-gh release create vX.Y.Z \
-  --title "Release vX.Y.Z" \
-  --notes-file RELEASE_NOTES.md
-
-# 6. (Opcional) Deploy to production
-# Seguir procedimentos de deploy específicos
-```
+Checklist pós-entrega: [docs/guides/delivery-verification.md](./docs/guides/delivery-verification.md).
 
 ---
 
