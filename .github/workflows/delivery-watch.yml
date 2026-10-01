@@ -1,18 +1,16 @@
-# Delivery watch — inventory open PRs; fail on base-policy violations or failing checks.
-# Refs: #78 #87
+# Delivery watch — inventory open PRs (base-policy + failing checks on schedule).
+# Not a second CI. Agents follow docs/guides/delivery-automation.md (babysit + merge-pr.sh).
+# Refs: #78 #87 #91
 name: Delivery watch
 
 on:
   schedule:
-    # Daily 12:00 UTC + every 6h for faster signal
     - cron: '0 */6 * * *'
   workflow_dispatch:
   pull_request:
-    types: [opened, reopened, edited, synchronize, ready_for_review, labeled]
+    types: [opened, reopened, edited, synchronize, ready_for_review]
     branches: [main, sandbox]
-  # Catch check completions so failing CI on open PRs surfaces without waiting for cron
-  check_suite:
-    types: [completed]
+  # After PR Validation completes — inventory signal (AIOS-style workflow_run observe)
   workflow_run:
     workflows: ["PR Validation - Protocol 3→2→1"]
     types: [completed]
@@ -24,18 +22,16 @@ permissions:
   actions: read
 
 concurrency:
-  group: delivery-watch-${{ github.event_name }}-${{ github.event.pull_request.number || github.event.workflow_run.head_branch || github.event.check_suite.head_branch || 'repo' }}
+  group: delivery-watch-${{ github.event_name }}-${{ github.event.pull_request.number || github.event.workflow_run.head_branch || 'repo' }}
   cancel-in-progress: true
 
 jobs:
   inventory:
     name: Open PR hygiene inventory
     runs-on: ubuntu-latest
-    # Avoid recursive noise: skip when this workflow itself is the only signal and
-    # the triggering PR Validation was for Delivery watch (not applicable). Always run.
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: Inventory open PRs + failing checks
         env:
@@ -48,7 +44,7 @@ jobs:
 
       - name: Upload inventory artifact
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: delivery-watch-${{ github.run_id }}
           path: reports/delivery-watch/
