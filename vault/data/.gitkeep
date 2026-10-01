@@ -1,0 +1,1 @@
+# Vault file storage (local). Contents are gitignored; keep directory present for Compose mounts.

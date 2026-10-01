@@ -8,7 +8,10 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Added
-- (none yet)
+- Vault local config tree (`vault/config/vault-config.hcl`), init/seed scripts, and `docs/guides/vault-local.md` (#51)
+
+### Changed
+- Pin `hashicorp/vault` to `1.18.4`; README Vault section matches committed tree
 
 ## [1.3.0] - 2026-10-01
 
