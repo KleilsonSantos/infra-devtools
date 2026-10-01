@@ -1,23 +1,28 @@
-# Delivery watch — inventory open PRs; fail if any violate ADR-0001 base policy.
-# Refs: #78
+# Delivery watch — inventory open PRs (base-policy + failing checks on schedule).
+# Not a second CI. Agents follow docs/guides/delivery-automation.md (babysit + merge-pr.sh).
+# Refs: #78 #87 #91
 name: Delivery watch
 
 on:
   schedule:
-    # Daily 12:00 UTC
-    - cron: '0 12 * * *'
+    - cron: '0 */6 * * *'
   workflow_dispatch:
-  # Also when a PR is opened/retargeted to main (fast signal for bot PRs)
   pull_request:
-    types: [opened, reopened, edited, synchronize]
-    branches: [main]
+    types: [opened, reopened, edited, synchronize, ready_for_review]
+    branches: [main, sandbox]
+  # After PR Validation completes — inventory signal (AIOS-style workflow_run observe)
+  workflow_run:
+    workflows: ["PR Validation - Protocol 3→2→1"]
+    types: [completed]
 
 permissions:
   contents: read
   pull-requests: read
+  checks: read
+  actions: read
 
 concurrency:
-  group: delivery-watch-${{ github.event_name }}-${{ github.event.pull_request.number || 'repo' }}
+  group: delivery-watch-${{ github.event_name }}-${{ github.event.pull_request.number || github.event.workflow_run.head_branch || 'repo' }}
   cancel-in-progress: true
 
 jobs:
@@ -26,9 +31,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
-      - name: Inventory open PRs
+      - name: Inventory open PRs + failing checks
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -39,7 +44,7 @@ jobs:
 
       - name: Upload inventory artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: delivery-watch-${{ github.run_id }}
           path: reports/delivery-watch/

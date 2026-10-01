@@ -72,12 +72,15 @@ See [releases.md](./releases.md).
 ```bash
 gh issue list --state open --limit 20
 gh pr list --state open --limit 30
-bash scripts/delivery-watch.sh   # fails if any open PR is main ← non-sandbox
+bash scripts/delivery-watch.sh   # fails on main←non-sandbox OR any PR with failing checks
+gh run list --limit 15 --json conclusion,name,headBranch,url --jq '.[]|select(.conclusion=="failure")'
 ```
 
 Record in the Issue comment or PR summary:
 
 - Open Issues still relevant
+- Open PRs (especially any targeting `main` incorrectly, or stuck red CI)
+- Delivery-watch / failed-run evidence
 - Open PRs (human vs Dependabot/Snyk) — bots must target **sandbox** (`.github/dependabot.yml`)
 - Next Issue ID for the following slice
 

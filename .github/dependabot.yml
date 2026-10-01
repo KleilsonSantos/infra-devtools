@@ -1,5 +1,7 @@
-# Dependabot — open PRs against sandbox (ADR-0001), not main.
-# Refs: #78
+# Dependabot — version updates → sandbox (ADR-0001 / AIOS git-workflow).
+# Note: Dependabot *security* updates may still target the default branch (main)
+# when target-branch is set — prefer alerts + sandbox bumps; close stale main queues.
+# Refs: #78 #91
 version: 2
 updates:
   - package-ecosystem: npm
