@@ -121,6 +121,29 @@ bash scripts/check-semver-alignment.sh
 
 ---
 
+## 🪝 Local Git hooks (before GitHub)
+
+Hooks live in [`.githooks/`](./.githooks/) (Git `core.hooksPath`). Enabled by `npm install` / `npm run prepare`:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+| Hook | Checks |
+|------|--------|
+| `pre-commit` | Staged shell syntax, flake8 on staged `src/**/*.py`, optional `ggshield secret scan pre-commit` |
+| `pre-push` | No direct push to `main`/`sandbox`; runs [`scripts/preflight.sh`](./scripts/preflight.sh) |
+
+```bash
+bash scripts/preflight.sh   # or: npm run preflight
+```
+
+`preflight` mirrors the CI jobs that historically fail locally (VERSION SSOT, SemVer, unit tests, Bandit, yamllint, `bash -n`). Full guide: [docs/guides/git-workflow.md](./docs/guides/git-workflow.md).
+
+Do not use `--no-verify` for routine work — CI still fail-closes on GitHub.
+
+---
+
 ## 🔄 Pull Requests — Workflow Obrigatório
 
 Canonical flow after [ADR-0001](./docs/adr/0001-sandbox-branching-strategy.md):

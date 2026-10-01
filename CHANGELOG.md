@@ -8,7 +8,11 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Added
-- (none yet)
+- Local preflight hooks (`.githooks` + `scripts/preflight.sh`) mirroring PR Validation gates before push (#66)
+
+### Changed
+- Replace dead Husky path with Git-native `core.hooksPath=.githooks`; `npm run prepare` enables hooks
+- `npm run version:check` now calls `scripts/version.sh check` (not the deprecated alignment script)
 
 ## [1.3.1] - 2026-10-01
 

@@ -51,7 +51,9 @@ make up
 | Comando | Descrição |
 |---------|-----------|
 | `./scripts/validate-env.sh` | Valida arquivo .env |
-| `./scripts/check-version-alignment.sh` | Verifica alinhamento de versões |
+| `./scripts/version.sh check` | Verifica alinhamento VERSION / package / sonar |
+| `./scripts/check-semver-alignment.sh` | Gate SemVer anti-drift (após tags) |
+| `./scripts/preflight.sh` | Gate local antes do push (parity CI enxuta) |
 | `./scripts/run-dependency-check.sh` | Scan de vulnerabilidades |
 | `make test` | Executa testes |
 
@@ -85,8 +87,9 @@ make up
 
 | Comando | Descrição |
 |---------|-----------|
-| `./scripts/install-hooks.sh` | Instala Git Hooks com Husky |
-| `./scripts/run-ci-local.sh` | Executa CI localmente com act |
+| `npm run prepare` | `git config core.hooksPath .githooks` |
+| `npm run preflight` / `./scripts/preflight.sh` | Gate local (SSOT, SemVer, unit, bandit, yamllint, shell) |
+| `./scripts/run-ci-local.sh` | Executa workflows com `act` (manual; não é o gate de push) |
 
 ---
 
@@ -238,9 +241,11 @@ SONARQUBE_PORT=9003
 ### ❌ Erro: "Version mismatch detected"
 
 ```bash
-# Solução: Sincronize versões
-./scripts/check-version-alignment.sh
-# Siga as instruções para alinhamento
+# Solução: Sincronize SSOT (ADR-0002)
+./scripts/version.sh check
+./scripts/check-semver-alignment.sh
+# ou o gate completo:
+./scripts/preflight.sh
 ```
 
 ### ❌ Erro: "Containers not responding"
@@ -291,12 +296,22 @@ Valida configuração de ambiente
 ./scripts/validate-env.sh
 ```
 
-### `scripts/check-version-alignment.sh`
-Verifica alinhamento entre files de versão
+### `scripts/check-semver-alignment.sh`
+Gate SemVer anti-drift após a última tag `v*`
 
 ```bash
-./scripts/check-version-alignment.sh
+./scripts/check-semver-alignment.sh
 ```
+
+### `scripts/preflight.sh`
+Gate local antes do push (espelha Version SSOT + Testes 1/3/4 do PR Validation)
+
+```bash
+./scripts/preflight.sh
+# ou: npm run preflight
+```
+
+Hooks: `.githooks/pre-commit` e `.githooks/pre-push` (ativados via `npm run prepare`).
 
 ### `scripts/run-dependency-check.sh`
 Executa OWASP Dependency-Check
@@ -320,15 +335,8 @@ Codifica .env para GitHub secrets
 # Saída: Base64-encoded content pronto para copiar
 ```
 
-### `scripts/install-hooks.sh`
-Instala Git Hooks com Husky
-
-```bash
-./scripts/install-hooks.sh
-```
-
 ### `scripts/run-ci-local.sh`
-Executa CI localmente (requer 'act')
+Executa workflows com `act` (manual; requer Docker). Preferir `preflight.sh` no dia a dia.
 
 ```bash
 ./scripts/run-ci-local.sh
@@ -818,9 +826,9 @@ make backup
 ### Validação Completa Antes de Push
 
 ```bash
-./scripts/validate-env.sh && \
-./scripts/check-version-alignment.sh && \
-./scripts/run-dependency-check.sh
+./scripts/preflight.sh
+# opcional (mais pesado):
+# ./scripts/run-dependency-check.sh
 ```
 
 ### Reset Completo (Use com Cuidado!)
