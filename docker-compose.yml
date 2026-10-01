@@ -1,7 +1,12 @@
 # ================================================================================
 # 🐳 BASE INFRASTRUCTURE - MAKEFILE
 # 👨‍💻 Author: Kleilson Santos
-# 📅 Last update: 2025-06-18
+# 📅 Last update: 2026-10-01
+#
+# Pin policy: prefer immutable tags (x.y.z / vX.Y.Z). Avoid :latest and untagged
+# images for infra/admin UIs. Owned app images (kleilsonsantos/*) may stay on
+# :latest until the publishing pipeline emits version tags. Update cadence: with
+# Dependabot (sandbox) + quarterly security review (SECURITY.md).
 #
 # 🏗️ INTEGRATED SERVICES (as per docker-compose.yml):
 #   🛢️ Databases:           MongoDB, PostgreSQL, MySQL, Redis, Vault
@@ -44,7 +49,7 @@ services:
   # 📧 POSTFIX ECOSYSTEM
   # ======================
   mailhog:
-    image: mailhog/mailhog
+    image: mailhog/mailhog:v1.0.1
     container_name: infra-default-mailhog
     restart: always
     ports:
@@ -59,7 +64,7 @@ services:
   # 🛢️ MONGODB ECOSYSTEM
   # ======================
   mongo:
-    image: mongo:latest
+    image: mongo:7.0.19
     container_name: infra-default-mongo
     env_file: .env
     restart: always
@@ -95,12 +100,12 @@ services:
       - infra-default-shared-net
 
   mongodb-exporter:
-    image: bitnami/mongodb-exporter:latest
+    image: percona/mongodb_exporter:0.49.0
     container_name: infra-default-mongodb-exporter
     env_file: .env
     restart: always
-    environment:
-      MONGODB_URI: 'mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017'
+    command:
+      - --mongodb.uri=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017
     ports:
       - '9216:9216'
     networks:
@@ -112,7 +117,7 @@ services:
   # 🐘 POSTGRESQL ECOSYSTEM
   # =======================
   postgres:
-    image: postgres:15
+    image: postgres:15.19
     container_name: infra-default-postgres
     env_file: .env
     restart: always
@@ -131,7 +136,7 @@ services:
   # 🖥️ PGADMIN ECOSYSTEM
   # =======================
   pgadmin:
-    image: dpage/pgadmin4:latest
+    image: dpage/pgadmin4:9.18.0
     container_name: infra-default-pgadmin
     env_file: .env
     restart: always
@@ -151,7 +156,7 @@ services:
   # 🗄️ POSTGRESQL EXPORTER
   # ======================
   postgres-exporter:
-    image: quay.io/prometheuscommunity/postgres-exporter
+    image: quay.io/prometheuscommunity/postgres-exporter:v0.16.0
     container_name: infra-default-postgres-exporter
     env_file: .env
     restart: always
@@ -168,7 +173,7 @@ services:
   # 🐬 MYSQL ECOSYSTEM
   # ======================
   mysql:
-    image: mysql:5.7
+    image: mysql:5.7.44
     container_name: infra-default-mysql
     env_file: .env
     restart: always
@@ -189,7 +194,7 @@ services:
   # 🖥️ PHPMYADMIN ECOSYSTEM
   # =======================
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
+    image: phpmyadmin/phpmyadmin:5.2.3
     container_name: infra-default-phpmyadmin
     env_file: .env
     restart: always
@@ -209,7 +214,7 @@ services:
   # 🗄️ MYSQL EXPORTER
   # ======================
   mysql-exporter:
-    image: prom/mysqld-exporter:latest
+    image: prom/mysqld-exporter:v0.15.1
     container_name: infra-default-mysql-exporter
     env_file: .env
     restart: always
@@ -258,7 +263,7 @@ services:
   # 📊 MONITORING TOOLS
   # ======================
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:v2.55.1
     container_name: infra-default-prometheus
     env_file: .env
     restart: always
@@ -277,7 +282,7 @@ services:
   # 📊 MONITORING TOOLS
   # ======================
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:11.6.16
     container_name: infra-default-grafana
     env_file: .env
     restart: always
@@ -301,7 +306,7 @@ services:
   # 🗄️ BLACKBOX EXPORTER
   # ======================
   blackbox-exporter:
-    image: prom/blackbox-exporter
+    image: prom/blackbox-exporter:v0.25.0
     container_name: infra-default-blackbox-exporter
     ports:
       - '9115:9115'
@@ -314,7 +319,7 @@ services:
   # 🐳 CADVISOR
   # ======================
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
     container_name: infra-default-cadvisor
     env_file: .env
     restart: always
@@ -332,7 +337,7 @@ services:
   # 🐳 NODE EXPORTER
   # ======================
   node-exporter:
-    image: prom/node-exporter:latest
+    image: prom/node-exporter:v1.9.1
     container_name: infra-default-node-exporter
     env_file: .env
     restart: always
@@ -345,7 +350,7 @@ services:
   # 🧹 CODE QUALITY TOOLS
   # ======================
   sonarqube:
-    image: sonarqube:latest
+    image: sonarqube:25.12.0.117093-community
     container_name: infra-default-sonarqube
     env_file: .env
     restart: always
@@ -387,7 +392,7 @@ services:
   # 🐇 RABBITMQ ECOSYSTEM
   # ======================
   rabbitmq:
-    image: rabbitmq:management
+    image: rabbitmq:3.13.7-management
     container_name: infra-default-rabbitmq
     restart: always
     env_file: .env
@@ -412,7 +417,7 @@ services:
   # 📊 RABBITMQ EXPORTER
   # ======================
   rabbitmq-exporter:
-    image: kbudde/rabbitmq-exporter
+    image: kbudde/rabbitmq-exporter:1.0.0
     container_name: infra-default-rabbitmq-exporter
     restart: always
     env_file: .env
@@ -434,7 +439,7 @@ services:
   # 🗃️ REDIS ECOSYSTEM
   # ======================
   redis:
-    image: redis:7.2
+    image: redis:7.2.7
     container_name: infra-default-redis
     env_file: .env
     restart: always
@@ -449,7 +454,7 @@ services:
   # 📊 REDIS INSIGHT
   # ======================
   redisinsight:
-    image: redis/redisinsight:latest
+    image: redis/redisinsight:2.70.1
     container_name: infra-default-redisinsight
     restart: always
     ports:
@@ -466,7 +471,7 @@ services:
   # 📊 REDIS EXPORTER
   # ======================
   redis-exporter:
-    image: oliver006/redis_exporter:latest
+    image: oliver006/redis_exporter:v1.92.1
     container_name: infra-default-redis-exporter
     env_file: .env
     restart: always
@@ -497,7 +502,7 @@ services:
   # 📊 ALERTMANAGER
   # ======================
   alertmanager:
-    image: prom/alertmanager
+    image: prom/alertmanager:v0.27.0
     container_name: infra-default-alertmanager
     restart: always
     volumes:

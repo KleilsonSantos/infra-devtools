@@ -8,17 +8,29 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Added
-- Delivery watch workflow + `scripts/delivery-watch.sh` (inventory open PRs; fail on main←non-sandbox) (#78)
-- PR base policy CI job + `scripts/check-pr-base-policy.sh` (#78)
-- Dependabot config targeting `sandbox` (#78)
+- (none yet)
 
 ### Changed
 - (none yet)
+
+## [1.3.3] - 2026-10-01
+
+### Changed
+- Pin Compose infra/admin images to immutable tags; document pin policy (#73)
+- Replace stub Prometheus alert exprs with real PromQL / blackbox probes (#74)
+- Switch MongoDB exporter to `percona/mongodb_exporter:0.49.0` (#73)
+- Add blackbox `http_2xx` module + Keycloak probe job (#74)
+
+### Fixed
+- Infra alerts no longer always-fire (`1 == bool 1`) (#74)
 
 ## [1.3.2] - 2026-10-01
 
 ### Added
 - Local preflight hooks (`.githooks` + `scripts/preflight.sh`) (#66)
+- Delivery watch workflow + `scripts/delivery-watch.sh` (inventory open PRs; fail on main←non-sandbox) (#78)
+- PR base policy CI job + `scripts/check-pr-base-policy.sh` (#78)
+- Dependabot config targeting `sandbox` (#78)
 
 ### Changed
 - Replace dead Husky path with Git-native `core.hooksPath=.githooks` (#66)
