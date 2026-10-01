@@ -80,7 +80,8 @@ Record in the Issue comment or PR summary:
 
 - Open Issues still relevant
 - Open PRs (especially any targeting `main` incorrectly, or stuck red CI)
-- Delivery-watch / failed-run evidence- Open PRs (human vs Dependabot/Snyk) — bots must target **sandbox** (`.github/dependabot.yml`)
+- Delivery-watch / failed-run evidence
+- Open PRs (human vs Dependabot/Snyk) — bots must target **sandbox** (`.github/dependabot.yml`)
 - Next Issue ID for the following slice
 
 ## Definition of done (slice)
