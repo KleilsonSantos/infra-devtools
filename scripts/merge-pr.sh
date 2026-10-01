@@ -31,15 +31,23 @@ if [[ "$STATE" != "OPEN" ]]; then
   exit 1
 fi
 
-# Soft warn on failing checks (branch protection may still block)
+# Refuse merge on red checks — use latest conclusion per check name
+# (statusCheckRollup can retain a stale FAILURE beside a newer SUCCESS).
 FAILS=$(printf '%s' "$META" | python3 -c '
 import json,sys
 d=json.load(sys.stdin)
-fails=[]
+latest={}
 for c in d.get("statusCheckRollup") or []:
-    conc=c.get("conclusion")
+    name=c.get("name") or "?"
+    ts=c.get("completedAt") or c.get("startedAt") or ""
+    prev=latest.get(name)
+    if prev is None or ts >= (prev.get("completedAt") or prev.get("startedAt") or ""):
+        latest[name]=c
+fails=[]
+for name,c in sorted(latest.items()):
+    conc=(c.get("conclusion") or "").upper()
     if conc in ("FAILURE","CANCELLED","TIMED_OUT","ACTION_REQUIRED"):
-        fails.append(c.get("name") or "?")
+        fails.append(name)
 print("\n".join(fails))
 ')
 if [[ -n "$FAILS" ]]; then
