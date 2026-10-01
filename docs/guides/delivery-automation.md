@@ -45,6 +45,8 @@ flowchart TD
 
 Two PRs per delivery ([ADR-0001](../adr/0001-sandbox-branching-strategy.md)): `branch → sandbox`, then `sandbox → main`.
 
+**One slice at a time:** one Issue → one work PR → one promote. Do not open cascading fix PRs for the same slice. Tag only when SemVer requires a bump ([releases.md](./releases.md)).
+
 ## Local gate (before push / `gh pr create`)
 
 ```bash

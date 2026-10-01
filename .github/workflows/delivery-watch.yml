@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Inventory open PRs + failing checks
         env:
@@ -44,7 +44,7 @@ jobs:
 
       - name: Upload inventory artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: delivery-watch-${{ github.run_id }}
           path: reports/delivery-watch/

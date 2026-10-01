@@ -7,12 +7,16 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
-### Added
-- `scripts/check-pr-delivery-gate.sh` + `docs/guides/delivery-automation.md` (AIOS-aligned) (#91)
+### Fixed
+- `merge-pr.sh` uses latest check conclusion per name (ignore stale FAILURE) (#97)
 
 ### Changed
-- `scripts/merge-pr.sh` → thin `gh pr merge --merge --subject` (refuses red checks) (#91)
-- `git-workflow.md` Dependabot + babysit discipline aligned with AIOS (#91)
+- Delivery cycle is project standard: preflight runs delivery-gate; CONTRIBUTING/README → delivery-automation (#97)
+- npm scripts `delivery-gate` / `merge-pr` (#97)
+
+### Added
+- `scripts/check-pr-delivery-gate.sh` + `docs/guides/delivery-automation.md` (AIOS-aligned) (#91)
+- Canonical `merge-pr.sh` + git-workflow Dependabot/babysit notes (#91)
 
 ## [1.3.4] - 2026-10-01
 
