@@ -1,26 +1,30 @@
-name: 🔐 Quarterly Security Audit
+# Scheduled / manual security checks (honest scope).
+#
+# PR Validation remains the fail-closed gate for every PR
+# (.github/workflows/pr-validation.yml).
+# This workflow is additive: Bandit must pass; deep image/host
+# audits stay local via scripts/security-audit.sh (not claimed as CI gates).
+#
+# Refs: #70
+
+name: Security checks (scheduled)
 
 on:
   schedule:
-    # Executa todo primeiro dia do trimestre às 00:00 UTC
+    # First day of each quarter, 00:00 UTC
     - cron: '0 0 1 1,4,7,10 *'
   workflow_dispatch:
-    # Permite execução manual
 
 permissions:
   contents: read
-  issues: write
-  actions: read
 
 env:
   PYTHON_VERSION: '3.11'
-  NODE_VERSION: '20'
 
 jobs:
-  security-audit:
-    name: 🔐 Complete Security Audit
+  bandit:
+    name: Bandit (fail-closed)
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,130 +34,20 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Install dependencies
+      - name: Run Bandit
         run: |
           python -m pip install --upgrade pip
-          pip install bandit safety
-          npm install --legacy-peer-deps
+          python -m pip install bandit
+          bandit -r src/ -ll -ii
 
-      - name: Install Trivy
+  informational-note:
+    name: Scope note (informational)
+    runs-on: ubuntu-latest
+    needs: [bandit]
+    steps:
+      - name: Document residual local audits
         run: |
-          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
-          echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
-          sudo apt-get update
-          sudo apt-get install trivy -y
-
-      - name: Run full security audit
-        run: |
-          chmod +x scripts/*.sh
-          ./scripts/security-audit.sh full
-        continue-on-error: true
-
-      - name: Run Bandit analysis
-        run: |
-          bandit -r src/ -f csv -o /tmp/bandit-report.csv || true
-          echo "📊 Bandit Report:"
-          cat /tmp/bandit-report.csv || echo "No issues found"
-        continue-on-error: true
-
-      - name: Run Safety dependency check
-        run: |
-          pip list | grep -E "Flask|Django|requests|pytest" | while read line; do
-            echo "Checking: $line"
-          done
-          echo "✅ Safety check completed"
-        continue-on-error: true
-
-      - name: Check for exposed secrets in git history
-        run: |
-          echo "🔐 Scanning for secrets in recent commits..."
-          git log --all -p --diff-filter=A -S "password" -S "secret" -S "key" -S "token" 2>/dev/null || echo "No sensitive changes in history"
-        continue-on-error: true
-
-      - name: Analyze .env files
-        run: |
-          echo "📋 Analyzing environment variables..."
-          if [ -f .env ]; then
-            echo "⚠️  .env file exists"
-            echo "Variables count: $(cat .env | grep -c '=')"
-            echo "✅ Ensure this is NOT committed to git"
-          else
-            echo "✅ No .env file (expected for CI)"
-          fi
-
-      - name: Docker images security check
-        run: |
-          echo "🐳 Checking docker-compose.yml images..."
-          grep -E "^\s+image:" docker-compose.yml | sed 's/.*image: *//g' | while read image; do
-            echo "  - Analyzing: $image"
-            if command -v trivy &> /dev/null; then
-              trivy image --severity HIGH,CRITICAL "$image" 2>/dev/null || echo "    (Scan skipped)"
-            fi
-          done
-
-      - name: Generate audit summary
-        run: |
-          echo "════════════════════════════════════════════════════════════════"
-          echo "  🔐 QUARTERLY SECURITY AUDIT REPORT"
-          echo "════════════════════════════════════════════════════════════════"
-          echo ""
-          echo "✅ Checks Performed:"
-          echo "  • Docker images vulnerability scan (Trivy)"
-          echo "  • Secrets detection in .env and code"
-          echo "  • File permissions analysis"
-          echo "  • Dependencies vulnerabilities (Bandit, Safety)"
-          echo "  • Static code analysis"
-          echo "  • Git history secrets scan"
-          echo ""
-          echo "📊 Detailed reports:"
-          echo "  - reports/security-audits/ (local)"
-          echo ""
-          echo "📅 Next scheduled audit: $(date -d '+3 months' +%Y-%m-%d)"
-          echo ""
-          echo "════════════════════════════════════════════════════════════════"
-        continue-on-error: true
-
-      - name: Upload audit reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: security-audit-reports
-          path: reports/security-audits/
-          retention-days: 90
-          if-no-files-found: ignore
-        continue-on-error: true
-
-      - name: Create issue if vulnerabilities found
-        if: failure()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: '🔐 Security Audit: Vulnerabilities Detected',
-              body: `
-              ## Security Audit Report
-
-              A security audit was performed on ${new Date().toISOString().split('T')[0]}.
-
-              ### Issues Found:
-              - Check the [Audit Reports](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details
-              - Download the artifacts to review findings
-
-              ### Recommended Actions:
-              1. Review the security audit reports
-              2. Address critical issues immediately
-              3. Schedule a security team review if needed
-              4. Update dependencies and patches
-
-              [View Audit Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
-              `,
-              labels: ['security', 'audit']
-            })
-        continue-on-error: true
+          echo "This workflow only enforces Bandit on src/."
+          echo "For Docker image / host / permission audits run locally:"
+          echo "  bash scripts/security-audit.sh full"
+          echo "PR Validation remains the merge gate (formats, unit, Bandit, SemVer, issue-link)."

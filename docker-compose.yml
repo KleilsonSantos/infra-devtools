@@ -365,10 +365,13 @@ services:
       - infra-default-shared-net
 
   # =======================
-  # 🐳 CONTAINER MANAGEMENT
+  # 🐳 CONTAINER MANAGEMENT (opt-in — Docker socket = host root equivalent)
+  # Start with: docker compose --env-file .env --profile tools up -d portainer
+  # Refs: #71
   # =======================
   portainer:
-    image: portainer/portainer-ce
+    profiles: ["tools"]
+    image: portainer/portainer-ce:2.21.4
     container_name: infra-default-portainer
     env_file: .env
     restart: always

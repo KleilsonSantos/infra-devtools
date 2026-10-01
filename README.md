@@ -284,7 +284,7 @@ make logs
 | Serviço                  | Porta   | Acesso                                           |
 | ------------------------ | ------- | ------------------------------------------------ |
 | 🛠 **SonarQube**         | `9002`  | [http://localhost:9002](http://localhost:9002)   |
-| 🐳 **Portainer**         | `9001`  | [http://localhost:9001](http://localhost:9001)   |
+| 🐳 **Portainer**         | `9001`  | Opt-in: `docker compose --env-file .env --profile tools up -d portainer` → [http://localhost:9001](http://localhost:9001) |
 | 🌐 **Mongo Express**     | `8081`  | [http://localhost:8081](http://localhost:8081)   |
 | 🖥️ **pgAdmin**           | `8088`  | [http://localhost:8088](http://localhost:8088)   |
 | 🧰 **phpMyAdmin**        | `8082`  | [http://localhost:8082](http://localhost:8082)   |

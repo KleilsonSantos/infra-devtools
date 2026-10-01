@@ -13,6 +13,11 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - Replace dead Husky path with Git-native `core.hooksPath=.githooks`; `npm run prepare` enables hooks
 - `npm run version:check` now calls `scripts/version.sh check` (not the deprecated alignment script)
+- Portainer moved to Compose profile `tools` (Docker socket opt-in); pin `portainer-ce:2.21.4` (#71)
+- Scheduled security workflow: Bandit fail-closed only; no soft-fail theater (#70)
+- SECURITY.md aligned with implemented controls; `.gitignore` adds `*.p12`/`*.pfx`/`backups/` (#72)
+- `health-check.sh` uses `MYSQL_ROOT_PASSWORD` / `MYSQL_PWD` (no hardcoded password) (#75)
+- Branch protection enabled on `main` and `sandbox` (#69)
 
 ## [1.3.1] - 2026-10-01
 

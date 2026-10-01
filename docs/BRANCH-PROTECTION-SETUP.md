@@ -3,6 +3,19 @@
 > Guia para configurar proteção de branch em GitHub seguindo Protocolo Canônico 3→2→1
 > e [ADR-0001](./adr/0001-sandbox-branching-strategy.md) (`sandbox` + `main`).
 
+## Status (live)
+
+As of **2026-10-01** (#69), classic branch protection is enabled on **`main`** and **`sandbox`**:
+
+- Require a pull request before merging (0 approvals — solo-dev friendly; raise when a team reviews)
+- Required status checks (strict): `Resultado: Protocolo 3→2→1`, `Issue link (Refs/Closes #N)`, `Version SSOT (VERSION=package=sonar)`
+- Force pushes / deletions disabled
+- `enforce_admins: false` (break-glass for repo admins)
+
+Verify: `gh api repos/KleilsonSantos/infra-devtools/branches/main/protection`
+
+The checklist below remains the operator guide if rules need to be recreated.
+
 ## 📌 Localização no GitHub
 
 ```
