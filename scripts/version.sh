@@ -116,11 +116,24 @@ update_sonar_properties() {
     local new_version="$1"
 
     log_info "Updating sonar-project.properties..."
-    if grep -q "sonar.projectVersion=" "$SONAR_FILE"; then
-        sed -i "s/sonar.projectVersion=.*/sonar.projectVersion=$new_version/" "$SONAR_FILE"
-    else
-        echo "sonar.projectVersion=$new_version" >> "$SONAR_FILE"
-    fi
+    python3 - "$SONAR_FILE" "$new_version" <<'PY'
+import pathlib, sys
+path = pathlib.Path(sys.argv[1])
+ver = sys.argv[2]
+text = path.read_text() if path.exists() else ""
+lines = text.splitlines()
+out = []
+found = False
+for line in lines:
+    if line.startswith("sonar.projectVersion="):
+        out.append(f"sonar.projectVersion={ver}")
+        found = True
+    else:
+        out.append(line)
+if not found:
+    out.append(f"sonar.projectVersion={ver}")
+path.write_text("\n".join(out) + "\n")
+PY
     log_debug "sonar-project.properties version: $new_version"
 }
 
@@ -145,16 +158,9 @@ update_changelog() {
 }
 
 create_git_tag() {
-    local new_version="$1"
-
-    log_info "Creating git tag: v$new_version"
-
-    if ! git tag -a "v$new_version" -m "Release version $new_version" 2>/dev/null; then
-        log_warning "Failed to create git tag (may already exist or not in git repo)"
-        return 0
-    fi
-
-    log_success "Git tag created: v$new_version"
+    # Tags are NOT created during bump. Tag only on main after merge — see releases.md.
+    log_warning "Skipping auto-tag during bump (canonical: tag on main after merge)"
+    log_info "See docs/guides/releases.md / ADR-0002"
 }
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -225,12 +231,13 @@ cmd_bump() {
     update_changelog "$new_version" || log_warning "Failed to update CHANGELOG.md"
 
     echo ""
-    log_header "Next Steps"
-    log_info "1. Review changes: git diff"
-    log_info "2. Commit: git add . && git commit -m 'chore(release): bump to $new_version'"
-    log_info "3. Tag: git push && git push --tags"
+    log_header "Next Steps (canonical — docs/guides/releases.md)"
+    log_info "1. Edit CHANGELOG.md — real notes under ## [$new_version]"
+    log_info "2. Commit via sandbox flow: chore(release): bump to $new_version"
+    log_info "3. After merge to main: annotated tag v$new_version + gh release create"
+    log_info "4. Verify: bash scripts/check-semver-alignment.sh"
 
-    log_success "✅ Version bumped to $new_version"
+    log_success "✅ Version files bumped to $new_version (tag NOT created yet)"
 }
 
 cmd_help() {
@@ -259,11 +266,14 @@ EXAMPLES:
     ./version.sh check
 
 MANAGED FILES:
-    - VERSION (primary source)
+    - VERSION (SSOT)
     - package.json
     - sonar-project.properties
-    - CHANGELOG.md (entry added)
-    - Git tags (created automatically)
+    - CHANGELOG.md (placeholder entry — edit before release)
+
+TAGS / GITHUB RELEASE:
+    Not created by this script. Follow docs/guides/releases.md (ADR-0002):
+    bump → PR via sandbox → main → git tag -a vX.Y.Z → gh release create
 
 SEMVER FORMAT:
     MAJOR.MINOR.PATCH

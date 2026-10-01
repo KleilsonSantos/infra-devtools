@@ -65,6 +65,7 @@ Avoid GitHub’s default merge subject when using the project script conventions
 ## Related
 
 - [ADR-0001](../adr/0001-sandbox-branching-strategy.md)
+- [ADR-0002](../adr/0002-canonical-semver-releases.md) · [releases.md](./releases.md)
 - [delivery-verification.md](./delivery-verification.md) — checklist after each delivery
 - [BRANCH-PROTECTION-SETUP.md](../BRANCH-PROTECTION-SETUP.md)
 - [CONTRIBUTING.md](../../CONTRIBUTING.md)
