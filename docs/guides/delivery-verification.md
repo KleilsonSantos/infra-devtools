@@ -71,13 +71,14 @@ See [releases.md](./releases.md).
 
 ```bash
 gh issue list --state open --limit 20
-gh pr list --state open --limit 20
+gh pr list --state open --limit 30
+bash scripts/delivery-watch.sh   # fails if any open PR is main ← non-sandbox
 ```
 
 Record in the Issue comment or PR summary:
 
 - Open Issues still relevant
-- Open PRs (human vs Dependabot/Snyk)
+- Open PRs (human vs Dependabot/Snyk) — bots must target **sandbox** (`.github/dependabot.yml`)
 - Next Issue ID for the following slice
 
 ## Definition of done (slice)

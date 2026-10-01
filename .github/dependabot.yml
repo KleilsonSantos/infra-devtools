@@ -1,0 +1,28 @@
+# Dependabot — open PRs against sandbox (ADR-0001), not main.
+# Refs: #78
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    target-branch: sandbox
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      npm_and_yarn:
+        patterns:
+          - "*"
+    labels:
+      - dependencies
+      - ci:no-issue-required
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    target-branch: sandbox
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+    labels:
+      - dependencies
+      - ci:no-issue-required

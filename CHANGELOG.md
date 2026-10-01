@@ -8,6 +8,11 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Added
+- Delivery watch workflow + `scripts/delivery-watch.sh` (inventory open PRs; fail on main←non-sandbox) (#78)
+- PR base policy CI job + `scripts/check-pr-base-policy.sh` (#78)
+- Dependabot config targeting `sandbox` (#78)
+
+### Changed
 - (none yet)
 
 ## [1.3.2] - 2026-10-01

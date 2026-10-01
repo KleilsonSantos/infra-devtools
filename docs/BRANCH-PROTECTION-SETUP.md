@@ -8,7 +8,7 @@
 As of **2026-10-01** (#69), classic branch protection is enabled on **`main`** and **`sandbox`**:
 
 - Require a pull request before merging (0 approvals — solo-dev friendly; raise when a team reviews)
-- Required status checks (strict): `Resultado: Protocolo 3→2→1`, `Issue link (Refs/Closes #N)`, `Version SSOT (VERSION=package=sonar)`
+- Required status checks (strict): `Resultado: Protocolo 3→2→1`, `Issue link (Refs/Closes #N)`, `Version SSOT (VERSION=package=sonar)`, `PR base policy (sandbox or promote)`
 - Force pushes / deletions disabled
 - `enforce_admins: false` (break-glass for repo admins)
 

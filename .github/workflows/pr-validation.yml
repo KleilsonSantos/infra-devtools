@@ -45,6 +45,21 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bash scripts/check-pr-issue-link.sh
 
+  pr-base-policy:
+    name: 'PR base policy (sandbox or promote)'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Enforce ADR-0001 base branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/check-pr-base-policy.sh
+
   validate-formats:
     name: 'Teste 1: Validação de Formatos'
     runs-on: ubuntu-latest
@@ -256,6 +271,7 @@ jobs:
       [
         analyze-pr,
         issue-link,
+        pr-base-policy,
         validate-formats,
         validate-critical-files,
         unit-tests,
@@ -272,6 +288,7 @@ jobs:
           echo "PROTOCOLO 3→2→1 VALIDATION SUMMARY"
           echo "analyze-pr: ${{ needs.analyze-pr.result }}"
           echo "issue-link: ${{ needs.issue-link.result }}"
+          echo "pr-base-policy: ${{ needs.pr-base-policy.result }}"
           echo "formats: ${{ needs.validate-formats.result }}"
           echo "critical-files: ${{ needs.validate-critical-files.result }}"
           echo "unit-tests: ${{ needs.unit-tests.result }}"
@@ -284,6 +301,7 @@ jobs:
           for r in \
             "${{ needs.analyze-pr.result }}" \
             "${{ needs.issue-link.result }}" \
+            "${{ needs.pr-base-policy.result }}" \
             "${{ needs.validate-formats.result }}" \
             "${{ needs.validate-critical-files.result }}" \
             "${{ needs.unit-tests.result }}" \
