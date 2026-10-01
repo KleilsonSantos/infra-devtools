@@ -1,10 +1,43 @@
 # 📋 Guia de Contribuição — Infra DevTools
 
-Este documento estabelece os padrões de desenvolvimento para o **Infra DevTools** — uma infraestrutura DevOps profissional com Docker, monitoring e quality assurance.
+Este documento estabelece os padrões de desenvolvimento para o **Infra DevTools**.
 
 ---
 
-## 🎯 Fluxo de Trabalho
+## 🎯 Ciclo de entrega (obrigatório)
+
+**SSOT do fluxo:** [docs/guides/delivery-automation.md](./docs/guides/delivery-automation.md) · [docs/guides/git-workflow.md](./docs/guides/git-workflow.md) · [ADR-0001](./docs/adr/0001-sandbox-branching-strategy.md)
+
+```text
+Issue (#N)
+  → git checkout sandbox && git pull
+  → git checkout -b <type>/<N>-<slug>
+  → bash scripts/check-pr-delivery-gate.sh   # antes do push / gh pr create
+  → PR → sandbox  (body: Refs #N)
+  → CI verde
+  → bash scripts/merge-pr.sh <n>             # nunca em checks vermelhos
+  → PR promote sandbox → main  (body: Closes #N)
+  → bash scripts/merge-pr.sh <n>
+  → tag vX.Y.Z **somente** se houve bump SemVer (feat/fix/…) — ver releases.md
+```
+
+| Não fazer | Fazer |
+|-----------|--------|
+| PR de trabalho direto para `main` | Sempre `feature/fix/ci/…` → `sandbox` |
+| Abrir vários PRs/fixes em cascata na mesma fatia | Uma Issue → um PR de trabalho → um promote |
+| `gh pr merge` no vermelho / subject default do GitHub | `bash scripts/merge-pr.sh <n>` |
+| Tag a cada merge `ci`/`chore`/`docs` | Tag só com VERSION + CHANGELOG `[X.Y.Z]` |
+| Inventar “watchers” paralelos que substituem o mapa | Babysit async: `gh pr checks <n>` |
+
+Comandos:
+
+```bash
+npm run delivery-gate          # parity issue-link local
+npm run preflight              # inclui delivery-gate + SSOT/tests
+npm run merge-pr -- <n>        # merge canónico
+```
+
+---
 
 ### 1️⃣ **Conventional Commits** (Commits Semânticos)
 

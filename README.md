@@ -355,7 +355,7 @@ Os testes são organizados com marcadores para facilitar a execução seletiva:
 
 Este projeto oferece comandos práticos para gerenciar a infraestrutura e os serviços. Você pode executá-los utilizando o `Makefile` ou os scripts definidos no `package.json` com `npm run`. Escolha a abordagem que preferir.
 
-## 🛡️ Local Git hooks + `preflight.sh`
+## 🛡️ Local Git hooks + delivery cycle
 
 Hooks versionados em `.githooks/` (Git `core.hooksPath`), ativados com:
 
@@ -367,14 +367,17 @@ npm run prepare
 | Hook | Função |
 |------|--------|
 | `pre-commit` | Checks rápidos em arquivos staged (`bash -n`, flake8, `ggshield` se instalado) |
-| `pre-push` | Bloqueia push direto a `main`/`sandbox` e roda o preflight |
+| `pre-push` | Bloqueia push direto a `main`/`sandbox` e roda o preflight (inclui **delivery-gate**) |
 
 ```bash
-bash scripts/preflight.sh
-# ou: npm run preflight
+npm run delivery-gate    # issue-link parity (antes do PR)
+npm run preflight        # delivery-gate + VERSION/SemVer + tests + bandit
+npm run merge-pr -- <n>  # merge só com CI verde + subject canónico
 ```
 
-Espelha os gates do PR Validation que mais falhavam localmente (VERSION SSOT, SemVer, unit tests, Bandit, yamllint, shell). Detalhes: [docs/guides/git-workflow.md](./docs/guides/git-workflow.md) · [CONTRIBUTING.md](./CONTRIBUTING.md).
+**Ciclo canónico:** Issue → branch → PR `sandbox` (`Refs #N`) → `merge-pr.sh` → promote `main` (`Closes #N`) → tag **só** se releaseable.
+
+Detalhes: [delivery-automation.md](./docs/guides/delivery-automation.md) · [git-workflow.md](./docs/guides/git-workflow.md) · [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 
 ## 🛡️ Importância do Script `convert_junit_to_sonar.py`

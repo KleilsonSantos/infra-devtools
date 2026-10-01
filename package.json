@@ -45,6 +45,8 @@
     "clean": "rm -rf reports/*",
     "sonar-scanner": "npx sonar-scanner -Dsonar.projectKey=infra-devtools -Dsonar.sources=. -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.token=$SONAR_TOKEN_INFRA_DEVTOOLS -Dsonar.sourceEncoding=UTF-8",
     "preflight": "bash scripts/preflight.sh",
+    "delivery-gate": "bash scripts/check-pr-delivery-gate.sh",
+    "merge-pr": "bash scripts/merge-pr.sh",
     "prepare": "git config core.hooksPath .githooks || true"
   },
   "dependencies": {
