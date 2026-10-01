@@ -7,6 +7,9 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Fixed
+- `merge-pr.sh` uses latest check conclusion per name (ignore stale FAILURE) (#97)
+
 ### Added
 - `scripts/check-pr-delivery-gate.sh` + `docs/guides/delivery-automation.md` (AIOS-aligned) (#91)
 
