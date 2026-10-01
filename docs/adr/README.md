@@ -5,6 +5,7 @@ ADRs record **accepted** architectural / delivery decisions for `infra-devtools`
 | ADR | Title | Status |
 |-----|-------|--------|
 | [0001](./0001-sandbox-branching-strategy.md) | Branch strategy with sandbox integration | Accepted |
+| [0002](./0002-canonical-semver-releases.md) | Canonical SemVer, tags, and GitHub Releases | Accepted |
 
 ## When to write an ADR
 

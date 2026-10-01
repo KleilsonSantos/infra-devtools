@@ -100,42 +100,24 @@ Signed-off-by: Kleilson Santos <kleilsonsantos0907@gmail.com>
 
 ## 📌 Versionamento Semântico (SemVer)
 
-Seguimos **Semantic Versioning** (`MAJOR.MINOR.PATCH`):
+**Canônico:** [docs/guides/releases.md](./docs/guides/releases.md) · [ADR-0002](./docs/adr/0002-canonical-semver-releases.md)
 
-### Format: `vX.Y.Z`
-
-```
-v1.2.9
-│ │ │
-│ │ └─ PATCH (1.2.X) — Bugfixes, melhorias
-│ └─── MINOR (1.X.0) — Novas features, compatível
-└───── MAJOR (X.0.0) — Breaking changes
-```
-
-### Quando Incrementar?
-
-| Tipo de Mudança | Versão | Exemplo |
-|-----------------|--------|---------|
-| **feat:** | MINOR | v1.2.0 → v1.3.0 |
-| **fix:** / **perf:** | PATCH | v1.2.0 → v1.2.1 |
-| **BREAKING CHANGE** | MAJOR | v1.2.0 → v2.0.0 |
-| **docs, style, test, chore, ci** | Nenhum | Não incrementa versão |
-
-### Exemplos
+- SSOT: `VERSION` (= `package.json` = `sonar.projectVersion`)
+- Release **só em `main`** após promote `sandbox → main`
+- Tag anotada `vX.Y.Z` + GitHub Release **depois** do bump mergeado
+- Não bumpar em todo PR de feature; agregar no release
 
 ```bash
-# Adicionar feature → MINOR
-make version-minor  # 1.2.9 → 1.3.0
-git push --tags
-
-# Corrigir bug → PATCH
-make version-patch  # 1.2.9 → 1.2.10
-git push --tags
-
-# Breaking change → MAJOR
-make version-major  # 1.2.9 → 2.0.0
-git push --tags
+bash scripts/version.sh show|check|patch|minor|major
+bash scripts/check-semver-alignment.sh
 ```
+
+| Tipo de Mudança | Versão |
+|-----------------|--------|
+| **feat:** | MINOR |
+| **fix:** / **perf:** | PATCH |
+| **BREAKING CHANGE** | MAJOR |
+| **docs, style, test, chore, ci** | Não força bump sozinho |
 
 ---
 
@@ -676,32 +658,11 @@ def backup_database(db_name: str, output_path: str) -> bool:
 
 ## 🚀 Release Process
 
-### Creating a Release
+Procedimento canônico completo: **[docs/guides/releases.md](./docs/guides/releases.md)** (ADR-0002).
 
-```bash
-# 1. Ensure main is up to date
-git checkout main
-git pull origin main
+Não faça `git push origin main` direto. Fluxo: bump → PR → `sandbox` → promote → `main` → tag + `gh release create`.
 
-# 2. Bump version
-make version-minor  # ou version-patch, version-major
-
-# 3. Update CHANGELOG.md
-# Adicionar entry para a nova versão
-
-# 4. Commit version bump
-git add VERSION CHANGELOG.md package.json sonar-project.properties
-git commit -m "chore(release): bump version to X.Y.Z"
-git push origin main
-
-# 5. Create GitHub Release
-gh release create vX.Y.Z \
-  --title "Release vX.Y.Z" \
-  --notes-file RELEASE_NOTES.md
-
-# 6. (Opcional) Deploy to production
-# Seguir procedimentos de deploy específicos
-```
+Checklist pós-entrega: [docs/guides/delivery-verification.md](./docs/guides/delivery-verification.md).
 
 ---
 

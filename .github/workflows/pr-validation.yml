@@ -235,6 +235,20 @@ jobs:
           grep -qE '^[A-Za-z_][A-Za-z0-9_]*=' .env.development
           echo "OK .env.development template present with key assignments"
 
+  version-ssot:
+    name: 'Version SSOT (VERSION=package=sonar)'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Align check
+        run: |
+          chmod +x scripts/version.sh scripts/check-semver-alignment.sh scripts/lib.sh
+          bash scripts/version.sh check
+          bash scripts/check-semver-alignment.sh
+
   validation-summary:
     name: 'Resultado: Protocolo 3→2→1'
     runs-on: ubuntu-latest
@@ -249,6 +263,7 @@ jobs:
         code-quality,
         compatibility-test,
         environment-validation,
+        version-ssot,
       ]
     if: always()
     steps:
@@ -264,6 +279,7 @@ jobs:
           echo "quality: ${{ needs.code-quality.result }}"
           echo "compat: ${{ needs.compatibility-test.result }}"
           echo "env: ${{ needs.environment-validation.result }}"
+          echo "version-ssot: ${{ needs.version-ssot.result }}"
 
           for r in \
             "${{ needs.analyze-pr.result }}" \
@@ -274,7 +290,8 @@ jobs:
             "${{ needs.security-scan.result }}" \
             "${{ needs.code-quality.result }}" \
             "${{ needs.compatibility-test.result }}" \
-            "${{ needs.environment-validation.result }}"
+            "${{ needs.environment-validation.result }}" \
+            "${{ needs.version-ssot.result }}"
           do
             if [ "$r" != "success" ]; then
               echo "BLOCKED — one or more required jobs did not succeed"

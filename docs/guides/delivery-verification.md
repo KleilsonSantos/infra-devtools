@@ -55,7 +55,19 @@ gh issue view <N> --json state,closedAt,title
 gh pr view <P> --json state,mergedAt,url
 ```
 
-### 5. Portfolio snapshot (optional but recommended)
+### 5. Release (when cutting a version — ADR-0002)
+
+Only after the slice is on `main` and you intend a public version:
+
+- [ ] `bash scripts/version.sh check` (SSOT aligned)
+- [ ] CHANGELOG has `## [X.Y.Z]` with real notes
+- [ ] Annotated tag `vX.Y.Z` pushed
+- [ ] GitHub Release created
+- [ ] `bash scripts/check-semver-alignment.sh` OK
+
+See [releases.md](./releases.md).
+
+### 6. Portfolio snapshot (optional but recommended)
 
 ```bash
 gh issue list --state open --limit 20
