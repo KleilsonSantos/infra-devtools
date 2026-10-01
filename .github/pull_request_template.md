@@ -4,10 +4,10 @@
 
 ## Issue
 
-- Refs #<N> <!-- required for PRs → main (CI job `issue-link`, #53) -->
+- Refs #<N> <!-- required for PRs → sandbox (CI job `issue-link`, ADR-0001 / #55) -->
 
-<!-- Prefer Closes #<N> / Fixes #<N> when this PR fully completes the Issue
-     (closing keywords apply on the default branch). -->
+<!-- On promote sandbox → main, prefer: Closes #<N>
+     (GitHub closing keywords only apply on the default branch). -->
 
 ## Change type
 
@@ -23,10 +23,12 @@
 ## Checklist
 
 - [ ] GitHub **Issue** opened (or reused) before this branch
-- [ ] Branch created from up-to-date `main`
+- [ ] Branch created from up-to-date **`sandbox`**
+- [ ] Target: work branch → `sandbox`; later promote `sandbox` → `main`
 - [ ] Local validation for the touched area (make/npm/pytest/scripts as applicable)
-- [ ] Docs updated if operator-facing behavior changed
+- [ ] Docs / ADR updated if architecture or operator workflow changed
 - [ ] No secrets committed (`.env` stays local)
+- [ ] Ran [delivery-verification](../docs/guides/delivery-verification.md) checklist before merge
 
 ## Test plan
 

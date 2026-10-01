@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# Require a GitHub Issue reference on PRs targeting main (main-only branch model).
+# Require a GitHub Issue reference on work PRs targeting sandbox (ADR-0001 / #55).
 #
-# Adapted from AIOS scripts/check-pr-issue-link.sh for infra-devtools until/unless
-# a sandbox promotion flow is adopted. Closing keywords auto-link on the default
-# branch per GitHub docs:
-# https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue
+# Official context:
+# - https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue
+#   Closing keywords (Closes/Fixes/Resolves) only link/close when the PR targets the
+#   *default* branch (main). For PRs → sandbox we require Refs/#N (or bare #N).
+# - Branch protection has no native “require linked issue”; enforce via status check.
 #
 # Usage (CI):
 #   bash scripts/check-pr-issue-link.sh
@@ -15,12 +16,13 @@
 # Bypass:
 #   - dependabot[bot], dependabot, snyk[bot]
 #   - Label `ci:no-issue-required`
+#   - PR base != sandbox (promote sandbox→main skipped here; use Closes #N on promote)
 set -euo pipefail
 
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$ROOT"
 
-DEFAULT_BASE_REF="${ISSUE_LINK_BASE_REF:-main}"
+INTEGRATION_BASE_REF="${ISSUE_LINK_BASE_REF:-sandbox}"
 
 if [[ "${GITHUB_EVENT_NAME:-}" != "pull_request" && -z "${PR_NUMBER:-}" ]]; then
   echo "issue-link: skip (not a pull_request event and PR_NUMBER unset)"
@@ -54,8 +56,8 @@ fi
 
 echo "issue-link: PR #${PR_NUMBER} ${HEAD_REF} → ${BASE_REF} (actor=${ACTOR})"
 
-if [[ "$BASE_REF" != "$DEFAULT_BASE_REF" ]]; then
-  echo "issue-link: skip (base is '${BASE_REF}', expected '${DEFAULT_BASE_REF}')"
+if [[ "$BASE_REF" != "$INTEGRATION_BASE_REF" ]]; then
+  echo "issue-link: skip (base is '${BASE_REF}', not ${INTEGRATION_BASE_REF}) — use Closes/Fixes/Resolves #N on promote → main"
   exit 0
 fi
 
@@ -103,10 +105,10 @@ PY
 
 if [[ ${#ISSUE_NUMS[@]} -eq 0 ]]; then
   echo "issue-link: FAIL — no GitHub issue reference found in PR title/body/branch." >&2
-  echo "  Open an Issue first, then add e.g.:" >&2
-  echo "    Refs #53" >&2
-  echo "    Closes #53" >&2
-  echo "  Bypass (rare): label ci:no-issue-required" >&2
+  echo "  Open an Issue first (docs/guides/git-workflow.md), then add e.g.:" >&2
+  echo "    Refs #55" >&2
+  echo "  Closing keywords (Closes/Fixes) only auto-link on PRs → main (GitHub docs)." >&2
+  echo "  Bypass: label ci:no-issue-required (rare)." >&2
   exit 1
 fi
 

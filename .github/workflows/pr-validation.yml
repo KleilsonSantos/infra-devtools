@@ -3,7 +3,7 @@ name: 'PR Validation - Protocol 3→2→1'
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-    branches: [main]
+    branches: [main, sandbox]
 
 permissions:
   contents: read
@@ -39,7 +39,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Require Issue reference on PRs to main
+      - name: Require Issue reference on PRs to sandbox
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
