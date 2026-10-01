@@ -529,17 +529,20 @@ services:
   # 📊 VAULT
   # ======================
   vault:
-    image: hashicorp/vault:latest
+    image: hashicorp/vault:1.18.4
     container_name: infra-default-vault
     ports:
       - "8200:8200"
     environment:
-      VAULT_ADDR: ${VAULT_ADDR}
-      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_DEV_ROOT_TOKEN_ID}
+      VAULT_ADDR: ${VAULT_ADDR:-http://127.0.0.1:8200}
+      # Unused for `vault server -config=...` (not -dev). Kept for env template compatibility.
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_DEV_ROOT_TOKEN_ID:-}
     volumes:
-      - ./vault/config:/vault/config
+      - ./vault/config:/vault/config:ro
       - ./vault/data:/vault/data
     command: "vault server -config=/vault/config/vault-config.hcl"
+    cap_add:
+      - IPC_LOCK
     restart: always
     networks:
       - infra-default-shared-net
