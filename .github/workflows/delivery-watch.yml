@@ -35,7 +35,7 @@ jobs:
     # the triggering PR Validation was for Delivery watch (not applicable). Always run.
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Inventory open PRs + failing checks
         env:
