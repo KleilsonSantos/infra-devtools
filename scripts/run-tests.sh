@@ -53,6 +53,12 @@ check_prerequisites() {
         print_error "Docker Compose services not running. Please start with 'make up'"
         exit 1
     fi
+
+    # Fail closed: host ports must be free or owned by infra-default-*
+    if ! bash scripts/check-port-conflicts.sh --mode test; then
+        print_error "Port preflight failed (foreign holders on infra host ports)"
+        exit 1
+    fi
     
     # Check if required Python packages are installed
     if ! python3 -c "import pytest" >/dev/null 2>&1; then
