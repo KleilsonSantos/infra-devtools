@@ -8,7 +8,7 @@
 As of **2026-10-01** (#69), classic branch protection is enabled on **`main`** and **`sandbox`**:
 
 - Require a pull request before merging (0 approvals — solo-dev friendly; raise when a team reviews)
-- Required status checks (strict): `Resultado: Protocolo 3→2→1`, `Issue link (Refs/Closes #N)`, `Version SSOT (VERSION=package=sonar)`, `PR base policy (sandbox or promote)`
+- Required status checks (strict): `Protocol gate`, `Issue link`, `Version SSOT`, `PR base policy`
 - Force pushes / deletions disabled
 - `enforce_admins: false` (break-glass for repo admins)
 
@@ -27,8 +27,10 @@ Configure **duas** rules (ou um ruleset covering both): `main` e `sandbox`.
 
 Required status checks (mínimo):
 
-- `Issue link (Refs/Closes #N)` — obrigatório em PRs → `sandbox`
-- `Resultado: Protocolo 3→2→1`
+- `Issue link` — obrigatório em PRs → `sandbox`
+- `Protocol gate`
+- `Version SSOT`
+- `PR base policy`
 
 ---
 
