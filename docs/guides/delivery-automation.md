@@ -77,6 +77,15 @@ Delivery watch inventories open PRs (artifact + summary). It is **not** a second
 
 Do **not** add Delivery watch to branch-protection required checks. Close or retarget stale `main`←non-sandbox PRs instead of opening meta-PRs to `main`.
 
+
+## Issue-first (agents and humans)
+
+Every **human-driven** slice: **Issue → branch → PR → sandbox → promote**. PR body must include `Refs #N` (work) or `Closes #N` (promote when finishing).
+
+**Only** Dependabot/Snyk (label `ci:no-issue-required` / script skip) may omit Issues. If an agent *orchestrates* merging bot PRs, open a tracking Issue for that orchestration.
+
+Cursor rule: `.cursor/rules/issue-first-delivery.mdc` (`alwaysApply`).
+
 ## SemVer anti-drift
 
 `scripts/check-semver-alignment.sh` — releaseable commits (`feat`/`fix`/…) after last `v*` tag require VERSION bump + CHANGELOG section. Non-releaseable alone: `chore`, `docs`, `ci`, `test`, `style`, `build`, `merge`, Dependabot `chore(deps):`.
