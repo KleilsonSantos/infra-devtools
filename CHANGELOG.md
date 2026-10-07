@@ -7,6 +7,9 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Changed
+- Issue-first delivery rule for agents (`.cursor/rules/issue-first-delivery.mdc`) + delivery-automation note (#117)
+
 ## [1.3.5] - 2026-10-07
 
 ### Fixed
