@@ -14,9 +14,11 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Fixed
 - `merge-pr.sh` uses latest check conclusion per name (ignore stale FAILURE) (#97)
+- Delivery watch no longer reddens healthy PRs (repo-wide inventory contagion / self-check loop) (#110)
 
 ### Changed
 - Delivery cycle is project standard: preflight runs delivery-gate; CONTRIBUTING/README → delivery-automation (#97)
+- Delivery watch: drop `pull_request` trigger; hard-fail only on schedule/dispatch for ADR-0001 base-policy; check failures report-only (#110)
 
 ## [1.3.4] - 2026-10-01
 
