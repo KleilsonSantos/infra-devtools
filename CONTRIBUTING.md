@@ -394,6 +394,8 @@ A análise e merge de qualquer PR deve seguir esta sequência **EXATAMENTE** nes
 
 ---
 
+> **CI Checks UI (PR Validation):** job names are English — `PR change summary`, `Format validation`, `Critical files`, `Unit tests`, `Security scan`, `Code quality`, `Compatibility`, `Environment validation`, plus required `Issue link`, `PR base policy`, `Version SSOT`, `Protocol gate`. Local steps below remain a human checklist (not 1:1 with job labels).
+
 ### **OPÇÃO 2️⃣: Executar Testes** (15-30 minutos)
 
 **Testes obrigatórios:**

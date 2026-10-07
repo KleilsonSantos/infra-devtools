@@ -38,7 +38,7 @@ flowchart TD
 
 | Git event | Workflows / jobs | SemVer | Next step |
 |-----------|------------------|--------|-----------|
-| **PR** → `sandbox` | PR Validation (`issue-link`, `pr-base-policy`, tests, Bandit, VERSION SSOT) | No | Merge when **required** checks green — `bash scripts/merge-pr.sh <n>` |
+| **PR** → `sandbox` | PR Validation (`Issue link`, `PR base policy`, tests, Bandit, `Version SSOT`, `Protocol gate`) | No | Merge when **required** checks green — `bash scripts/merge-pr.sh <n>` |
 | **PR** → `main` (promote) | Same + SemVer alignment | Yes | Body prefers `Closes #N`; merge only via `merge-pr.sh` |
 | **Push** → `sandbox` / `main` | Branch protection + Delivery watch (inventory) | On `main` path | Integrate; open promote when slice ready |
 | Dependabot PR → `sandbox` | Same as work PR (`issue-link` skipped for Dependabot) | No | Review → merge → promote |
