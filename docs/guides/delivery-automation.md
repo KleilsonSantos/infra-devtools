@@ -67,7 +67,15 @@ If the owner asks for blocking watch: `gh pr checks <n> --watch`.
 
 **Never merge on red required checks.** Use `bash scripts/merge-pr.sh <n>` (refuses red).
 
-Delivery watch inventories open PRs (base-policy + failing checks on schedule). It is **not** a second CI and must not replace this map.
+Delivery watch inventories open PRs (artifact + summary). It is **not** a second CI and must not replace this map:
+
+| Event | Behaviour |
+|-------|-----------|
+| `schedule` / `workflow_dispatch` | Exit **1** only on ADR-0001 base-policy violations (`main` ← head ≠ `sandbox`, unless `ci:allow-main-base`) |
+| `workflow_run` (after PR Validation) | Report only (exit 0) — must not redden the PR under test |
+| Check failures on open PRs | Always listed in the summary; **never** a hard-fail (avoids self-contagion via `Open PR hygiene inventory`) |
+
+Do **not** add Delivery watch to branch-protection required checks. Close or retarget stale `main`←non-sandbox PRs instead of opening meta-PRs to `main`.
 
 ## SemVer anti-drift
 

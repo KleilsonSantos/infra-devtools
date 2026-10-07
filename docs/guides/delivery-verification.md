@@ -72,7 +72,8 @@ See [releases.md](./releases.md).
 ```bash
 gh issue list --state open --limit 20
 gh pr list --state open --limit 30
-bash scripts/delivery-watch.sh   # fails on main←non-sandbox OR any PR with failing checks
+bash scripts/delivery-watch.sh   # local: report only (HARD_FAIL=0). CI schedule fails on base-policy only.
+HARD_FAIL=1 bash scripts/delivery-watch.sh   # optional: same hard-fail as schedule
 gh run list --limit 15 --json conclusion,name,headBranch,url --jq '.[]|select(.conclusion=="failure")'
 ```
 

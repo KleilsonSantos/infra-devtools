@@ -2,10 +2,16 @@
 # Inventory open PRs: base-policy (ADR-0001) + failing check runs.
 # Intended for scheduled/manual Actions (delivery-watch) and local operators.
 #
-# Exit 1 if:
-#   - any open PR targets main with head ≠ sandbox (unless ci:allow-main-base), OR
-#   - any open PR has a completed check run with conclusion failure/cancelled
-#     (pending/neutral/skipped ignored; draft PRs still reported but do not fail CI unless POLICY_FAIL_DRAFTS=1)
+# This is NOT a second CI. It must not redden healthy PRs because of other PRs.
+#
+# Exit 1 only when HARD_FAIL=1 (default on schedule / workflow_dispatch) AND
+# there is at least one base-policy violation (main ← head≠sandbox without
+# ci:allow-main-base). Draft PRs still count for base-policy.
+#
+# Check-run failures are always reported in the summary/artifact but never
+# cause exit 1 (avoids self-contagion via "Open PR hygiene inventory").
+#
+# On pull_request / workflow_run / local default: HARD_FAIL=0 (report only).
 set -euo pipefail
 
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
@@ -17,20 +23,21 @@ mkdir -p "$OUT_DIR"
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 JSON_OUT="$OUT_DIR/open-prs-${STAMP}.json"
 MD_OUT="$OUT_DIR/summary-${STAMP}.md"
-FAIL_DRAFTS="${POLICY_FAIL_DRAFTS:-0}"
-# On pull_request events: hard-fail only base-policy (avoid deadlock while fixing others).
-# On schedule / workflow_dispatch / workflow_run / check_suite: also hard-fail on red checks.
-ENFORCE_CI_FAILURES="${ENFORCE_CI_FAILURES:-}"
-if [[ -z "$ENFORCE_CI_FAILURES" ]]; then
+
+# Own check name — never treat as a PR CI failure (breaks feedback loops).
+SELF_CHECK_NAME="${DELIVERY_WATCH_CHECK_NAME:-Open PR hygiene inventory}"
+
+HARD_FAIL="${HARD_FAIL:-}"
+if [[ -z "$HARD_FAIL" ]]; then
   case "${GITHUB_EVENT_NAME:-}" in
-    pull_request|pull_request_target) ENFORCE_CI_FAILURES=0 ;;
-    *) ENFORCE_CI_FAILURES=1 ;;
+    schedule|workflow_dispatch) HARD_FAIL=1 ;;
+    *) HARD_FAIL=0 ;;
   esac
 fi
 
 : "${GH_TOKEN:=${GITHUB_TOKEN:-}}"
 
-echo "delivery-watch: listing open PRs on ${REPO}"
+echo "delivery-watch: listing open PRs on ${REPO} (HARD_FAIL=${HARD_FAIL})"
 
 gh api --paginate "repos/${REPO}/pulls?state=open&per_page=100" \
   --jq '[.[] | {
@@ -47,11 +54,10 @@ gh api --paginate "repos/${REPO}/pulls?state=open&per_page=100" \
   }]' > "$JSON_OUT"
 
 # Enrich with check-run conclusions per head SHA
-python3 - "$JSON_OUT" "$REPO" <<'PY'
+python3 - "$JSON_OUT" "$REPO" "$SELF_CHECK_NAME" <<'PY'
 import json, os, subprocess, sys
 
-path, repo = sys.argv[1], sys.argv[2]
-token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN") or ""
+path, repo, self_name = sys.argv[1], sys.argv[2], sys.argv[3]
 prs = json.load(open(path))
 
 def gh_api(url: str):
@@ -83,6 +89,8 @@ for p in prs:
         if prev is None or (r.get("started_at") or "") > (prev.get("started_at") or ""):
             latest[name] = r
     for name, r in latest.items():
+        if name == self_name:
+            continue
         status = r.get("status")
         conclusion = r.get("conclusion")
         if status != "completed":
@@ -97,22 +105,21 @@ json.dump(prs, open(path, "w"), indent=2)
 print(f"delivery-watch: enriched {len(prs)} PR(s) with check runs")
 PY
 
-python3 - "$JSON_OUT" "$MD_OUT" "$FAIL_DRAFTS" "$ENFORCE_CI_FAILURES" <<'PY'
+python3 - "$JSON_OUT" "$MD_OUT" "$HARD_FAIL" <<'PY'
 import json, sys
 from pathlib import Path
 
-path, md_path, fail_drafts, enforce_ci = sys.argv[1], sys.argv[2], sys.argv[3] == "1", sys.argv[4] == "1"
+path, md_path, hard_fail = sys.argv[1], sys.argv[2], sys.argv[3] == "1"
 prs = json.load(open(path))
 base_violations = []
 ci_failures = []
 for p in prs:
     labels = set(p.get("labels") or [])
-    draft = bool(p.get("draft"))
     if p.get("base") == "main" and p.get("head") != "sandbox":
         if "ci:allow-main-base" not in labels:
             base_violations.append(p)
     fails = p.get("check_failures") or []
-    if fails and (not draft or fail_drafts):
+    if fails:
         ci_failures.append(p)
 
 lines = [
@@ -120,8 +127,8 @@ lines = [
     "",
     f"Total open: **{len(prs)}**",
     f"Base-policy violations (main ← non-sandbox): **{len(base_violations)}**",
-    f"PRs with failing checks: **{len(ci_failures)}**",
-    f"Enforce CI failures (exit 1): **{enforce_ci}**",
+    f"PRs with failing checks (reported only): **{len(ci_failures)}**",
+    f"Hard-fail on base-policy: **{hard_fail}**",
     "",
     "| # | Base | Head | Author | Checks | Title |",
     "|---|------|------|--------|--------|-------|",
@@ -154,17 +161,17 @@ if base_violations:
     lines.append("")
 
 if ci_failures:
-    lines.append("## Failing checks (investigate / fix / close)")
+    lines.append("## Failing checks (report only — not a merge gate)")
     lines.append("")
     for p in ci_failures:
         lines.append(f"- #{p['number']}: {', '.join(p.get('check_failures') or [])}")
     lines.append("")
-    if not enforce_ci:
-        lines.append("_Reported only on this event (`ENFORCE_CI_FAILURES=0`); schedule/dispatch will fail the job._")
-        lines.append("")
+
+if not hard_fail:
+    lines.append("_Event mode: report only (`HARD_FAIL=0`). Schedule/dispatch hard-fails on base-policy._")
+    lines.append("")
 
 Path(md_path).write_text("\n".join(lines) + "\n", encoding="utf-8")
 print("\n".join(lines))
-hard = bool(base_violations) or (enforce_ci and bool(ci_failures))
-sys.exit(1 if hard else 0)
+sys.exit(1 if (hard_fail and base_violations) else 0)
 PY
