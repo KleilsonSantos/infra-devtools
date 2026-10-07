@@ -16,10 +16,10 @@ test-results/
 .nyc_output/
 jest-cache/
 jest-test-results.json
-src/tests/__pycache__/*
-src/tests/integration/__pycache__/*
-src/tests/unit/__pycache__/*
-src/utils/__pycache__/*
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
 
 # 📝 Logs e Relatórios
 logs/
@@ -78,4 +78,7 @@ Thumbs.db
 vault/data/*
 !vault/data/.gitkeep
 target/vault-dev-*.txt
-node_modules__pycache__/
+
+# Delivery watch artifacts
+reports/delivery-watch/
+

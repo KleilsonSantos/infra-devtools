@@ -36,6 +36,8 @@
 
 # shellcheck source=scripts/lib.sh
 . "$(dirname "$0")/lib.sh"
+# shellcheck source=scripts/lib-port-preflight.sh
+. "$(dirname "$0")/lib-port-preflight.sh"
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # 🔧 Configuration

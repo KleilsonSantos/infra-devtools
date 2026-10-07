@@ -55,8 +55,8 @@ src/
 # Teste rápido (unit + integration)
 make test-quick
 
-# Todos os testes organizados por categoria
-make test-professional
+# Suite completa (com port preflight)
+make test-all
 
 # Testes com relatório de cobertura
 make test-coverage
@@ -72,17 +72,39 @@ make test-monitoring   # Só monitoramento
 make test-health       # Só health checks
 ```
 
-### Script Avançado
+### Script de teste (SSOT)
 ```bash
-# Script completo com múltiplas opções
+# Prefer Makefile (já aplica port preflight):
+make test-unit
+make test-integration
+make test-all
+
+# Ou o único script de teste (aplica port preflight):
 ./scripts/run-tests.sh [tipo]
 
 # Exemplos:
 ./scripts/run-tests.sh database     # Só DBs
-./scripts/run-tests.sh security     # Só segurança  
+./scripts/run-tests.sh security     # Só segurança
 ./scripts/run-tests.sh comprehensive # Teste integrado
 ./scripts/run-tests.sh complete     # Tudo com coverage
 ```
+
+> `scripts/run-tests-professional.sh` foi removido — use `run-tests.sh` ou `make test-*`.
+
+### E2E / aderência (papéis distintos)
+```bash
+# Orquestra bring-up serial (RAM + portas + probe por serviço)
+bash scripts/e2e-staged.sh
+bash scripts/e2e-staged.sh --adhere-only   # probes no stack já up
+
+# Pacote de prova auditável (comando + stdout + token único)
+bash scripts/e2e-adherence-evidence.sh
+```
+
+### Portas (regra Compose)
+- **1 HOST_PORT → 1 serviço.** Dois serviços não podem publicar a mesma porta no host (`bind: address already in use`).
+- Comunicação service-to-service usa a **porta do container** via DNS interno (`postgres:5432`), não a host port ([Docker Compose networking](https://docs.docker.com/compose/how-tos/networking/)).
+- Validar: `make check-compose-ports` / `bash scripts/check-port-conflicts.sh --mode catalog`
 
 ## 📊 Tipos de Validação
 
@@ -148,7 +170,7 @@ network         # Testes de rede/DNS
 volumes         # Testes de volumes Docker
 ```
 
-## 🎯 Exemplo de Uso Profissional
+## 🎯 Exemplo de Uso
 
 ```bash
 # 1. Subir a infraestrutura
@@ -156,8 +178,8 @@ make up
 
 # 2. Aguardar serviços ficarem prontos (30s)
 
-# 3. Executar validação profissional completa
-make test-professional
+# 3. Executar validação completa
+make test-all
 
 # 4. Ou teste específico de um componente
 make test-database  # Validar só as bases de dados

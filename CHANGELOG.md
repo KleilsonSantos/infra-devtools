@@ -11,6 +11,21 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - PR Validation Checks UI names: English, drop `Opção 3` / `Teste N` ordinals; required contexts → `Protocol gate`, `Issue link`, `Version SSOT`, `PR base policy` (#115)
 - Issue-first delivery rule for agents (`.cursor/rules/issue-first-delivery.mdc`) + delivery-automation note (#117)
 
+## [1.3.6] - 2026-10-07
+
+### Added
+- Shared host-port preflight (`lib-port-preflight.sh` + `check-port-conflicts.sh`) and Python mirror for pytest (#122)
+- Serial compose bring-up (`compose-up-serial.sh`); Makefile `check-ports` / `check-compose-ports` / `check-ports-start` (#122)
+- E2E staged orchestrator + adherence evidence scripts (`e2e-staged.sh`, `e2e-adherence-evidence.sh`) (#122)
+
+### Changed
+- `make up` / `force-recreate` use serial preflight→up→verify; integration/docker test targets gate on ports (#122)
+- Test SSOT is `scripts/run-tests.sh` / `make test-*`; remove deprecated `run-tests-professional.sh` (#122)
+
+### Fixed
+- Broader `__pycache__` / `*.pyc` ignore (was leaking under `src/`) (#122)
+- `pytest.ini` `pythonpath = .` so `from src…` imports work in unit CI (#122)
+
 ## [1.3.5] - 2026-10-07
 
 ### Fixed
