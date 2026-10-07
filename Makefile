@@ -105,17 +105,30 @@ CHECK_DEPS = scripts/run-dependency-check.sh
 # 📦 Common Targets
 .PHONY: up down force-recreate logs ps ps-format ps-detailed rebuild \
         clean check-deps coverage test lint format sonar-scanner \
-        test-unit test-integration test-volumes test-docker test-all
+        test-unit test-integration test-volumes test-docker test-all \
+        check-ports check-ports-start check-compose-ports
 
-## 🚀 Start all containers
-up:
-	@echo "🔼 Starting containers..."
-	$(DC_UP) $(SERVICES)
+## 🔍 Fail-closed: foreign / wrong owners on infra ports
+check-ports:
+	@bash scripts/check-port-conflicts.sh --mode test
+
+## 🔍 Fail-closed: compose.yml must not map the same HOST port to two services
+check-compose-ports:
+	@bash scripts/check-port-conflicts.sh --mode catalog
+
+## 🔍 Fail-closed before compose up
+check-ports-start:
+	@bash scripts/check-port-conflicts.sh --mode start --policy $${E2E_PORT_POLICY:-abort}
+
+## 🚀 Start all containers (serial: preflight→up→verify per service)
+up: check-compose-ports
+	@echo "🔼 Starting containers serially (port gate per service)..."
+	@bash scripts/compose-up-serial.sh $(SERVICES)
 
 ## 🚀 Start a specific service: make up-service service=name
 up-service:
-	@echo "🔼 Starting container $(service)..."
-	$(DC_UP) $(service)
+	@echo "🔼 Starting container $(service) (preflight→up→verify)..."
+	@bash scripts/compose-up-serial.sh $(service)
 
 ## ⛔ Stop a specific service
 down-service:
@@ -127,10 +140,11 @@ down:
 	@echo "🔽 Stopping containers..."
 	$(DC_DOWN)
 
-## ♻️ Force recreate all containers
+## ♻️ Force recreate all containers (serial)
 force-recreate:
-	@echo "♻️ Recreating containers..."
-	$(DC_DOWN) && $(DC_UP) $(SERVICES)
+	@echo "♻️ Recreating containers serially..."
+	$(DC_DOWN)
+	@bash scripts/compose-up-serial.sh $(SERVICES)
 
 ## 📋 Show logs of a specific container: make logs service=name
 logs:
@@ -168,22 +182,22 @@ test-unit:
 	$(PYTEST) -m "unit" $(JUNIT_REPORT)
 
 ## 🔗 Run only integration tests
-test-integration:
+test-integration: check-ports
 	@echo "🔗 Running integration tests..."
 	$(PYTEST) -m "integration" $(JUNIT_REPORT)
 
 ## 💾 Run only volume-related tests
-test-volumes:
+test-volumes: check-ports
 	@echo "💾 Running volume tests..."
 	$(PYTEST) -m "volumes" $(JUNIT_REPORT)
 
 ## 🐳 Run only docker/network related tests
-test-docker:
+test-docker: check-ports
 	@echo "🐳 Running docker/network tests..."
 	$(PYTEST) -m "docker or network" $(JUNIT_REPORT)
 
 ## 🧪 Run all tests without coverage
-test-all:
+test-all: check-ports
 	@echo "🧪 Running all tests..."
 	$(PYTEST) $(JUNIT_REPORT)
 
