@@ -38,7 +38,7 @@ flowchart TD
 
 | Git event | Workflows / jobs | SemVer | Next step |
 |-----------|------------------|--------|-----------|
-| **PR** → `sandbox` | PR Validation (`issue-link`, `pr-base-policy`, tests, Bandit, VERSION SSOT) | No | Merge when **required** checks green — `bash scripts/merge-pr.sh <n>` |
+| **PR** → `sandbox` | PR Validation (`Issue link`, `PR base policy`, tests, Bandit, `Version SSOT`, `Protocol gate`) | No | Merge when **required** checks green — `bash scripts/merge-pr.sh <n>` |
 | **PR** → `main` (promote) | Same + SemVer alignment | Yes | Body prefers `Closes #N`; merge only via `merge-pr.sh` |
 | **Push** → `sandbox` / `main` | Branch protection + Delivery watch (inventory) | On `main` path | Integrate; open promote when slice ready |
 | Dependabot PR → `sandbox` | Same as work PR (`issue-link` skipped for Dependabot) | No | Review → merge → promote |
@@ -76,6 +76,15 @@ Delivery watch inventories open PRs (artifact + summary). It is **not** a second
 | Check failures on open PRs | Always listed in the summary; **never** a hard-fail (avoids self-contagion via `Open PR hygiene inventory`) |
 
 Do **not** add Delivery watch to branch-protection required checks. Close or retarget stale `main`←non-sandbox PRs instead of opening meta-PRs to `main`.
+
+
+## Issue-first (agents and humans)
+
+Every **human-driven** slice: **Issue → branch → PR → sandbox → promote**. PR body must include `Refs #N` (work) or `Closes #N` (promote when finishing).
+
+**Only** Dependabot/Snyk (label `ci:no-issue-required` / script skip) may omit Issues. If an agent *orchestrates* merging bot PRs, open a tracking Issue for that orchestration.
+
+Cursor rule: `.cursor/rules/issue-first-delivery.mdc` (`alwaysApply`).
 
 ## SemVer anti-drift
 

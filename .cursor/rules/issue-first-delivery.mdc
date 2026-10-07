@@ -1,0 +1,28 @@
+---
+description: Issue-first delivery — no agent code/merge without GitHub Issue
+alwaysApply: true
+---
+
+# Issue-first delivery (ADR-0001)
+
+## Hard rule for this agent
+
+Before **any** human-driven implementation, workflow change, merge orchestration, or promote:
+
+1. Ensure a **GitHub Issue** exists (create one if missing).
+2. Work on a branch → PR to **`sandbox`** with body `Refs #<n>` (promote to `main` uses `Closes #<n>` when finishing the slice).
+3. Do **not** push/merge “silent” work with no Issue link.
+
+## Intentional exceptions (only these)
+
+- **Dependabot / Snyk** PRs with label `ci:no-issue-required` (or actors skipped by `check-pr-issue-link.sh`) — bots may omit Issues.
+- If the **human explicitly asks to merge specific bot PRs**, still open a short tracking Issue (e.g. “Merge Actions bumps #108 #109”) and `Refs` it on any promote/orchestration notes — the bot PRs themselves stay exempt.
+
+## Not exceptions
+
+- “Quick fix”, rename, docs, CI hygiene, closing stale PRs as part of a plan → **needs Issue**.
+- Copilot/agent PRs targeting `main` outside `sandbox` → **reject/close** (ADR-0001).
+
+## Why
+
+Issue-link CI + delivery map require traceability. Skipping Issues is a **process violation**, not a shortcut.
