@@ -11,6 +11,13 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - PR Validation Checks UI names: English, drop `Opção 3` / `Teste N` ordinals; required contexts → `Protocol gate`, `Issue link`, `Version SSOT`, `PR base policy` (#115)
 - Issue-first delivery rule for agents (`.cursor/rules/issue-first-delivery.mdc`) + delivery-automation note (#117)
 
+## [1.3.8] - 2026-10-08
+
+### Fixed
+- `health-check.sh`: counters use `VAR=$((VAR + 1))` so `set -e` no longer aborts on first `((VAR++))` when VAR is 0 (#128)
+- `health-check.sh`: MongoDB exec target is `infra-default-mongo` (was wrong name) (#128)
+- E2E final health uses `HEALTH_CHECK_SCOPE=e2e-staged` (skips Sonar/Portainer/Keycloak outside stages 1–5) (#128)
+
 ## [1.3.7] - 2026-10-08
 
 ### Fixed
