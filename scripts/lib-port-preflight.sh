@@ -239,24 +239,13 @@ verify_service_ports_owned() {
   return 0
 }
 
-# Before compose up for one service.
-# rc 0 = ok to up; 1 = blocked; 2 = already ours (reuse / skip up)
-preflight_service_start() {
+# Stop foreign docker holders of $svc host ports when E2E_PORT_POLICY=stop-foreign.
+# rc 0 = ports clear or already ours; 1 = blocked.
+resolve_foreign_ports_for_service() {
   local svc="$1"
-  local cname ports port holder
+  local cname ports port holder stop_name
   cname="$(service_container_name "$svc")"
   ports="$(service_host_ports "$svc")"
-
-  if container_running "$cname"; then
-    # Still confirm ports belong to US exactly (no hijack / remap)
-    if verify_service_ports_owned "$svc" 3; then
-      log_info "preflight(start) $svc — $cname already running + ports owned; reuse"
-      record_port_conflict "$svc" 0 "self:$cname" "reuse" >/dev/null
-      return 2
-    fi
-    log_error "preflight(start) $svc — container up but port ownership mismatch"
-    return 1
-  fi
 
   for port in $ports; do
     [[ -z "$port" ]] && continue
@@ -277,7 +266,7 @@ preflight_service_start() {
     case "${E2E_PORT_POLICY}" in
       stop-foreign)
         if [[ "$holder" == docker:* ]]; then
-          local stop_name="${holder#docker:}"
+          stop_name="${holder#docker:}"
           log_warning "E2E_PORT_POLICY=stop-foreign — stopping $stop_name"
           docker stop "$stop_name" >/dev/null 2>&1 || true
           sleep 1
@@ -303,6 +292,44 @@ preflight_service_start() {
   return 0
 }
 
+# Before compose up for one service.
+# rc 0 = ok to up; 1 = blocked; 2 = already ours (reuse / skip up)
+# Sets PREFLIGHT_FORCE_RECREATE=1 when the existing container must be recreated
+# (e.g. running without host port publish after a foreign holder was cleared).
+preflight_service_start() {
+  local svc="$1"
+  local cname ports
+  cname="$(service_container_name "$svc")"
+  ports="$(service_host_ports "$svc")"
+  PREFLIGHT_FORCE_RECREATE=0
+
+  if container_running "$cname"; then
+    # Still confirm ports belong to US exactly (no hijack / remap)
+    if verify_service_ports_owned "$svc" 3; then
+      log_info "preflight(start) $svc — $cname already running + ports owned; reuse"
+      record_port_conflict "$svc" 0 "self:$cname" "reuse" >/dev/null
+      return 2
+    fi
+    # Common case: our container is up without host publish while a foreign
+    # container holds the port. stop-foreign → free ports, then recreate ours.
+    log_warning "preflight(start) $svc — $cname up but port ownership mismatch"
+    if ! resolve_foreign_ports_for_service "$svc"; then
+      return 1
+    fi
+    if verify_service_ports_owned "$svc" 3; then
+      log_info "preflight(start) $svc — ports recovered; reuse $cname"
+      record_port_conflict "$svc" 0 "self:$cname" "reuse_after_foreign_stop" >/dev/null
+      return 2
+    fi
+    log_warning "preflight(start) $svc — stopping $cname for recreate (ports not published)"
+    docker stop "$cname" >/dev/null 2>&1 || true
+    sleep 1
+    PREFLIGHT_FORCE_RECREATE=1
+  fi
+
+  resolve_foreign_ports_for_service "$svc"
+}
+
 # Canonical per-service lifecycle used by e2e + make up-serial:
 #   catalog check → preflight THIS svc → compose up → verify ownership
 # Returns: 0 ok (up or reuse); 1 failed
@@ -326,12 +353,18 @@ bring_up_one_service() {
     return 0
   fi
 
-  log_info "compose up -d $svc"
+  local up_args=(-d --no-deps)
+  if [[ "${PREFLIGHT_FORCE_RECREATE:-0}" -eq 1 ]]; then
+    up_args+=(--force-recreate)
+    log_info "compose up ${up_args[*]} $svc (force-recreate)"
+  else
+    log_info "compose up ${up_args[*]} $svc"
+  fi
   set +e
   if declare -F compose >/dev/null 2>&1; then
-    compose up -d "$svc"
+    compose up "${up_args[@]}" "$svc"
   else
-    docker compose --env-file "${ENV_FILE:-.env}" up -d "$svc"
+    docker compose --env-file "${ENV_FILE:-.env}" up "${up_args[@]}" "$svc"
   fi
   local up_rc=$?
   set -e
@@ -342,6 +375,23 @@ bring_up_one_service() {
   fi
   sleep 2
   if ! verify_service_ports_owned "$svc"; then
+    # Stale container without published ports: one force-recreate retry
+    if [[ "${PREFLIGHT_FORCE_RECREATE:-0}" -ne 1 ]]; then
+      log_warning "verify failed after up — retry force-recreate $svc"
+      set +e
+      if declare -F compose >/dev/null 2>&1; then
+        compose up -d --no-deps --force-recreate "$svc"
+      else
+        docker compose --env-file "${ENV_FILE:-.env}" up -d --no-deps --force-recreate "$svc"
+      fi
+      up_rc=$?
+      set -e
+      sleep 2
+      if [[ "$up_rc" -eq 0 ]] && verify_service_ports_owned "$svc"; then
+        LAST_BRING_UP_STATUS="up"
+        return 0
+      fi
+    fi
     LAST_BRING_UP_STATUS="failed"
     return 1
   fi

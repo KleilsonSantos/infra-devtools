@@ -11,6 +11,14 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - PR Validation Checks UI names: English, drop `Opção 3` / `Teste N` ordinals; required contexts → `Protocol gate`, `Issue link`, `Version SSOT`, `PR base policy` (#115)
 - Issue-first delivery rule for agents (`.cursor/rules/issue-first-delivery.mdc`) + delivery-automation note (#117)
 
+## [1.3.7] - 2026-10-08
+
+### Fixed
+- `e2e-staged.sh` Darwin memory gate: count inactive+purgeable pages (was aborting Colima waves with ~80MB "free") (#125)
+- Prefer `.venv/bin` for stage0 pytest/bandit when present (#125)
+- Port preflight `stop-foreign` also applies when our container is up but host ports are held by a foreign container; force-recreate when ports were not published (#125)
+- `health-check.sh` PROJECT_ROOT path typo (extra `)`) broke final E2E health steps (#125)
+
 ## [1.3.6] - 2026-10-07
 
 ### Added
