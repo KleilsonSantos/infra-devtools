@@ -1,7 +1,8 @@
 # 🔒 Configuração de Branch Protection Rules
 
-> Guia para configurar proteção de branch em GitHub seguindo Protocolo Canônico 3→2→1
-> e [ADR-0001](./adr/0001-sandbox-branching-strategy.md) (`sandbox` + `main`).
+> Guia para configurar proteção de branch em GitHub alinhado a
+> [ADR-0001](./adr/0001-sandbox-branching-strategy.md) (`sandbox` + `main`) e
+> [delivery-automation.md](./guides/delivery-automation.md).
 
 ## Status (live)
 
