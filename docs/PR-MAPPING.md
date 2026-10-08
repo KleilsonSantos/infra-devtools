@@ -308,10 +308,9 @@ Quando todos PRs seguem Protocolo 3→2→1:
 
 ## 📚 Referências
 
-- [CANONICAL-WORKFLOW.md](./CANONICAL-WORKFLOW.md) - Protocolo completo 3→2→1
-- [CANONICAL-OPÇÃO-3-LEITURA.md](./CANONICAL-OPÇÃO-3-LEITURA.md) - Checklist OPÇÃO 3
-- [CANONICAL-OPÇÃO-2-TESTES.md](./CANONICAL-OPÇÃO-2-TESTES.md) - Checklist OPÇÃO 2
-- [CANONICAL-OPÇÃO-1-MERGE.md](./CANONICAL-OPÇÃO-1-MERGE.md) - Checklist OPÇÃO 1
+- [guides/git-workflow.md](./guides/git-workflow.md) — current delivery SSOT
+- [guides/delivery-automation.md](./guides/delivery-automation.md)
+- [archive/README.md](./archive/README.md) — historical CANONICAL / Opção docs
 - [BRANCH-PROTECTION-SETUP.md](./BRANCH-PROTECTION-SETUP.md) - GitHub branch protection
 
 ---

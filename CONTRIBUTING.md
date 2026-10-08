@@ -346,31 +346,28 @@ Antes de criar PR, valide:
 
 ---
 
-## 🔴 **PROTOCOLO CANÔNICO: Sequência 3 → 2 → 1** (OBRIGATÓRIO)
+## Delivery workflow (SSOT)
 
-A análise e merge de qualquer PR deve seguir esta sequência **EXATAMENTE** nesta ordem.
+Issue → feature branch → PR → **`sandbox`** (`Refs #<n>`) → promote → **`main`** (`Closes #<n>` when finishing the slice). See [ADR-0001](./docs/adr/0001-sandbox-branching-strategy.md).
 
-**Documentação Completa e Scripts Automatizados:**
-- 📖 [CANONICAL-WORKFLOW.md](./docs/CANONICAL-WORKFLOW.md) — Protocolo completo e detalhado
-- ✅ [CANONICAL-OPÇÃO-3-LEITURA.md](./docs/CANONICAL-OPÇÃO-3-LEITURA.md) — Checklist interativo OPÇÃO 3
-- 🧪 [CANONICAL-OPÇÃO-2-TESTES.md](./docs/CANONICAL-OPÇÃO-2-TESTES.md) — Checklist interativo OPÇÃO 2
-- 1️⃣ [CANONICAL-OPÇÃO-1-MERGE.md](./docs/CANONICAL-OPÇÃO-1-MERGE.md) — Checklist interativo OPÇÃO 1
-- 🔒 [BRANCH-PROTECTION-SETUP.md](./docs/BRANCH-PROTECTION-SETUP.md) — Configuração de branch protection
-- 📊 [PR-MAPPING.md](./docs/PR-MAPPING.md) — Histórico formal de PRs mergeadas
+**Living docs (use these):**
+- [git-workflow.md](./docs/guides/git-workflow.md) — branches, Issues, PRs
+- [delivery-automation.md](./docs/guides/delivery-automation.md) — gates + `merge-pr.sh`
+- [delivery-verification.md](./docs/guides/delivery-verification.md) — end-of-slice checklist
+- [releases.md](./docs/guides/releases.md) · [ADR-0002](./docs/adr/0002-canonical-semver-releases.md)
+- [BRANCH-PROTECTION-SETUP.md](./docs/BRANCH-PROTECTION-SETUP.md)
+- Historical “Opção / Protocolo Canônico” prose: [docs/archive/](./docs/archive/README.md) (not SSOT)
 
-**Scripts para Automação:**
+**Operator commands:**
 ```bash
-# Validar que OPÇÃO 2 (7 testes) foram completados
-./scripts/enforce-pr-validation.sh #PR_NUMBER --verbose
-
-# Fazer merge com protocolo padronizado
-./scripts/merge-pr.sh #PR_NUMBER --author "Nome" --reviewer "Nome"
-
-# Orquestrar workflow completo (OPÇÃO 3 → 2 → 1)
-./scripts/canonical-workflow-automation.sh #PR_NUMBER --auto
+bash scripts/check-pr-delivery-gate.sh
+bash scripts/preflight.sh
+bash scripts/merge-pr.sh <PR_NUMBER>
 ```
 
-### **OPÇÃO 3️⃣: Ler Documentação** (10-15 minutos)
+### Review the PR (read)
+
+Was: “OPÇÃO 3”.
 
 **O que fazer:**
 1. Ler descrição completa da PR
@@ -396,7 +393,9 @@ A análise e merge de qualquer PR deve seguir esta sequência **EXATAMENTE** nes
 
 > **CI Checks UI (PR Validation):** job names are English — `PR change summary`, `Format validation`, `Critical files`, `Unit tests`, `Security scan`, `Code quality`, `Compatibility`, `Environment validation`, plus required `Issue link`, `PR base policy`, `Version SSOT`, `Protocol gate`. Local steps below remain a human checklist (not 1:1 with job labels).
 
-### **OPÇÃO 2️⃣: Executar Testes** (15-30 minutos)
+### Validate (CI + local checks)
+
+Was: “OPÇÃO 2”.
 
 **Testes obrigatórios:**
 
@@ -498,14 +497,14 @@ Registre como comentário na PR:
 
 ---
 
-### **OPÇÃO 1️⃣: Mergear PR** (5-10 minutos)
+### Merge the PR
 
-**Pré-requisitos (Obrigatório):**
-- ✅ Opção 3 (Leitura) COMPLETA
-- ✅ Opção 2 (7 Testes) COMPLETA E PASSARAM
-- ✅ **GitHub Actions Status: ALL CHECKS PASSED** (fundamental)
-- ✅ Code review aprovado
+**Pré-requisitos (obrigatório):**
+- ✅ Review completa
+- ✅ Required checks green (`Protocol gate`, `Issue link`, `Version SSOT`, `PR base policy`, …)
+- ✅ Code review aprovado (quando aplicável)
 - ✅ Nenhum bloqueador encontrado
+- Prefer: `bash scripts/merge-pr.sh <PR>` (sandbox or promote)
 
 **Via GitHub Interface (Recomendado):**
 ```

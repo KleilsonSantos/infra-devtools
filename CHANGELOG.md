@@ -11,6 +11,11 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - PR Validation Checks UI names: English, drop `Opção 3` / `Teste N` ordinals; required contexts → `Protocol gate`, `Issue link`, `Version SSOT`, `PR base policy` (#115)
 - Issue-first delivery rule for agents (`.cursor/rules/issue-first-delivery.mdc`) + delivery-automation note (#117)
 
+## [1.3.10] - 2026-10-08
+
+### Changed
+- Docs SSOT: archive `CANONICAL-OPÇÃO*` / `CANONICAL-WORKFLOW` under `docs/archive/`; CONTRIBUTING points to guides + ADRs (#132)
+
 ## [1.3.9] - 2026-10-08
 
 ### Fixed

@@ -154,7 +154,7 @@ execute_opcao_3() {
 
     echo ""
     log_info "Instruções:"
-    log_info "1. Revisar documentação: docs/CANONICAL-OPÇÃO-3-LEITURA.md"
+    log_info "1. Revisar docs SSOT: docs/guides/git-workflow.md + delivery-verification.md"
     log_info "2. Responder 12 perguntas obrigatórias"
     log_info "3. Validar que TODAS questões críticas (1-5) passaram"
     echo ""
