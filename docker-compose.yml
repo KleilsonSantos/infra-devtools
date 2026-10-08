@@ -3,10 +3,14 @@
 # 👨‍💻 Author: Kleilson Santos
 # 📅 Last update: 2026-10-01
 #
-# Pin policy: prefer immutable tags (x.y.z / vX.Y.Z). Avoid :latest and untagged
-# images for infra/admin UIs. Owned app images (kleilsonsantos/*) may stay on
-# :latest until the publishing pipeline emits version tags. Update cadence: with
-# Dependabot (sandbox) + quarterly security review (SECURITY.md).
+# Pin policy: prefer immutable tags (x.y.z / vX.Y.Z / digest). Avoid :latest and
+# untagged images for infra/admin UIs. Update cadence: Dependabot → sandbox +
+# quarterly security review (SECURITY.md).
+#
+# EXCEPTIONS (:latest) — tracked until publishing emits version tags/digests (#131):
+#   - kleilsonsantos/users-api:latest
+#   - kleilsonsantos/webhook-alerts-rabbitmq:latest
+#   - kleilsonsantos/eureka-server:latest
 #
 # 🏗️ INTEGRATED SERVICES (as per docker-compose.yml):
 #   🛢️ Databases:           MongoDB, PostgreSQL, MySQL, Redis, Vault
@@ -219,7 +223,8 @@ services:
     env_file: .env
     restart: always
     environment:
-      DATA_SOURCE_NAME: ${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(infra-defualt-mysql:3306)/
+      # Compose DNS service name (must match `mysql` service; not container_name)
+      DATA_SOURCE_NAME: ${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(mysql:3306)/
     ports:
       - '9104:9104'
     networks:
