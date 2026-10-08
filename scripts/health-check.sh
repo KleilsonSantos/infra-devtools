@@ -83,25 +83,25 @@ check_containers() {
             case "$health" in
                 "healthy")
                     log_success "  ✅ $service: Running (healthy)"
-                    ((HEALTHY++))
+                    HEALTHY=$((HEALTHY + 1))
                     ;;
                 "starting")
                     log_warning "  ⏳ $service: Starting..."
-                    ((UNKNOWN++))
+                    UNKNOWN=$((UNKNOWN + 1))
                     ;;
                 "unhealthy")
                     log_error "  ❌ $service: Unhealthy"
-                    ((UNHEALTHY++))
+                    UNHEALTHY=$((UNHEALTHY + 1))
                     all_running=false
                     ;;
                 *)
                     log_info "  ℹ️  $service: Running (no health check)"
-                    ((HEALTHY++))
+                    HEALTHY=$((HEALTHY + 1))
                     ;;
             esac
         else
             log_error "  ❌ $service: Not running"
-            ((UNHEALTHY++))
+            UNHEALTHY=$((UNHEALTHY + 1))
             all_running=false
         fi
     done <<< "$services"
@@ -112,19 +112,40 @@ check_containers() {
 check_endpoints() {
     log_header "🌐 HTTP Endpoints"
 
-    local endpoints=(
-        "http://localhost:9002 SonarQube"
-        "http://localhost:9001 Portainer"
-        "http://localhost:8081 Mongo Express"
-        "http://localhost:8088 pgAdmin"
-        "http://localhost:8082 phpMyAdmin"
-        "http://localhost:8083 RedisInsight"
-        "http://localhost:3001 Grafana"
-        "http://localhost:9090 Prometheus"
-        "http://localhost:8200 Vault"
-        "http://localhost:8084 Keycloak"
-        "http://localhost:15672 RabbitMQ"
-    )
+    # HEALTH_CHECK_SCOPE=full (default) | e2e-staged
+    # e2e-staged matches scripts/e2e-staged.sh stages 1–5 (no Sonar/Portainer/Keycloak).
+    local scope="${HEALTH_CHECK_SCOPE:-full}"
+    local endpoints=()
+    case "$scope" in
+        e2e-staged)
+            log_info "scope=e2e-staged (services covered by e2e-staged waves)"
+            endpoints=(
+                "http://localhost:8081 Mongo Express"
+                "http://localhost:8088 pgAdmin"
+                "http://localhost:8082 phpMyAdmin"
+                "http://localhost:8083 RedisInsight"
+                "http://localhost:3001 Grafana"
+                "http://localhost:9090 Prometheus"
+                "http://localhost:8200 Vault"
+                "http://localhost:15672 RabbitMQ"
+            )
+            ;;
+        *)
+            endpoints=(
+                "http://localhost:9002 SonarQube"
+                "http://localhost:9001 Portainer"
+                "http://localhost:8081 Mongo Express"
+                "http://localhost:8088 pgAdmin"
+                "http://localhost:8082 phpMyAdmin"
+                "http://localhost:8083 RedisInsight"
+                "http://localhost:3001 Grafana"
+                "http://localhost:9090 Prometheus"
+                "http://localhost:8200 Vault"
+                "http://localhost:8084 Keycloak"
+                "http://localhost:15672 RabbitMQ"
+            )
+            ;;
+    esac
 
     local all_accessible=true
 
@@ -135,10 +156,10 @@ check_endpoints() {
 
         if timeout $TIMEOUT_RESPONSE curl -s -f "$url" > /dev/null 2>&1; then
             log_success "  ✅ $port_name: Accessible"
-            ((HEALTHY++))
+            HEALTHY=$((HEALTHY + 1))
         else
             log_warning "  ⚠️  $port_name: Not accessible (may be starting)"
-            ((UNKNOWN++))
+            UNKNOWN=$((UNKNOWN + 1))
         fi
     done
 
@@ -153,22 +174,22 @@ check_databases() {
         if timeout $TIMEOUT_CONNECT docker exec infra-default-postgres \
             psql -U postgres -c "SELECT 1" > /dev/null 2>&1; then
             log_success "  ✅ PostgreSQL: Connected"
-            ((HEALTHY++))
+            HEALTHY=$((HEALTHY + 1))
         else
             log_warning "  ⚠️  PostgreSQL: Cannot connect"
-            ((UNKNOWN++))
+            UNKNOWN=$((UNKNOWN + 1))
         fi
     fi
 
     # MongoDB
     if docker image ls | grep -q mongo; then
-        if timeout $TIMEOUT_CONNECT docker exec infra-default-mongodb \
+        if timeout $TIMEOUT_CONNECT docker exec infra-default-mongo \
             mongosh --eval "db.adminCommand('ping')" > /dev/null 2>&1; then
             log_success "  ✅ MongoDB: Connected"
-            ((HEALTHY++))
+            HEALTHY=$((HEALTHY + 1))
         else
             log_warning "  ⚠️  MongoDB: Cannot connect"
-            ((UNKNOWN++))
+            UNKNOWN=$((UNKNOWN + 1))
         fi
     fi
 
@@ -176,14 +197,14 @@ check_databases() {
     if command -v mysql &> /dev/null || docker ps --format '{{.Names}}' 2>/dev/null | grep -qx infra-default-mysql; then
         if [[ -z "${MYSQL_ROOT_PASSWORD:-}" ]]; then
             log_warning "  ⚠️  MySQL: skip (set MYSQL_ROOT_PASSWORD)"
-            ((UNKNOWN++))
+            UNKNOWN=$((UNKNOWN + 1))
         elif timeout $TIMEOUT_CONNECT docker exec -e MYSQL_PWD="$MYSQL_ROOT_PASSWORD" infra-default-mysql \
             mysql -u root -e "SELECT 1" > /dev/null 2>&1; then
             log_success "  ✅ MySQL: Connected"
-            ((HEALTHY++))
+            HEALTHY=$((HEALTHY + 1))
         else
             log_warning "  ⚠️  MySQL: Cannot connect"
-            ((UNKNOWN++))
+            UNKNOWN=$((UNKNOWN + 1))
         fi
     fi
 
@@ -192,10 +213,10 @@ check_databases() {
         if timeout $TIMEOUT_CONNECT docker exec infra-default-redis \
             redis-cli ping > /dev/null 2>&1; then
             log_success "  ✅ Redis: Connected"
-            ((HEALTHY++))
+            HEALTHY=$((HEALTHY + 1))
         else
             log_warning "  ⚠️  Redis: Cannot connect"
-            ((UNKNOWN++))
+            UNKNOWN=$((UNKNOWN + 1))
         fi
     fi
 
@@ -210,19 +231,19 @@ check_networking() {
 
     if docker network ls | grep -q "$network_name"; then
         log_success "  ✅ Docker network exists: $network_name"
-        ((HEALTHY++))
+        HEALTHY=$((HEALTHY + 1))
     else
         log_warning "  ⚠️  Docker network not found"
-        ((UNKNOWN++))
+        UNKNOWN=$((UNKNOWN + 1))
     fi
 
     # Verificar DNS resolution
     if docker run --rm --network "$network_name" alpine nslookup postgres > /dev/null 2>&1; then
         log_success "  ✅ DNS resolution working"
-        ((HEALTHY++))
+        HEALTHY=$((HEALTHY + 1))
     else
         log_warning "  ⚠️  DNS resolution may have issues"
-        ((UNKNOWN++))
+        UNKNOWN=$((UNKNOWN + 1))
     fi
 
     return 0
@@ -237,31 +258,31 @@ check_resources() {
 
     if [[ "$disk_usage" -lt 80 ]]; then
         log_success "  ✅ Disk usage: ${disk_usage}% (healthy)"
-        ((HEALTHY++))
+        HEALTHY=$((HEALTHY + 1))
     elif [[ "$disk_usage" -lt 90 ]]; then
         log_warning "  ⚠️  Disk usage: ${disk_usage}% (warning)"
-        ((UNKNOWN++))
+        UNKNOWN=$((UNKNOWN + 1))
     else
         log_error "  ❌ Disk usage: ${disk_usage}% (critical)"
-        ((UNHEALTHY++))
+        UNHEALTHY=$((UNHEALTHY + 1))
     fi
 
     # Verificar Docker engine
     if docker ps > /dev/null 2>&1; then
         log_success "  ✅ Docker engine: Running"
-        ((HEALTHY++))
+        HEALTHY=$((HEALTHY + 1))
     else
         log_error "  ❌ Docker engine: Not accessible"
-        ((UNHEALTHY++))
+        UNHEALTHY=$((UNHEALTHY + 1))
     fi
 
     # Verificar espaço em volumes
     if docker volume ls | grep -q "infra-"; then
         log_success "  ✅ Docker volumes: Available"
-        ((HEALTHY++))
+        HEALTHY=$((HEALTHY + 1))
     else
         log_warning "  ⚠️  Docker volumes: Not found"
-        ((UNKNOWN++))
+        UNKNOWN=$((UNKNOWN + 1))
     fi
 
     return 0
@@ -373,6 +394,11 @@ COMMANDS:
     resources   Checa recursos do sistema
     quick       Quick check (apenas containers, 30s)
     help        Mostra esta mensagem
+
+ENV:
+    HEALTH_CHECK_SCOPE=full|e2e-staged
+        e2e-staged — only HTTP targets covered by e2e-staged stages 1–5
+                    (skips SonarQube, Portainer, Keycloak)
 
 EXAMPLES:
     # Health check completo

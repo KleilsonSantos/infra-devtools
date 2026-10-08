@@ -566,9 +566,10 @@ run_stage 3 512 "${STAGE3[@]}"
 run_stage 4 768 "${STAGE4[@]}"
 run_stage 5 768 "${STAGE5[@]}"
 
-# Final health only for what we actually reached
+# Final health only for what we actually reached (scoped to e2e waves)
 if docker_ok && [[ "$REACHED" -ge 1 ]]; then
-  run_cmd final-health-endpoints bash scripts/health-check.sh endpoints || true
+  run_cmd final-health-endpoints \
+    env HEALTH_CHECK_SCOPE=e2e-staged bash scripts/health-check.sh endpoints || true
   run_cmd final-health-databases bash scripts/health-check.sh databases || true
 fi
 
