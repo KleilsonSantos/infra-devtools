@@ -11,6 +11,14 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - PR Validation Checks UI names: English, drop `Opção 3` / `Teste N` ordinals; required contexts → `Protocol gate`, `Issue link`, `Version SSOT`, `PR base policy` (#115)
 - Issue-first delivery rule for agents (`.cursor/rules/issue-first-delivery.mdc`) + delivery-automation note (#117)
 
+## [1.3.9] - 2026-10-08
+
+### Fixed
+- MySQL exporter `DATA_SOURCE_NAME` used typo host `infra-defualt-mysql`; now Compose DNS `mysql:3306` (aligned with `--mysqld.address`) (#131)
+
+### Changed
+- Compose pin policy: explicit `:latest` exception registry for owned `kleilsonsantos/*` images until version tags/digests exist (#131)
+
 ## [1.3.8] - 2026-10-08
 
 ### Fixed
