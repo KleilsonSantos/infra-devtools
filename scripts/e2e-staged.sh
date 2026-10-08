@@ -25,6 +25,10 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
+# Prefer project venv so stage0 pytest/bandit match local SSOT
+if [[ -x "$ROOT/.venv/bin/python3" ]]; then
+  export PATH="$ROOT/.venv/bin:$PATH"
+fi
 # shellcheck source=lib.sh
 . "$(dirname "$0")/lib.sh"
 # shellcheck source=lib-port-preflight.sh
@@ -69,14 +73,18 @@ STAGE5=(mailhog pgadmin phpmyadmin redisinsight mongo-express)
 # ─── Helpers ────────────────────────────────────────────────────────────────
 free_mb() {
   if [[ "$(uname -s)" == "Darwin" ]]; then
-    local ps free
+    # macOS keeps most RAM in inactive/purgeable; "Pages free" alone under-reports
+    # ~100× vs reclaimable memory and falsely aborts Colima E2E waves.
+    local ps pages
     ps="$(pagesize 2>/dev/null || echo 4096)"
-    free="$(vm_stat 2>/dev/null | awk '
+    pages="$(vm_stat 2>/dev/null | awk '
       /Pages free/ {gsub(/\./,"",$3); f=$3}
       /Pages speculative/ {gsub(/\./,"",$3); s=$3}
-      END {print (f+0)+(s+0)}
+      /Pages inactive/ {gsub(/\./,"",$3); i=$3}
+      /Pages purgeable/ {gsub(/\./,"",$3); p=$3}
+      END {print (f+0)+(s+0)+(i+0)+(p+0)}
     ')"
-    echo $(( free * ps / 1024 / 1024 ))
+    echo $(( pages * ps / 1024 / 1024 ))
   elif [[ -r /proc/meminfo ]]; then
     awk '/MemAvailable:/ {printf "%d", $2/1024}' /proc/meminfo
   else
@@ -102,9 +110,22 @@ try:
             raw = v.strip().rstrip(".")
             if raw.isdigit():
                 vals[k.strip()] = int(raw)
-        free = (vals.get("Pages free", 0) + vals.get("Pages speculative", 0)) * ps / (1024 * 1024)
+        # Align with free_mb(): reclaimable ≈ free + speculative + inactive + purgeable
+        reclaim = (
+            vals.get("Pages free", 0)
+            + vals.get("Pages speculative", 0)
+            + vals.get("Pages inactive", 0)
+            + vals.get("Pages purgeable", 0)
+        ) * ps / (1024 * 1024)
         out.update(
-            free_mb=round(free),
+            free_mb=round(reclaim),
+            free_strict_mb=round(
+                (vals.get("Pages free", 0) + vals.get("Pages speculative", 0))
+                * ps
+                / (1024 * 1024)
+            ),
+            inactive_mb=round(vals.get("Pages inactive", 0) * ps / (1024 * 1024)),
+            purgeable_mb=round(vals.get("Pages purgeable", 0) * ps / (1024 * 1024)),
             active_mb=round(vals.get("Pages active", 0) * ps / (1024 * 1024)),
             wired_mb=round(vals.get("Pages wired down", 0) * ps / (1024 * 1024)),
             compressor_mb=round(vals.get("Pages occupied by compressor", 0) * ps / (1024 * 1024)),

@@ -43,7 +43,7 @@
 # 🔧 Configuration
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/..)" && pwd)"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DOCKER_COMPOSE_FILE="$PROJECT_ROOT/docker-compose.yml"
 HEALTH_REPORT="$PROJECT_ROOT/reports/health-check.json"
 
