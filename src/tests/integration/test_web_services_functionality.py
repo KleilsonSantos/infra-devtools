@@ -43,7 +43,6 @@ class WebServiceTestUtils:
                     url,
                     timeout=5,
                     auth=HTTPBasicAuth(*auth) if auth else None,
-                    verify=False,  # nosec B501
                 )
                 if response.status_code < 500:  # Service is responding
                     return True
@@ -76,7 +75,6 @@ class WebServiceTestUtils:
                 url,
                 timeout=timeout,
                 auth=HTTPBasicAuth(*auth) if auth else None,
-                verify=False,  # nosec B501
                 allow_redirects=True,
             )
             return response
